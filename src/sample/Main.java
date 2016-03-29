@@ -25,8 +25,12 @@ public class Main extends Application {
     final double TRACK_LENGTH = 60;
 
     Image wave;
+
+    //The total length of the displayed waveform
+    final double TRACK_LENGTH = 60;
+
+    Image wave;
     ImageView iv1 = new ImageView();
-    ImageView iv2 = new ImageView();
     Slider progressSlider1 = new Slider();
     Slider progressSlider2 = new Slider();
     final int WIDTH = 1024;
@@ -118,7 +122,6 @@ public class Main extends Application {
 
     public void zoomIn() {
         iv1.setFitWidth(iv1.getFitWidth() * ZOOM);
-        iv2.setFitWidth(iv2.getFitWidth() * ZOOM);
         secondsPerPixel = secondsPerPixel * 0.80;
         updateSliders();
 
@@ -127,7 +130,6 @@ public class Main extends Application {
     public void zoomOut() {
         if (iv1.getFitWidth() / ZOOM >= WIDTH) {
             iv1.setFitWidth(iv1.getFitWidth() / ZOOM);
-            iv2.setFitWidth(iv2.getFitWidth() / ZOOM);
             secondsPerPixel = secondsPerPixel / 0.80;
             updateSliders();
         }
@@ -141,19 +143,14 @@ public class Main extends Application {
     private void drawWaveformBox(Pane root) {
         //Load image and resize
         iv1.setImage(wave);
-        iv2.setImage(wave);
-        iv1.setScaleY(-1);
-        iv1.setFitHeight(100);
-        iv2.setFitHeight(100);
+        iv1.setFitHeight(200);
         iv1.setFitWidth(WIDTH);
-        iv2.setFitWidth(WIDTH);
 
-        VBox box = new VBox();
+        HBox box = new HBox();
         box.getChildren().add(iv1);
-        box.getChildren().add(iv2);
 
         ScrollPane sPane = new ScrollPane(box);
-        sPane.setPrefViewportHeight(iv1.getFitHeight() * 2);
+        sPane.setPrefViewportHeight(iv1.getFitHeight());
         sPane.setFitToHeight(true);
         sPane.setFitToWidth(true);
 
