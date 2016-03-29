@@ -5,45 +5,43 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
-import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioInputStream;
-import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by max on 29/03/16 with help from http://codeidol.com/java/swing/Audio/Build-an-Audio-Waveform-Display/
+ * Created by max on 29/03/16
  */
 public class WaveformGenerator {
 
-    private AudioInputStream audioInputStream;
+    private AudioInputStream audioStream;
 
     private int frameLength;
-    //private float sampleRate;
     private int frameSize;
-    private int numChannels;
 
-
-    public WaveformGenerator(File f) throws IOException, UnsupportedAudioFileException {
-        audioInputStream = AudioSystem.getAudioInputStream(f);
+    public WaveformGenerator(AudioInputStream audioStream) throws UnsupportedAudioFileException {
+        this.audioStream = audioStream;
+        if (audioStream.getFormat().getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
+            throw new UnsupportedAudioFileException("Must PCM_SIGNED");
+        } else if (audioStream.getFormat().getChannels() != 1) {
+            throw new UnsupportedAudioFileException("Must be mono");
+        }
         analyseInputFile();
     }
 
     public void analyseInputFile() {
-        frameLength = (int) audioInputStream.getFrameLength();
-        frameSize = audioInputStream.getFormat().getFrameSize();
-        numChannels = audioInputStream.getFormat().getChannels();
-        audioInputStream.getFormat();
+        frameLength = (int) audioStream.getFrameLength();
+        frameSize = audioStream.getFormat().getFrameSize();
+        audioStream.getFormat();
     }
 
-    public int[] getFrameArray() throws IOException {
-        //Fail if not mono
-        //Fail if not 16 bit
+    public int[] getFrameArray() throws IOException { //With help from http://codeidol.com/java/swing/Audio/Build-an-Audio-Waveform-Display/
 
         byte[] bytes = new byte[frameLength * frameSize];
         int[] frames = new int[frameLength];
 
-        audioInputStream.read(bytes);
+        audioStream.read(bytes);
 
         for (int t = 0, sampleIndex=0; t < bytes.length; sampleIndex++) {
             int sample = getSixteenBitSample((int) bytes[t++], (int) bytes[t++]);
@@ -56,9 +54,12 @@ public class WaveformGenerator {
     public Image getWaveformImage(int resolution) throws IOException {
         int[] frames = getFrameArray();
 
-        int width = frames.length / resolution;
+        //All configurable
         int height = 256;
-        Color colour= Color.color(0, 1, 0);
+        int width = frames.length / resolution;
+        Color colour = Color.color(0, 1, 0);
+
+        int sampleSize = (int) Math.pow(2, 16);
 
         WritableImage waveformImage = new WritableImage(width, height);
 
@@ -67,10 +68,10 @@ public class WaveformGenerator {
             int amplitude = 0;
             for (int i=x*resolution; i<(x+1) *resolution; i++) {
                 if (frames[i] > amplitude) {
-                    amplitude = frames[i]/255;
+                    amplitude = (int) (frames[i] * ((height/2)/(double)sampleSize));
                 }
             }
-            for (int y=0; y<amplitude; y++) {
+            for (int y=(height/2)-amplitude; y<=(height/2)+amplitude; y++) {
                 pixelWriter.setColor(x, y, colour);
             }
         }

@@ -16,15 +16,12 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.swing.*;
 import java.io.File;
 
 public class Main extends Application {
-
-    //The total length of the displayed waveform
-    final double TRACK_LENGTH = 60;
-
-    Image wave;
 
     //The total length of the displayed waveform
     final double TRACK_LENGTH = 60;
@@ -42,7 +39,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-        WaveformGenerator gen = new WaveformGenerator(audioFile);
+        WaveformGenerator gen = new WaveformGenerator(AudioSystem.getAudioInputStream(audioFile));
         wave = gen.getWaveformImage(50);
 
         progressSlider1.setMax(TRACK_LENGTH);
