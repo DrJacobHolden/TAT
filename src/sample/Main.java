@@ -17,14 +17,19 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.io.File;
 
 public class Main extends Application {
-
 
     //The total length of the displayed waveform
     final double TRACK_LENGTH = 60;
 
-    Image wave = new Image(Main.class.getResourceAsStream("images/waveform_post.png"));
+    Image wave;
+
+    //The total length of the displayed waveform
+    final double TRACK_LENGTH = 60;
+
+    Image wave;
     ImageView iv1 = new ImageView();
     Slider progressSlider1 = new Slider();
     Slider progressSlider2 = new Slider();
@@ -36,6 +41,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
+        WaveformGenerator gen = new WaveformGenerator(audioFile);
+        wave = gen.getWaveformImage(50);
 
         progressSlider1.setMax(TRACK_LENGTH);
         progressSlider2.setMax(TRACK_LENGTH);
@@ -183,6 +191,4 @@ public class Main extends Application {
         text.setWrapText(true);
         return text;
     }
-
-    class Delta { double x, y; }
 }
