@@ -61,7 +61,6 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 progressSlider1.setValue(mouseEvent.getSceneX()*secondsPerPixel);
-                //progressSlider2.setValue(mouseEvent.getSceneX()*secondsPerPixel);
             }
         });
 
@@ -106,15 +105,25 @@ public class Main extends Application {
 
     }
 
+    public void updateSliders() {
+        progressSlider1.setValue(0);
+        progressSlider2.setValue(0);
+        progressSlider1.setMax(secondsPerPixel*WIDTH);
+        progressSlider2.setMax(secondsPerPixel*WIDTH);
+    }
+
     public void zoomIn() {
         iv1.setFitWidth(iv1.getFitWidth() * ZOOM);
         secondsPerPixel = secondsPerPixel * 0.80;
+        updateSliders();
+
     }
 
     public void zoomOut() {
         if (iv1.getFitWidth() / ZOOM >= WIDTH) {
             iv1.setFitWidth(iv1.getFitWidth() / ZOOM);
             secondsPerPixel = secondsPerPixel / 0.80;
+            updateSliders();
         }
     }
 
