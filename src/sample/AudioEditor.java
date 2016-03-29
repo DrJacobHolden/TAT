@@ -10,7 +10,7 @@ import javafx.scene.layout.Priority;
 /**
  * Created by max on 29/03/16.
  */
-public class AudioEditor extends ZoomableWaveformPane {
+public class AudioEditor extends SelectableWaveformPane {
 
     //The total length of the displayed waveform
     //TODO: FIX

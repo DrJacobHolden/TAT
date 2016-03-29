@@ -4,9 +4,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Box;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -20,15 +18,24 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
 
     protected final double ZOOM = 1.2;
 
-    protected WaveformImageView waveformImageView = new WaveformImageView();
-    protected ScrollPane waveformScrollPane = new ScrollPane(waveformImageView);
+    protected WaveformImageView waveformImageView;
+    protected ScrollPane waveformScrollPane;
 
     protected HBox toolbars = new HBox();
     protected ToolBar zoomToolbar = new ToolBar();
 
     public ZoomableWaveformPane() {
-        addContents();
+        initialize(new WaveformImageView());
+    }
 
+    public ZoomableWaveformPane(WaveformImageView wf) {
+        initialize(wf);
+    }
+
+    protected void initialize(WaveformImageView wf) {
+        waveformImageView = wf;
+        waveformScrollPane = new ScrollPane(waveformImageView);
+        addContents();
         //TODO: Fix
         waveformImageView.setFitWidth(1024);
     }
