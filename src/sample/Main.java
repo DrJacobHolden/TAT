@@ -18,10 +18,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.io.File;
 
 public class Main extends Application {
 
-    Image wave = new Image(Main.class.getResourceAsStream("images/waveform_post.png"));
+    Image wave;
     ImageView iv1 = new ImageView();
     final int WIDTH = 1024;
     final int HEIGHT = 768;
@@ -29,6 +30,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
+        WaveformGenerator gen = new WaveformGenerator(audioFile);
+        wave = gen.getWaveformImage(50);
 
         Pane root = new StackPane();
         VBox vbox = new VBox();
