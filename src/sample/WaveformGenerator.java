@@ -64,6 +64,7 @@ public class WaveformGenerator {
         WritableImage waveformImage = new WritableImage(width, height);
 
         PixelWriter pixelWriter = waveformImage.getPixelWriter();
+
         for (int x=0; x<width; x++) {
             int amplitude = 0;
             for (int i=x*resolution; i<(x+1) *resolution; i++) {

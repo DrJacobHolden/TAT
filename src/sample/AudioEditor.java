@@ -18,37 +18,8 @@ public class AudioEditor extends SelectableWaveformPane {
     //TODO: FIX
     double secondsPerPixel = TRACK_LENGTH / 1024;
 
-    Slider progressSlider1;
-    Slider progressSlider2;
-
     public AudioEditor() {
         super();
-    }
-
-    protected void addWaveformClickListeners() {
-        waveformScrollPane.setOnMousePressed(
-                mouseEvent -> progressSlider1.setValue(mouseEvent.getSceneX()*secondsPerPixel)
-        );
-
-        waveformScrollPane.setOnMouseReleased(
-                mouseEvent -> progressSlider2.setValue(mouseEvent.getSceneX()*secondsPerPixel)
-        );
-    }
-
-    @Override
-    protected void addContents() {
-        super.addContents();
-        addSliders();
-    }
-
-    protected void addSliders() {
-        progressSlider1 = new Slider();
-        progressSlider2 = new Slider();
-
-        progressSlider1.setMax(TRACK_LENGTH);
-        progressSlider2.setMax(TRACK_LENGTH);
-        getChildren().add(progressSlider1);
-        getChildren().add(progressSlider2);
     }
 
     @Override
@@ -83,20 +54,11 @@ public class AudioEditor extends SelectableWaveformPane {
     public void zoomIn() {
         super.zoomIn();
         secondsPerPixel = secondsPerPixel * 0.80;
-        updateSliders();
     }
 
     @Override
     public void zoomOut() {
         super.zoomOut();
         secondsPerPixel = secondsPerPixel / 0.80;
-        updateSliders();
-    }
-
-    protected void updateSliders() {
-        progressSlider1.setValue(0);
-        progressSlider2.setValue(0);
-        progressSlider1.setMax(secondsPerPixel*getWidth());
-        progressSlider2.setMax(secondsPerPixel*getWidth());
     }
 }

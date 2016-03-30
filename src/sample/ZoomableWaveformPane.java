@@ -4,6 +4,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import javax.sound.sampled.AudioInputStream;
@@ -18,6 +20,7 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
 
     protected final double ZOOM = 1.2;
 
+    protected Pane waveformPane;
     protected WaveformImageView waveformImageView;
     protected ScrollPane waveformScrollPane;
 
@@ -34,7 +37,11 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
 
     protected void initialize(WaveformImageView wf) {
         waveformImageView = wf;
-        waveformScrollPane = new ScrollPane(waveformImageView);
+        //Allow clicking anywhere on the image
+        waveformImageView.pickOnBoundsProperty().setValue(true);
+
+        waveformPane = new Pane(wf);
+        waveformScrollPane = new ScrollPane(waveformPane);
         addContents();
         //TODO: Fix
         waveformImageView.setFitWidth(1024);
