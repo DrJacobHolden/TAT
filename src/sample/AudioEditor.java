@@ -1,9 +1,12 @@
 package sample;
 
+import icon.Icon;
+import icon.IconLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -28,12 +31,21 @@ public class AudioEditor extends SelectableWaveformPane {
      * Add controls for manipulating audio playback
      */
     private void addPlayControlToolbar() {
-        Separator sep = new Separator();
+        ToolBar sep = new ToolBar();
+        sep.setMaxHeight(43);
+        sep.setMinHeight(43);
         HBox.setHgrow(sep, Priority.ALWAYS);
+        Button prevButton = new Button("", new Icon(IconLoader.getInstance().prevIcon));
+        Button playButton = new Button("", new Icon(IconLoader.getInstance().playIcon));
+        Button pauseButton = new Button("", new Icon(IconLoader.getInstance().pauseIcon));
+        Button stopButton = new Button("", new Icon(IconLoader.getInstance().stopIcon));
+        Button nextButton = new Button("", new Icon(IconLoader.getInstance().nextIcon));
         ToolBar playControlToolbar = new ToolBar(
-                new Button("|>"),
-                new Button("||"),
-                new Button("[]")
+                prevButton,
+                playButton,
+                pauseButton,
+                stopButton,
+                nextButton
         );
         toolbars.getChildren().addAll(sep, playControlToolbar);
     }
@@ -42,7 +54,9 @@ public class AudioEditor extends SelectableWaveformPane {
      * Add controls for splitting and joining audio
      */
     private void addSplitToolbar() {
-        Separator sep = new Separator();
+        ToolBar sep = new ToolBar();
+        sep.setMaxHeight(43);
+        sep.setMinHeight(43);
         ToolBar splitToolbar = new ToolBar(
                 new Button("Split"),
                 new Button("Join")
