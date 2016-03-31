@@ -56,15 +56,26 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         cursorPosition.addChangeListener(new WaveformTimeListener() {
             @Override
             public void onChange(WaveformTime time) {
-                cursorLine.setStartX(waveformPane.getWidth() * time.getPercent());
-                cursorLine.setEndX(waveformPane.getWidth() * time.getPercent());
+                updateCursorLine();
             }
         });
     }
 
+    protected void updateCursorLine(){
+        cursorLine.setStartX(waveformImageView.getFitWidth() * cursorPosition.getPercent());
+        cursorLine.setEndX(waveformImageView.getFitWidth() * cursorPosition.getPercent());
+    }
+
+    @Override
+    protected void resizeWaveform(double zoom) {
+        super.resizeWaveform(zoom);
+        //Update cursor position with resize
+        if (cursorLine != null)
+            updateCursorLine();
+    }
+
     protected void clicked(MouseEvent event) {
         event.getSource();
-        double x = event.getX();
 
         //Update cursor position
         double percent = event.getX() / (waveformImageView.getFitWidth());
