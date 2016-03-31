@@ -1,5 +1,7 @@
 package sample;
 
+import icon.Icon;
+import icon.IconLoader;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -7,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -79,11 +82,8 @@ public class ZoomableWaveformPane extends VBox {
      * Adds the toolbar for zooming in and out of the image
      */
     protected void addZoomToolbar() {
-        Button zoomIn = new ZoomInButton();
-        Button zoomOut = new ZoomOutButton();
-
-        zoomIn.setText("+");
-        zoomOut.setText("-");
+        Button zoomIn = new ZoomInButton("", new Icon(IconLoader.getInstance().zoomInIcon));
+        Button zoomOut = new ZoomOutButton("", new Icon(IconLoader.getInstance().zoomOutIcon));
 
         zoomToolbar.getItems().addAll(zoomIn, zoomOut);
         toolbars.getChildren().add(zoomToolbar);
@@ -138,12 +138,18 @@ public class ZoomableWaveformPane extends VBox {
     }
 
     protected class ZoomInButton extends Button {
+        ZoomInButton(String text, ImageView iv1) {
+            super(text, iv1);
+        }
         {
             setOnAction(event -> zoomIn());
         }
     }
 
     protected class ZoomOutButton extends Button {
+        ZoomOutButton(String text, ImageView iv1) {
+            super(text, iv1);
+        }
         {
             setOnAction(event -> zoomOut());
         }
