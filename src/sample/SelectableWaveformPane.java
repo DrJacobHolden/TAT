@@ -14,7 +14,7 @@ import java.util.List;
 public class SelectableWaveformPane extends ZoomableWaveformPane {
 
     protected WaveformTime cursorPosition = new WaveformTime();
-    protected Line clickLine;
+    protected Line cursorLine;
 
     /**
      * Gets the position of the waveform cursor. This WaveformTime object can be modified and the GUI will update
@@ -35,7 +35,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         super.imageChanged();
 
         //Clickline can't be added until after waveform
-        if (clickLine == null) {
+        if (cursorLine == null) {
             addCursorLine();
         }
     }
@@ -44,20 +44,20 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
      * Adds the cursor line to the waveform scroll pane
      */
     protected void addCursorLine() {
-        clickLine = new Line();
-        waveformPane.getChildren().add(clickLine);
+        cursorLine = new Line();
+        waveformPane.getChildren().add(cursorLine);
 
-        clickLine.setStartX(0);
-        clickLine.setEndX(0);
-        clickLine.setStartY(1);
-        clickLine.setEndY(waveformImageView.getFitHeight());
+        cursorLine.setStartX(0);
+        cursorLine.setEndX(0);
+        cursorLine.setStartY(1);
+        cursorLine.setEndY(waveformImageView.getFitHeight());
 
         //Update the line whenever the time is changed
         cursorPosition.addChangeListener(new WaveformTimeListener() {
             @Override
             public void onChange(WaveformTime time) {
-                clickLine.setStartX(waveformPane.getWidth() * time.getPercent());
-                clickLine.setEndX(waveformPane.getWidth() * time.getPercent());
+                cursorLine.setStartX(waveformPane.getWidth() * time.getPercent());
+                cursorLine.setEndX(waveformPane.getWidth() * time.getPercent());
             }
         });
     }

@@ -20,7 +20,6 @@ public class Main extends Application {
 
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
-        editor.setAudioStream(audioFile);
 
         Pane root = new StackPane();
 
@@ -43,6 +42,7 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
+        editor.setAudioStream(audioFile);
     }
 
     public static void main(String[] args) {

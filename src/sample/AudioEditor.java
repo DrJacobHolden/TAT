@@ -13,10 +13,6 @@ import javafx.scene.layout.Priority;
  */
 public class AudioEditor extends SelectableWaveformPane {
 
-    //The total length of the displayed waveform
-    //TODO: FIX
-    final double TRACK_LENGTH = 60;
-
     public AudioEditor() {
         super();
     }
