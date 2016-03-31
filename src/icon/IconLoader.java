@@ -17,17 +17,17 @@ public class IconLoader {
     }
 
     //Playback controls
-    public Image prevIcon = new Image(getClass().getResourceAsStream("/sample/icons/previous-track.png"));
-    public Image playIcon = new Image(getClass().getResourceAsStream("/sample/icons/play-button.png"));
-    public Image nextIcon = new Image(getClass().getResourceAsStream("/sample/icons/next-track-button.png"));
-    public Image pauseIcon = new Image(getClass().getResourceAsStream("/sample/icons/pause-button.png"));
-    public Image stopIcon = new Image(getClass().getResourceAsStream("/sample/icons/stop.png"));
+    public Image prevIcon = new Image(getClass().getResourceAsStream("/icon/icons/previous-track.png"));
+    public Image playIcon = new Image(getClass().getResourceAsStream("/icon/icons/play-button.png"));
+    public Image nextIcon = new Image(getClass().getResourceAsStream("/icon/icons/next-track-button.png"));
+    public Image pauseIcon = new Image(getClass().getResourceAsStream("/icon/icons/pause-button.png"));
+    public Image stopIcon = new Image(getClass().getResourceAsStream("/icon/icons/stop.png"));
 
     //Zoom controls
-    public Image zoomInIcon = new Image(getClass().getResourceAsStream("/sample/icons/zoom-in.png"));
-    public Image zoomOutIcon = new Image(getClass().getResourceAsStream("/sample/icons/zoom-out.png"));
+    public Image zoomInIcon = new Image(getClass().getResourceAsStream("/icon/icons/add.png"));
+    public Image zoomOutIcon = new Image(getClass().getResourceAsStream("/icon/icons/remove.png"));
 
     //Menu Icons
-    public Image menuIcon = new Image(getClass().getResourceAsStream("/sample/icons/menu-1.png"));
+    public Image menuIcon = new Image(getClass().getResourceAsStream("/icon/icons/menu-1.png"));
 
 }
