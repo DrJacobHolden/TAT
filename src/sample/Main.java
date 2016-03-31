@@ -14,7 +14,8 @@ public class Main extends Application {
     int HEIGHT = 768;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
+
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
 
@@ -23,14 +24,16 @@ public class Main extends Application {
 
         Pane root = new StackPane();
 
+        HBox mainPane = new HBox();
         VBox vbox = new VBox();
-        root.getChildren().add(vbox);
+        root.getChildren().add(mainPane);
+        mainPane.getChildren().add(new MenuToolbar());
+        mainPane.getChildren().add(vbox);
         vbox.getChildren().add(editor);
+        vbox.getChildren().add(annotationBox());
 
         //Create a scene
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-
-        vbox.getChildren().add(annotationBox());
 
         primaryStage.setTitle("Transcription Assistance Toolkit");
         primaryStage.setScene(scene);
