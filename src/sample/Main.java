@@ -15,9 +15,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-        AudioEditor wf = new AudioEditor();
-        wf.setAudioStream(audioFile);
+
+        //This is what is used for editing audio
+        AudioEditor editor = new AudioEditor();
+        editor.setAudioStream(audioFile);
 
         Pane root = new StackPane();
 
@@ -26,7 +29,7 @@ public class Main extends Application {
         );
         VBox vbox = new VBox();
         root.getChildren().add(vbox);
-        vbox.getChildren().add(wf);
+        vbox.getChildren().add(editor);
 
         vbox.getChildren().add(toolBar);
 

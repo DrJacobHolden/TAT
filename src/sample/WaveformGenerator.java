@@ -12,6 +12,7 @@ import java.io.IOException;
 
 /**
  * Created by max on 29/03/16
+ * Generates a waveform image for an audio file
  */
 public class WaveformGenerator {
 
@@ -33,7 +34,6 @@ public class WaveformGenerator {
     public void analyseInputFile() {
         frameLength = (int) audioStream.getFrameLength();
         frameSize = audioStream.getFormat().getFrameSize();
-        audioStream.getFormat();
     }
 
     public int[] getFrameArray() throws IOException { //With help from http://codeidol.com/java/swing/Audio/Build-an-Audio-Waveform-Display/
@@ -51,6 +51,12 @@ public class WaveformGenerator {
         return frames;
     }
 
+    /**
+     * Actually generate an image and return it
+     * @param resolution Generate one vertical line per this many frames (larger value is a smaller image)
+     * @return The image
+     * @throws IOException
+     */
     public Image getWaveformImage(int resolution) throws IOException {
         int[] frames = getFrameArray();
 

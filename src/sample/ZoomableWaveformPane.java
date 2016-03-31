@@ -15,8 +15,9 @@ import java.io.IOException;
 
 /**
  * Created by max on 29/03/16.
+ * A waveform display that can be zoomed and scrolled
  */
-public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
+public class ZoomableWaveformPane extends VBox {
 
     protected final double ZOOM = 1.2;
 
@@ -35,6 +36,10 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
         initialize(wf);
     }
 
+    /**
+     * Set up the scroll pane
+     * @param wf The WaveformImageView this contains
+     */
     protected void initialize(WaveformImageView wf) {
         waveformImageView = wf;
         //Allow clicking anywhere on the image
@@ -47,6 +52,9 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
         waveformImageView.setFitWidth(1024);
     }
 
+    /**
+     * Adds the toolbar for zooming in and out of the image
+     */
     protected void addZoomToolbar() {
         Button zoomIn = new ZoomInButton();
         Button zoomOut = new ZoomOutButton();
@@ -68,6 +76,9 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
         }
     }
 
+    /**
+     * Add the contents to this HBox
+     */
     protected void addContents() {
         getChildren().add(waveformScrollPane);
         getChildren().add(toolbars);
@@ -88,6 +99,9 @@ public class ZoomableWaveformPane extends VBox implements WaveformDisplay {
         imageChanged();
     }
 
+    /**
+     * Called when the waveform image is changed
+     */
     protected void imageChanged() {
         waveformImageView.setFitHeight(200);
         waveformScrollPane.setPrefViewportHeight(waveformImageView.getFitHeight());

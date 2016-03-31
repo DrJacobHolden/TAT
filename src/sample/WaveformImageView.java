@@ -11,8 +11,9 @@ import java.io.IOException;
 
 /**
  * Created by max on 29/03/16.
+ * A JavaFX imageview for a waveform
  */
-public class WaveformImageView extends ImageView implements WaveformDisplay {
+public class WaveformImageView extends ImageView {
 
     protected AudioInputStream audioStream;
     protected WaveformGenerator waveformGenerator;
@@ -31,7 +32,7 @@ public class WaveformImageView extends ImageView implements WaveformDisplay {
         return audioStream;
     }
 
-    public void generateAndDisplayWaveform() {
+    private void generateAndDisplayWaveform() {
         try {
             //10 is just a guess at a good resolution. Should really changed depending on zoom.
             int resolution = 10;

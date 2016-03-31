@@ -9,14 +9,13 @@ import javafx.scene.layout.Priority;
 
 /**
  * Created by max on 29/03/16.
+ * GUI for splitting, joining and playing back audio
  */
 public class AudioEditor extends SelectableWaveformPane {
 
     //The total length of the displayed waveform
     //TODO: FIX
     final double TRACK_LENGTH = 60;
-    //TODO: FIX
-    double secondsPerPixel = TRACK_LENGTH / 1024;
 
     public AudioEditor() {
         super();
@@ -29,6 +28,9 @@ public class AudioEditor extends SelectableWaveformPane {
         addSplitToolbar();
     }
 
+    /**
+     * Add controls for manipulating audio playback
+     */
     private void addPlayControlToolbar() {
         Separator sep = new Separator();
         HBox.setHgrow(sep, Priority.ALWAYS);
@@ -40,6 +42,9 @@ public class AudioEditor extends SelectableWaveformPane {
         toolbars.getChildren().addAll(sep, playControlToolbar);
     }
 
+    /**
+     * Add controls for splitting and joining audio
+     */
     private void addSplitToolbar() {
         Separator sep = new Separator();
         ToolBar splitToolbar = new ToolBar(
@@ -48,17 +53,5 @@ public class AudioEditor extends SelectableWaveformPane {
         );
         HBox.setHgrow(sep, Priority.ALWAYS);
         toolbars.getChildren().addAll(sep, splitToolbar);
-    }
-
-    @Override
-    public void zoomIn() {
-        super.zoomIn();
-        secondsPerPixel = secondsPerPixel * 0.80;
-    }
-
-    @Override
-    public void zoomOut() {
-        super.zoomOut();
-        secondsPerPixel = secondsPerPixel / 0.80;
     }
 }

@@ -8,14 +8,21 @@ import java.util.List;
 
 /**
  * Created by max on 29/03/16.
+ *
+ * This class represents a GUI selectable, zoomable waveform for an audio file.
  */
 public class SelectableWaveformPane extends ZoomableWaveformPane {
 
-    protected WaveformTime clickPosition = new WaveformTime();
+    protected WaveformTime cursorPosition = new WaveformTime();
     protected Line clickLine;
 
-    public WaveformTime getClickPosition() {
-        return clickPosition;
+    /**
+     * Gets the position of the waveform cursor. This WaveformTime object can be modified and the GUI will update
+     * automatically.
+     * @return The cursor position
+     */
+    public WaveformTime getCursorPosition() {
+        return cursorPosition;
     }
 
     @Override
@@ -29,11 +36,14 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
 
         //Clickline can't be added until after waveform
         if (clickLine == null) {
-            addClickLine();
+            addCursorLine();
         }
     }
 
-    protected void addClickLine() {
+    /**
+     * Adds the cursor line to the waveform scroll pane
+     */
+    protected void addCursorLine() {
         clickLine = new Line();
         waveformPane.getChildren().add(clickLine);
 
@@ -42,7 +52,8 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         clickLine.setStartY(1);
         clickLine.setEndY(waveformImageView.getFitHeight());
 
-        clickPosition.addChangeListener(new WaveformTimeListener() {
+        //Update the line whenever the time is changed
+        cursorPosition.addChangeListener(new WaveformTimeListener() {
             @Override
             public void onChange(WaveformTime time) {
                 clickLine.setStartX(waveformPane.getWidth() * time.getPercent());
@@ -55,13 +66,16 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         event.getSource();
         double x = event.getX();
 
+        //Update cursor position
         double percent = event.getX() / (waveformImageView.getFitWidth());
-        clickPosition.setPercent(percent);
+        cursorPosition.setPercent(percent);
 
-        System.out.println(clickPosition);
-
+        System.out.println(cursorPosition);
     }
 
+    /**
+     * Represents a time position  within a waveform
+     */
     protected class WaveformTime {
         long frame = 0;
         double percent = 0;
