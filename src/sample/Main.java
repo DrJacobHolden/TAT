@@ -23,14 +23,9 @@ public class Main extends Application {
 
         Pane root = new StackPane();
 
-        ToolBar toolBar = new ToolBar(
-                new Button("File")
-        );
         VBox vbox = new VBox();
         root.getChildren().add(vbox);
         vbox.getChildren().add(editor);
-
-        vbox.getChildren().add(toolBar);
 
         //Create a scene
         Scene scene = new Scene(root, WIDTH, HEIGHT);
