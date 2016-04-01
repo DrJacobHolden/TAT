@@ -1,14 +1,12 @@
-package sample;
+package ui;
 
-import icon.Icon;
-import icon.IconLoader;
+import ui.icon.Icon;
+import ui.icon.IconLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import ui.waveform.SelectableWaveformPane;
 
 import java.util.ArrayList;
 import java.util.List;

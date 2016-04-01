@@ -1,4 +1,4 @@
-package sample;
+package ui.waveform;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
