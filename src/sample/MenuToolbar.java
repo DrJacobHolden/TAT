@@ -14,14 +14,32 @@ import javafx.scene.control.ToolBar;
 public class MenuToolbar extends ToolBar {
 
     public MenuToolbar() {
-        super(new MenuButton());
+        super(new fileButton(), new saveButton(), new configButton(), new uploadButton());
         setOrientation(Orientation.VERTICAL);
         setMinWidth(51);
     }
 }
 
-class MenuButton extends Button {
-    public MenuButton() {
-        super("", new Icon(IconLoader.getInstance().menuIcon));
+class fileButton extends Button {
+    public fileButton() {
+        super("", new Icon(IconLoader.getInstance().fileIcon));
+    }
+}
+
+class saveButton extends Button {
+    public saveButton() {
+        super("", new Icon(IconLoader.getInstance().saveIcon));
+    }
+}
+
+class configButton extends Button {
+    public configButton() {
+        super("", new Icon(IconLoader.getInstance().configIcon));
+    }
+}
+
+class uploadButton extends Button {
+    public uploadButton() {
+        super("", new Icon(IconLoader.getInstance().uploadIcon));
     }
 }

@@ -28,7 +28,10 @@ public class IconLoader {
     public Image zoomOutIcon = new Image(getClass().getResourceAsStream("/icon/icons/remove.png"));
 
     //Menu Icons
-    public Image menuIcon = new Image(getClass().getResourceAsStream("/icon/icons/menu-1.png"));
+    public Image fileIcon = new Image(getClass().getResourceAsStream("/icon/icons/file.png"));
+    public Image saveIcon = new Image(getClass().getResourceAsStream("/icon/icons/save_2.png"));
+    public Image uploadIcon = new Image(getClass().getResourceAsStream("/icon/icons/upload.png"));
+    public Image configIcon = new Image(getClass().getResourceAsStream("/icon/icons/config.png"));
 
     //Split Join Icons
     public Image splitIcon = new Image(getClass().getResourceAsStream("/icon/icons/arrows.png"));
