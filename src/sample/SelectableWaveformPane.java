@@ -1,6 +1,8 @@
 package sample;
 
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
@@ -13,8 +15,10 @@ import java.util.List;
  */
 public class SelectableWaveformPane extends ZoomableWaveformPane {
 
-    protected WaveformTime cursorPosition = new WaveformTime();
-    protected Line cursorLine;
+    protected WaveformTime cursorPosition = new WaveformTime(){{
+        setStroke(Color.MAGENTA);
+    }};
+    protected List<WaveformTime> waveformTimes = new ArrayList<>();
 
     /**
      * Gets the position of the waveform cursor. This WaveformTime object can be modified and the GUI will update
@@ -33,45 +37,24 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
 
     protected void imageChanged() {
         super.imageChanged();
-
-        //Clickline can't be added until after waveform
-        if (cursorLine == null) {
-            addCursorLine();
-        }
+        addWaveformTime(cursorPosition);
+        //cursorPosition.toFront();
     }
 
     /**
-     * Adds the cursor line to the waveform scroll pane
+     * Adds a line to the waveform scroll pane
      */
-    protected void addCursorLine() {
-        cursorLine = new Line();
-        waveformPane.getChildren().add(cursorLine);
-
-        cursorLine.setStartX(0);
-        cursorLine.setEndX(0);
-        cursorLine.setStartY(1);
-        cursorLine.setEndY(waveformImageView.getFitHeight());
-
-        //Update the line whenever the time is changed
-        cursorPosition.addChangeListener(new WaveformTimeListener() {
-            @Override
-            public void onChange(WaveformTime time) {
-                updateCursorLine();
-            }
-        });
-    }
-
-    protected void updateCursorLine(){
-        cursorLine.setStartX(waveformImageView.getFitWidth() * cursorPosition.getPercent());
-        cursorLine.setEndX(waveformImageView.getFitWidth() * cursorPosition.getPercent());
+    protected void addWaveformTime(WaveformTime w) {
+        waveformPane.getChildren().add(w);
+        waveformTimes.add(w);
     }
 
     @Override
     protected void resizeWaveform(double zoom) {
         super.resizeWaveform(zoom);
-        //Update cursor position with resize
-        if (cursorLine != null)
-            updateCursorLine();
+        for (WaveformTime waveformTime : waveformTimes){
+            waveformTime.updateGui();
+        }
     }
 
     protected void clicked(MouseEvent event) {
@@ -87,9 +70,15 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
     /**
      * Represents a time position  within a waveform
      */
-    protected class WaveformTime {
+    protected class WaveformTime extends Line {
         long frame = 0;
         double percent = 0;
+
+        public WaveformTime() {
+            setStartX(0);
+            setEndX(0);
+            setStartY(1);
+        }
 
         protected List<WaveformTimeListener> changeListeners = new ArrayList<>();
 
@@ -101,7 +90,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
             return frame;
         }
 
-        public void setFrame(int frame) throws IllegalArgumentException {
+        public void setFrame(long frame) throws IllegalArgumentException {
             long length = waveformImageView.getAudioStream().getFrameLength();
             if (frame >= length) {
                 throw new IllegalArgumentException();
@@ -109,6 +98,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
                 this.frame = frame;
                 percent = frame/((double) length);
             }
+            updateGui();
             notifyChange();
         }
 
@@ -119,13 +109,21 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
                 this.percent = percent;
                 this.frame = (long) (percent * (double) waveformImageView.getAudioStream().getFrameLength());
             }
+            updateGui();
             notifyChange();
         }
 
         protected void notifyChange() {
+            setEndY(waveformImageView.getFitHeight());
+
             for (WaveformTimeListener listener : changeListeners) {
                 listener.onChange(this);
             }
+        }
+
+        protected void updateGui() {
+            setStartX(waveformImageView.getFitWidth() * percent);
+            setEndX(waveformImageView.getFitWidth() * percent);
         }
 
         public void addChangeListener(WaveformTimeListener listener) {

@@ -10,11 +10,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by max on 29/03/16.
  * GUI for splitting, joining and playing back audio
  */
 public class AudioEditor extends SelectableWaveformPane {
+
+    private List<WaveformTime> splitTimes = new ArrayList<>();
 
     public AudioEditor() {
         super();
@@ -50,6 +55,12 @@ public class AudioEditor extends SelectableWaveformPane {
         toolbars.getChildren().addAll(sep, playControlToolbar);
     }
 
+    private void splitAudio() {
+        WaveformTime split = new WaveformTime();
+        split.setFrame(cursorPosition.getFrame());
+        addWaveformTime(split);
+    }
+
     /**
      * Add controls for splitting and joining audio
      */
@@ -63,6 +74,9 @@ public class AudioEditor extends SelectableWaveformPane {
                 splitButton,
                 joinButton
         );
+
+        splitButton.setOnAction(e -> splitAudio());
+
         HBox.setHgrow(sep, Priority.ALWAYS);
         toolbars.getChildren().addAll(sep, splitToolbar);
     }
