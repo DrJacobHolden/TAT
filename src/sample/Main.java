@@ -1,6 +1,6 @@
 package sample;
 
-import audio_player.PlayAudio;
+import audio_player.AudioPlayer;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -42,13 +42,11 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
-        editor.setAudioStream(audioFile);
+        editor.setAudioFile(audioFile);
     }
 
     public static void main(String[] args) {
-        //launch(args);
-        PlayAudio audioPlayer = new PlayAudio();
-        audioPlayer.play();
+        launch(args);
     }
 
     private TextArea annotationBox() {
