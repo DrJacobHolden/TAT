@@ -57,9 +57,11 @@ public class AudioEditor extends SelectableWaveformPane {
         ToolBar sep = new ToolBar();
         sep.setMaxHeight(43);
         sep.setMinHeight(43);
+        Button splitButton = new Button("", new Icon(IconLoader.getInstance().splitIcon));
+        Button joinButton = new Button("", new Icon(IconLoader.getInstance().joinIcon));
         ToolBar splitToolbar = new ToolBar(
-                new Button("Split"),
-                new Button("Join")
+                splitButton,
+                joinButton
         );
         HBox.setHgrow(sep, Priority.ALWAYS);
         toolbars.getChildren().addAll(sep, splitToolbar);

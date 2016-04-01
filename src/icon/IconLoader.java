@@ -30,4 +30,8 @@ public class IconLoader {
     //Menu Icons
     public Image menuIcon = new Image(getClass().getResourceAsStream("/icon/icons/menu-1.png"));
 
+    //Split Join Icons
+    public Image splitIcon = new Image(getClass().getResourceAsStream("/icon/icons/arrows.png"));
+    public Image joinIcon = new Image(getClass().getResourceAsStream("/icon/icons/arrows_inv.png"));
+
 }
