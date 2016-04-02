@@ -2,18 +2,16 @@ package sample;
 
 import icon.Icon;
 import icon.IconLoader;
-import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import javax.sound.sampled.AudioInputStream;
@@ -30,6 +28,9 @@ public class ZoomableWaveformPane extends VBox {
     protected final double ZOOM = 1.2;
 
     private double zoomLevel = 1;
+
+    //For zoom centering
+    private double scrollpaneViewportPercent;
 
     protected Pane waveformPane;
     protected WaveformImageView waveformImageView;
@@ -72,6 +73,7 @@ public class ZoomableWaveformPane extends VBox {
                     zoomLevel = waveformImageView.getFitWidth() / waveformScrollPane.getWidth();
             }
         });
+        setupZoomCentering();
 
         addContents();
         //TODO: Fix
@@ -103,7 +105,21 @@ public class ZoomableWaveformPane extends VBox {
 
     protected void resizeWaveform(double zoomLevel) {
         this.zoomLevel = zoomLevel;
+        //For zoom centering
+        scrollpaneViewportPercent = waveformScrollPane.getHvalue();
         waveformImageView.setFitWidth(waveformScrollPane.getWidth() * zoomLevel);
+    }
+
+    /**
+     * Make sure zooming doesn't jump you to a random position in the waveform
+     */
+    private void setupZoomCentering() {
+        waveformPane.widthProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldvalue, Object newValue) {
+                waveformScrollPane.setHvalue(scrollpaneViewportPercent);
+            }
+        });
     }
 
     /**
@@ -133,15 +149,12 @@ public class ZoomableWaveformPane extends VBox {
      * Called when the waveform image is changed
      */
     protected void imageChanged() {
-        waveformImageView.setFitHeight(200);
-        waveformScrollPane.setPrefViewportHeight(waveformImageView.getFitHeight());
+        waveformScrollPane.setFitToHeight(true);
     }
 
     protected class ZoomInButton extends Button {
         ZoomInButton(String text, ImageView iv1) {
             super(text, iv1);
-        }
-        {
             setOnAction(event -> zoomIn());
         }
     }
@@ -149,8 +162,6 @@ public class ZoomableWaveformPane extends VBox {
     protected class ZoomOutButton extends Button {
         ZoomOutButton(String text, ImageView iv1) {
             super(text, iv1);
-        }
-        {
             setOnAction(event -> zoomOut());
         }
     }

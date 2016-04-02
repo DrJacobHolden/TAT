@@ -38,7 +38,6 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
     protected void imageChanged() {
         super.imageChanged();
         addWaveformTime(cursorPosition);
-        //cursorPosition.toFront();
     }
 
     /**
@@ -114,14 +113,13 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         }
 
         protected void notifyChange() {
-            setEndY(waveformImageView.getFitHeight());
-
             for (WaveformTimeListener listener : changeListeners) {
                 listener.onChange(this);
             }
         }
 
         protected void updateGui() {
+            setEndY(waveformPane.getHeight());
             setStartX(waveformImageView.getFitWidth() * percent);
             setEndX(waveformImageView.getFitWidth() * percent);
         }
