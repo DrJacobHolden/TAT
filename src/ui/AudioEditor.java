@@ -84,6 +84,7 @@ public class AudioEditor extends SelectableWaveformPane {
     }
     private void pause() {
         audioPlayer.pause();
+        cursorPosition.setFrame(audioPlayer.getCurrentFrame());
         playing = false;
     }
     private void stop() {
