@@ -90,6 +90,10 @@ public class AudioPlayer {
         notifyPositionListeners();
     }
 
+    public boolean isPlaying() {
+        return clip.isRunning();
+    }
+
     public long getCurrentFrame() {
         return clip.getFramePosition();
     }

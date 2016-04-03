@@ -29,8 +29,6 @@ public class AudioEditor extends SelectableWaveformPane {
     private List<WaveformTime> splitTimes = new ArrayList<>();
     private AudioPlayer audioPlayer;
 
-    private boolean playing = false;
-
     /**
      * This is number of frames that act as a buffer zone so that
      * you can use the skip buttons to move forwards and backwards
@@ -80,16 +78,13 @@ public class AudioEditor extends SelectableWaveformPane {
 
     private void play() {
         audioPlayer.play(cursorPosition.getFrame());
-        playing = true;
     }
     private void pause() {
         audioPlayer.pause();
         cursorPosition.setFrame(audioPlayer.getCurrentFrame());
-        playing = false;
     }
     private void stop() {
         audioPlayer.stop();
-        playing = false;
     }
 
     private void goToPrevSection() {
@@ -114,7 +109,11 @@ public class AudioEditor extends SelectableWaveformPane {
 
     private void splitAudio() {
         WaveformTime split = new WaveformTime();
-        split.setFrame(cursorPosition.getFrame());
+        if (audioPlayer.isPlaying()) {
+            split.setFrame(audioPlayer.getCurrentFrame());
+        } else {
+            split.setFrame(cursorPosition.getFrame());
+        }
         addWaveformTime(split);
         splitTimes.add(split);
     }
