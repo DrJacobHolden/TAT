@@ -1,7 +1,7 @@
 package sample;
 
-import icon.Icon;
-import icon.IconLoader;
+import ui.icon.Icon;
+import ui.icon.IconLoader;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;

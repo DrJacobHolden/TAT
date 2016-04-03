@@ -1,10 +1,12 @@
 package sample;
 
+import audio_player.AudioPlayer;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import ui.AudioEditor;
 
 import java.io.File;
 
@@ -40,7 +42,7 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
-        editor.setAudioStream(audioFile);
+        editor.setAudioFile(audioFile);
     }
 
     public static void main(String[] args) {

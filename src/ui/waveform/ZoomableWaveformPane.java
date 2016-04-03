@@ -1,11 +1,9 @@
-package sample;
+package ui.waveform;
 
-import icon.Icon;
-import icon.IconLoader;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Bounds;
-import javafx.geometry.Rectangle2D;
+import ui.icon.Icon;
+import ui.icon.IconLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -114,11 +112,8 @@ public class ZoomableWaveformPane extends VBox {
      * Make sure zooming doesn't jump you to a random position in the waveform
      */
     private void setupZoomCentering() {
-        waveformPane.widthProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldvalue, Object newValue) {
-                waveformScrollPane.setHvalue(scrollpaneViewportPercent);
-            }
+        waveformPane.widthProperty().addListener((ChangeListener) (observable, oldvalue, newValue) -> {
+            waveformScrollPane.setHvalue(scrollpaneViewportPercent);
         });
     }
 

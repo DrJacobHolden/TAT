@@ -1,8 +1,7 @@
-package sample;
+package ui.waveform;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
