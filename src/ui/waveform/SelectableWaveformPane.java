@@ -90,7 +90,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
 
         public void setFrame(long frame) throws IllegalArgumentException {
             long length = waveformImageView.getAudioStream().getFrameLength();
-            if (frame >= length) {
+            if (frame > length) {
                 throw new IllegalArgumentException();
             } else {
                 this.frame = frame;
@@ -132,7 +132,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         }
     }
 
-    public abstract class WaveformTimeListener {
-        public abstract void onChange(WaveformTime time);
+    public interface WaveformTimeListener {
+        void onChange(WaveformTime time);
     }
 }

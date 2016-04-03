@@ -1,7 +1,7 @@
 package ui;
 
 import audio_player.AudioPlayer;
-import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 import javafx.scene.control.Button;
@@ -22,6 +22,10 @@ import java.util.List;
  */
 public class AudioEditor extends SelectableWaveformPane {
 
+    protected WaveformTime playPosition = new WaveformTime(){{
+        setStroke(Color.BLUE);
+    }};
+
     private List<WaveformTime> splitTimes = new ArrayList<>();
     private AudioPlayer audioPlayer;
 
@@ -36,6 +40,7 @@ public class AudioEditor extends SelectableWaveformPane {
 
     public AudioEditor() {
         super();
+        addWaveformTime(playPosition);
     }
 
     @Override
@@ -89,7 +94,7 @@ public class AudioEditor extends SelectableWaveformPane {
     private void goToPrevSection() {
         int closestMatch = 0;
         for (WaveformTime t : splitTimes) {
-            if(t.getFrame() < audioPlayer.getCurrentFrames() - SKIP_OFFSET && t.getFrame() > closestMatch) {
+            if(t.getFrame() < audioPlayer.getCurrentFrame() - SKIP_OFFSET && t.getFrame() > closestMatch) {
                 closestMatch = (int)t.getFrame();
             }
         }
@@ -99,7 +104,7 @@ public class AudioEditor extends SelectableWaveformPane {
     private void goToNextSection() {
         int closestMatch = (int)audioPlayer.getEndFrame();
         for (WaveformTime t : splitTimes) {
-            if(t.getFrame() > audioPlayer.getCurrentFrames() + SKIP_OFFSET && t.getFrame() < closestMatch) {
+            if(t.getFrame() > audioPlayer.getCurrentFrame() + SKIP_OFFSET && t.getFrame() < closestMatch) {
                 closestMatch = (int)t.getFrame();
             }
         }
@@ -136,5 +141,9 @@ public class AudioEditor extends SelectableWaveformPane {
     public void setAudioFile(File audioFile) throws IOException, UnsupportedAudioFileException {
         setAudioStream(audioFile);
         audioPlayer = new AudioPlayer(audioFile);
+
+        audioPlayer.addAudioPositionListener(frame -> {
+            playPosition.setFrame(frame);
+        });
     }
 }

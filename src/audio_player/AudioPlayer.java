@@ -1,10 +1,13 @@
 package audio_player;
 
-import sample.Main;
+import javafx.application.Platform;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Tate on 1/04/2016.
@@ -13,6 +16,10 @@ public class AudioPlayer {
 
     public static Clip clip;
     public static Mixer mixer;
+    private Timer positionListenerTimer;
+    private List<AudioPositionListener> audioPositionListeners = new ArrayList<>();
+
+    private final long AUDIO_POSITION_UPDATE_INTERVAL = 20;
 
     /**
      * Sets up an audio player to play the specified sound file.
@@ -23,18 +30,50 @@ public class AudioPlayer {
 
         DataLine.Info dataInfo = new DataLine.Info(Clip.class, null);
         try {
-            clip = (Clip)mixer.getLine(dataInfo);
-        } catch(LineUnavailableException lue) { lue.printStackTrace(); }
-
-        try {
+            clip = (Clip) mixer.getLine(dataInfo);
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
             clip.open(audioStream);
-        } catch(Exception e) { e.printStackTrace(); }
+            setUpListenerEvents();
+        } catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void addAudioPositionListener(AudioPositionListener l) {
+        audioPositionListeners.add(l);
+    }
+
+    private void setUpListenerEvents() {
+        clip.addLineListener(event -> {
+            //Give regular updates of position if started
+            if (event.getType() == LineEvent.Type.START) {
+                notifyPositionListeners();
+                //Create new timer to notify position listeners
+                positionListenerTimer = new Timer();
+                positionListenerTimer.schedule(new TimerTask() {
+                    public void run() {
+                        Platform.runLater(() -> notifyPositionListeners());
+                    }
+                }, AUDIO_POSITION_UPDATE_INTERVAL, AUDIO_POSITION_UPDATE_INTERVAL);
+            }
+            //Stop giving regular updates of position if stopped
+            else if (event.getType() == LineEvent.Type.STOP) {
+                notifyPositionListeners();
+                positionListenerTimer.cancel();
+            }
+        });
     }
 
     public void play(long position) {
         clip.setFramePosition((int)position);
         clip.start();
+    }
+
+    private void notifyPositionListeners() {
+        for (AudioPositionListener l : audioPositionListeners){
+            l.frameUpdate(getCurrentFrame());
+        }
     }
 
     public void pause() {
@@ -48,9 +87,10 @@ public class AudioPlayer {
 
     public void goToSection(long position) {
         clip.setFramePosition((int) position);
+        notifyPositionListeners();
     }
 
-    public long getCurrentFrames() {
+    public long getCurrentFrame() {
         return clip.getFramePosition();
     }
 
@@ -58,4 +98,7 @@ public class AudioPlayer {
         return clip.getFrameLength();
     }
 
+    public interface AudioPositionListener {
+        void frameUpdate(long frame);
+    }
 }
