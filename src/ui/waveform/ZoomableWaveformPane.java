@@ -2,6 +2,8 @@ package ui.waveform;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 import javafx.scene.control.*;
@@ -21,7 +23,7 @@ import java.io.IOException;
  * Created by max on 29/03/16.
  * A waveform display that can be zoomed and scrolled
  */
-public class ZoomableWaveformPane extends VBox {
+public class ZoomableWaveformPane extends StackPane {
 
     protected final double ZOOM = 1.2;
 
@@ -33,9 +35,6 @@ public class ZoomableWaveformPane extends VBox {
     protected Pane waveformPane;
     protected WaveformImageView waveformImageView;
     protected ScrollPane waveformScrollPane;
-
-    protected HBox toolbars = new HBox();
-    protected ToolBar zoomToolbar = new ToolBar();
 
     public ZoomableWaveformPane() {
         initialize(new WaveformImageView());
@@ -74,60 +73,17 @@ public class ZoomableWaveformPane extends VBox {
         setupZoomCentering();
 
         addContents();
-        //TODO: Fix
-        waveformImageView.setFitWidth(1024);
+
     }
 
     /**
-     * Adds the toolbar for zooming in and out of the image
-     */
-    protected void addZoomToolbar() {
-        Button zoomIn = new ZoomInButton("", new Icon(IconLoader.getInstance().zoomInIcon));
-        Button zoomOut = new ZoomOutButton("", new Icon(IconLoader.getInstance().zoomOutIcon));
-
-        zoomToolbar.getItems().addAll(zoomIn, zoomOut);
-        toolbars.getChildren().add(zoomToolbar);
-    }
-
-    public void zoomIn() {
-        resizeWaveform(zoomLevel * ZOOM);
-    }
-
-    public void zoomOut() {
-        if (waveformImageView.getFitWidth() / ZOOM >= getWidth())
-            resizeWaveform((zoomLevel) / ZOOM);
-        else
-        //If you are close to zooming out fully then just zoom out fully
-            resizeWaveform(1);
-    }
-
-    protected void resizeWaveform(double zoomLevel) {
-        this.zoomLevel = zoomLevel;
-        //For zoom centering
-        scrollpaneViewportPercent = waveformScrollPane.getHvalue();
-        waveformImageView.setFitWidth(waveformScrollPane.getWidth() * zoomLevel);
-    }
-
-    /**
-     * Make sure zooming doesn't jump you to a random position in the waveform
-     */
-    private void setupZoomCentering() {
-        waveformPane.widthProperty().addListener((ChangeListener) (observable, oldvalue, newValue) -> {
-            waveformScrollPane.setHvalue(scrollpaneViewportPercent);
-        });
-    }
-
-    /**
-     * Add the contents to this HBox
+     * Adds the waveformScrollPane and zoomButtons to this StackPane
      */
     protected void addContents() {
+        ZoomButtons zoomButtons = new ZoomButtons(this);
+        zoomButtons.setAlignment(Pos.TOP_RIGHT);
         getChildren().add(waveformScrollPane);
-        getChildren().add(toolbars);
-        addToolbars();
-    }
-
-    protected void addToolbars() {
-        addZoomToolbar();
+        getChildren().add(zoomButtons);
     }
 
     public void setAudioStream(File audioFile) throws IOException, UnsupportedAudioFileException {
@@ -147,17 +103,32 @@ public class ZoomableWaveformPane extends VBox {
         waveformScrollPane.setFitToHeight(true);
     }
 
-    protected class ZoomInButton extends Button {
-        ZoomInButton(String text, ImageView iv1) {
-            super(text, iv1);
-            setOnAction(event -> zoomIn());
-        }
+    public void zoomIn() {
+        resizeWaveform(zoomLevel * ZOOM);
     }
 
-    protected class ZoomOutButton extends Button {
-        ZoomOutButton(String text, ImageView iv1) {
-            super(text, iv1);
-            setOnAction(event -> zoomOut());
-        }
+    public void zoomOut() {
+        if (waveformImageView.getFitWidth() / ZOOM >= getWidth())
+            resizeWaveform((zoomLevel) / ZOOM);
+        else
+            //If you are close to zooming out fully then just zoom out fully
+            resizeWaveform(1);
     }
+
+    protected void resizeWaveform(double zoomLevel) {
+        this.zoomLevel = zoomLevel;
+        //For zoom centering
+        scrollpaneViewportPercent = waveformScrollPane.getHvalue();
+        waveformImageView.setFitWidth(waveformScrollPane.getWidth() * zoomLevel);
+    }
+
+    /**
+     * Make sure zooming doesn't jump you to a random position in the waveform
+     */
+    private void setupZoomCentering() {
+        waveformPane.widthProperty().addListener((ChangeListener) (observable, oldvalue, newValue) -> {
+            waveformScrollPane.setHvalue(scrollpaneViewportPercent);
+        });
+    }
+
 }

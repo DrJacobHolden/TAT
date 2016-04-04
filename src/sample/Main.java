@@ -2,18 +2,21 @@ package sample;
 
 import audio_player.AudioPlayer;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import ui.AudioEditor;
+import ui.AudioToolBar;
+import ui.text_box.AnnotationBox;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main extends Application {
-
-    int WIDTH = 1024;
-    int HEIGHT = 768;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -24,18 +27,18 @@ public class Main extends Application {
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
 
-        Pane root = new StackPane();
-
-        HBox mainPane = new HBox();
         VBox vbox = new VBox();
-        root.getChildren().add(mainPane);
-        mainPane.getChildren().add(new MenuToolbar());
-        mainPane.getChildren().add(vbox);
         vbox.getChildren().add(editor);
-        vbox.getChildren().add(annotationBox());
+
+        //TODO: Prevent height hardcoding, possibly configurable?
+        editor.setMinHeight(256);
+
+        vbox.getChildren().add(new AudioToolBar(editor));
+
+        vbox.getChildren().add(new AnnotationBox());
 
         //Create a scene
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        Scene scene = new Scene(vbox);
 
         primaryStage.setTitle("Transcription Assistance Toolkit");
         primaryStage.setScene(scene);
@@ -47,13 +50,5 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private TextArea annotationBox() {
-        TextArea text = new TextArea();
-        text.setPrefWidth(WIDTH);
-        text.setPrefHeight(200);
-        text.setWrapText(true);
-        return text;
     }
 }
