@@ -1,20 +1,14 @@
 package sample;
 
-import audio_player.AudioPlayer;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.*;
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import ui.AudioEditor;
 import ui.AudioToolBar;
-import ui.text_box.AnnotationBox;
+import ui.text_box.AnnotationArea;
 
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Main extends Application {
 
@@ -23,6 +17,7 @@ public class Main extends Application {
 
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
+        String text = "Hello Max. This is Tate. | I'm just leaving you a voicemail message to test the voicemail functionality. | Complicated words. Made up of many vowels and sylables. And letters. Thank you. Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
 
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
@@ -35,7 +30,7 @@ public class Main extends Application {
 
         vbox.getChildren().add(new AudioToolBar(editor));
 
-        vbox.getChildren().add(new AnnotationBox());
+        vbox.getChildren().add(new AnnotationArea(text));
 
         //Create a scene
         Scene scene = new Scene(vbox);
