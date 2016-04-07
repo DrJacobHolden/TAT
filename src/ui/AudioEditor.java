@@ -3,6 +3,8 @@ package ui;
 import audio_player.AudioPlayer;
 import javafx.scene.paint.Color;
 import ui.waveform.SelectableWaveformPane;
+import undo.UndoRedoController;
+import undo.UndoableAction;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -15,6 +17,9 @@ import java.util.List;
  * GUI for splitting, joining and playing back audio
  */
 public class AudioEditor extends SelectableWaveformPane {
+
+    //All undoable actions should be performed on this. Must be set.
+    protected UndoRedoController undoRedoController;
 
     protected WaveformTime playPosition = new WaveformTime(){{
         setStroke(Color.BLUE);
@@ -35,6 +40,10 @@ public class AudioEditor extends SelectableWaveformPane {
         addWaveformTime(playPosition);
     }
 
+    public void setUndoRedoController(UndoRedoController c) {
+        undoRedoController = c;
+    }
+
     public void play() {
         audioPlayer.play(cursorPosition.getFrame());
     }
@@ -49,14 +58,15 @@ public class AudioEditor extends SelectableWaveformPane {
     }
 
     public void splitAudio() {
-        SelectableWaveformPane.WaveformTime split = new SelectableWaveformPane.WaveformTime();
+        long frame;
         if (audioPlayer.isPlaying()) {
-            split.setFrame(audioPlayer.getCurrentFrame());
+            frame = audioPlayer.getCurrentFrame();
         } else {
-            split.setFrame(cursorPosition.getFrame());
+            frame = cursorPosition.getFrame();
         }
-        addWaveformTime(split);
-        splitTimes.add(split);
+
+        SplitAudioAction split = new SplitAudioAction(frame);
+        undoRedoController.performAction(split);
     }
 
     public void setAudioFile(File audioFile) throws IOException, UnsupportedAudioFileException {
@@ -86,5 +96,31 @@ public class AudioEditor extends SelectableWaveformPane {
             }
         }
         audioPlayer.goToSection(closestMatch);
+    }
+
+    private class SplitAudioAction implements UndoableAction {
+
+        private SelectableWaveformPane.WaveformTime split;
+
+        public SplitAudioAction(long frame) {
+            split = new SelectableWaveformPane.WaveformTime();
+            split.setFrame(frame);
+        }
+
+        @Override
+        public void doAction() {
+            addWaveformTime(split);
+            splitTimes.add(split);
+        }
+
+        @Override
+        public void undoAction() {
+            removeWaveformTime(split);
+            splitTimes.remove(split);
+        }
+
+        public String toString() {
+            return "Split at " + split;
+        }
     }
 }
