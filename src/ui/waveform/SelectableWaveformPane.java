@@ -48,6 +48,11 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         waveformTimes.add(w);
     }
 
+    protected void removeWaveformTime(WaveformTime w) {
+        waveformPane.getChildren().remove(w);
+        waveformTimes.remove(w);
+    }
+
     @Override
     protected void resizeWaveform(double zoom) {
         super.resizeWaveform(zoom);

@@ -6,4 +6,5 @@ package undo;
 public interface UndoableAction {
     public void doAction();
     public void undoAction();
+    public String toString();
 }

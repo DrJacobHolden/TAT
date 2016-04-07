@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import ui.AudioEditor;
 import ui.AudioToolBar;
 import ui.text_box.AnnotationBox;
+import undo.UndoRedoController;
 
 import java.io.File;
 import java.util.Timer;
@@ -21,11 +22,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        UndoRedoController undoRedoController = new UndoRedoController();
+
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
 
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
+        editor.setUndoRedoController(undoRedoController);
 
         VBox vbox = new VBox();
         vbox.getChildren().add(editor);

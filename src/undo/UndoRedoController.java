@@ -4,8 +4,13 @@ import java.util.Stack;
 
 /**
  * Created by Max Lay on 8/04/2016.
+ *
+ * Used for managing GUI actions that can be undone or redone.
+ * Has the ability to peek at undo and redo actions, as well as undo or redo.
+ * Actions are performed for the first time but invoking the performAction method.
  */
 public class UndoRedoController {
+
     private Stack<UndoableAction> undoStack = new Stack<>();
     private Stack<UndoableAction> redoStack = new Stack<>();
 
