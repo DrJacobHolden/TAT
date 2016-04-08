@@ -19,35 +19,76 @@ import java.util.List;
  */
 public class AnnotationArea extends TextFlow {
 
-    private List<TextField> segments = new ArrayList<>();
+    private static AnnotationArea instance = null;
+    public static AnnotationArea getInstance() {
+        if (instance == null)
+            instance = new AnnotationArea();
+        return instance;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        createSegments();
+    }
+
+    private List<Annotation> segments = new ArrayList<>();
     private String text;
 
-    private final String SPLIT_CHAR = "\\|";
-    private final double TEXT_WIDTH = 5.5;
+    public static final String SPLIT_CHAR = "\\|";
+    public static final double TEXT_WIDTH = 5.7;
 
-    public AnnotationArea(String text) {
-        this.text = text;
+    private AnnotationArea() {
         VBox.setVgrow(this, Priority.ALWAYS);
-        getSegments();
+    }
+
+    public void split() {
+
+        //Get the currently active text segment
+        Annotation active = null;
+        for (Annotation s : segments) {
+            if(s.isActive())
+                active = s;
+        }
+
+        //Check the active segment exists
+        if(active == null) {
+            System.out.println("You must select where to split your text.");
+            return;
+        }
+
+        String[] halfs = active.getText().split(SPLIT_CHAR);
+        if(halfs.length < 2) {
+            //Do nothing if there aren't two halves in the active text field
+            return;
+        }
+        int oldIndex = segments.indexOf(active);
+        segments.remove(active);
+        segments.add(oldIndex, new Annotation(halfs[0]));
+        segments.add(oldIndex+1, new Annotation(halfs[1]));
+        update();
+    }
+
+    public void join() {
+
     }
 
     /**
      * Populates the current segments list based on the contents of the given string. Additional segments are
      * created for each instance of the split character.
      */
-    private void getSegments() {
+    private void createSegments() {
+        //Clear anything already in the list
+        segments.removeAll(segments);
+
+        //Get the segments by splitting on the split character
         String[] splits = text.split(SPLIT_CHAR);
         for (String s : splits) {
-            TextField t = new TextField(s);
+            Annotation t = new Annotation(s);
             t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
-            t.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
-                }
-            });
             segments.add(t);
         }
+
+        //Draw the next segments
         update();
     }
 
@@ -55,8 +96,12 @@ public class AnnotationArea extends TextFlow {
      * Updates the segments displayed currently
      */
     private void update() {
-        getChildren().removeAll();
+        getChildren().removeAll(getChildren());
         getChildren().addAll(segments);
+    }
+
+    public List<Annotation> getSegments() {
+        return segments;
     }
 
 }

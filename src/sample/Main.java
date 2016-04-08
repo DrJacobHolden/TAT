@@ -17,8 +17,6 @@ public class Main extends Application {
 
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-        String text = "Hello Max. This is Tate. | I'm just leaving you a voicemail message to test the voicemail functionality. | Complicated words. Made up of many vowels and sylables. And letters. Thank you. Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
-
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
 
@@ -30,7 +28,12 @@ public class Main extends Application {
 
         vbox.getChildren().add(new AudioToolBar(editor));
 
-        vbox.getChildren().add(new AnnotationArea(text));
+        AnnotationArea.getInstance().setText("Hello Max. This is Tate. | " +
+                "I'm just leaving you a voicemail message to test the voicemail functionality. | " +
+                "Complicated words. Made up of many vowels and sylables. And letters. Thank you. |" +
+                "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. |" +
+                "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n");
+        vbox.getChildren().add(AnnotationArea.getInstance());
 
         //Create a scene
         Scene scene = new Scene(vbox);
