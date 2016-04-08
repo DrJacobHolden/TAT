@@ -23,6 +23,12 @@ import static javafx.scene.input.KeyCode.T;
 
 public class Main extends Application {
 
+    final String text = "Hello Max. This is Tate. | " +
+            "I'm just leaving you a voicemail message to test the voicemail functionality. | " +
+            "Complicated words. Made up of many vowels and sylables. And letters. Thank you. |" +
+            "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. |" +
+            "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -32,6 +38,7 @@ public class Main extends Application {
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
+        AnnotationArea annotation = new AnnotationArea(text);
         editor.setUndoRedoController(undoRedoController);
 
         VBox vbox = new VBox();
@@ -42,12 +49,7 @@ public class Main extends Application {
 
         vbox.getChildren().add(new AudioToolBar(editor));
 
-        AnnotationArea.getInstance().setText("Hello Max. This is Tate. | " +
-                "I'm just leaving you a voicemail message to test the voicemail functionality. | " +
-                "Complicated words. Made up of many vowels and sylables. And letters. Thank you. |" +
-                "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. |" +
-                "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n");
-        vbox.getChildren().add(AnnotationArea.getInstance());
+        vbox.getChildren().add(annotation);
 
         //Create a scene
         Scene scene = new Scene(vbox);
@@ -68,9 +70,12 @@ public class Main extends Application {
                 undoRedoController.redo();
             }
         });
+
+
     }
 
     public static void main(String[] args) {
         launch(args);
     }
+
 }
