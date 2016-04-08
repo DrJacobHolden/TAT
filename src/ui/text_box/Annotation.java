@@ -21,12 +21,14 @@ public class Annotation extends TextField {
         focusedProperty().addListener(new TextFieldFocusListener());
     }
 
-    public void highlight() {
+    public void highlight(boolean notify) {
         setStyle("-fx-text-inner-color: green;");
         for (Annotation a : annotationArea.getSegments()) {
             if(!a.equals(this))
                 a.unhighlight();
         }
+        if(notify)
+            annotationArea.setActiveSegment(this);
     }
 
     public void unhighlight() {
@@ -57,7 +59,7 @@ public class Annotation extends TextField {
                 addCaret(getCaretPosition());
             } else {
                 removeCaret();
-                highlight();
+                highlight(true);
             }
         }
     }

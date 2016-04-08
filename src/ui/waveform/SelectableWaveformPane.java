@@ -95,6 +95,10 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         }
 
         public void setFrame(long frame) throws IllegalArgumentException {
+            setFrame(frame, true);
+        }
+
+        public void setFrame(long frame, boolean shouldNotify) throws IllegalArgumentException {
             long length = waveformImageView.getAudioStream().getFrameLength();
             if (frame > length) {
                 throw new IllegalArgumentException();
@@ -103,7 +107,8 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
                 percent = frame/((double) length);
             }
             updateGui();
-            notifyChange();
+            if(shouldNotify)
+                notifyChange();
         }
 
         public void setPercent(double percent) throws  IllegalArgumentException {

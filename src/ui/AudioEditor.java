@@ -3,7 +3,6 @@ package ui;
 import audio_player.AudioPlayer;
 import javafx.scene.paint.Color;
 import ui.waveform.SelectableWaveformPane;
-import ui.waveform.WaveSegment;
 import undo.UndoRedoController;
 import undo.UndoableAction;
 
@@ -33,10 +32,10 @@ public class AudioEditor extends SelectableWaveformPane {
     public void syncActiveSegment(int pos) {
         Iterator<WaveformTime> time = splitTimes.iterator();
         long frame = 0;
-        for (int i=0; i<pos-1; i++){
+        for (int i=0; i<pos; i++){
             frame = time.next().getFrame();
         }
-        cursorPosition.setFrame(frame);
+        cursorPosition.setFrame(frame, false);
     }
 
     /**
@@ -64,13 +63,13 @@ public class AudioEditor extends SelectableWaveformPane {
         super();
         addWaveformTime(playPosition);
 
-//        //Add a listener to the cursor position to check if we have changed segment
-//        cursorPosition.addChangeListener(new WaveformTimeListener() {
-//            @Override
-//            public void onChange(WaveformTime time) {
-//                setActiveSegmentForTime(time);
-//            }
-//        });
+        //Add a listener to the cursor position to check if we have changed segment
+        cursorPosition.addChangeListener(new WaveformTimeListener() {
+            @Override
+            public void onChange(WaveformTime time) {
+                notifyChange();
+            }
+        });
     }
 
     public void setUndoRedoController(UndoRedoController c) {
@@ -163,6 +162,17 @@ public class AudioEditor extends SelectableWaveformPane {
         }
     }
 
+    protected List<ActiveWaveSegmentListener> changeListeners = new ArrayList<>();
+
+    protected void notifyChange() {
+        for (ActiveWaveSegmentListener listener : changeListeners) {
+            listener.onChange(getActiveSegment());
+        }
+    }
+
+    public void addChangeListener(ActiveWaveSegmentListener listener) {
+        changeListeners.add(listener);
+    }
     public interface ActiveWaveSegmentListener {
         void onChange(int segIndex);
     }

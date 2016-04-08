@@ -71,31 +71,13 @@ public class Main extends Application {
             }
         });
 
-        editor.addChangeListener(new AudioEditor.ActiveWaveSegmentListener() {
-            @Override
-            public void onChange(int segIndex) {
-                segmentChanged(segIndex, editor, annotation);
-            }
-        });
-        annotation.addChangeListener(new AnnotationArea.ActiveAnnotationListener() {
-            @Override
-            public void onChange(int segIndex) {
-                segmentChanged(segIndex, editor, annotation);
-            }
-        });
+        editor.addChangeListener(segIndex ->
+                annotation.syncActiveSegment(segIndex));
+        annotation.addChangeListener(segIndex ->
+                editor.syncActiveSegment(segIndex));
 
     }
-
-    /**
-     * Synchronises the active segment across the audio editor and the annotation area
-     */
-    public void segmentChanged(int index, AudioEditor audioEditor, AnnotationArea annotationArea) {
-        if(index == -1)
-            index = 0;
-        audioEditor.syncActiveSegment(index);
-        annotationArea.syncActiveSegment(index);
-    }
-
+    
     public static void main(String[] args) {
         launch(args);
     }

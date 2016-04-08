@@ -29,6 +29,7 @@ public class AnnotationArea extends TextFlow {
      */
     public void syncActiveSegment(int i) {
         activeSegment = segments.get(i);
+        activeSegment.highlight(false);
     }
     public Annotation getActiveSegment() {
         return activeSegment;
