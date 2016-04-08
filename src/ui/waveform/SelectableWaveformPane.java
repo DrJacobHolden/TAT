@@ -74,7 +74,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
     /**
      * Represents a time position  within a waveform
      */
-    protected class WaveformTime extends Line {
+    protected class WaveformTime extends Line implements Comparable<WaveformTime> {
         long frame = 0;
         double percent = 0;
 
@@ -135,6 +135,13 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
 
         public String toString() {
             return "" + percent + " Frame " + frame + "/" + waveformImageView.getAudioStream().getFrameLength();
+        }
+
+        @Override
+        public int compareTo(WaveformTime o) {
+            if (this.getFrame() > o.getFrame())
+                return 1;
+            return -1;
         }
     }
 
