@@ -96,6 +96,7 @@ public class AnnotationArea extends TextFlow {
      * Updates the segments displayed currently
      */
     private void update() {
+        //TODO: Fix for speed
         getChildren().removeAll(getChildren());
         getChildren().addAll(segments);
     }
