@@ -37,12 +37,24 @@ public class AudioEditor extends SelectableWaveformPane {
      * This sets the currently active WaveSegment.
      */
     public void setActiveSegmentForTime(WaveformTime wf) {
+        int current = getSegments().indexOf(activeSegment);
+        System.out.println(current);
         for(WaveSegment w : getSegments()) {
             if(w.contains(wf)) {
                 activeSegment = w;
+                notifyChange();
+                if(current != getSegments().indexOf(activeSegment))
+                    System.out.println(getSegments().indexOf(activeSegment));
                 return;
             }
         }
+    }
+
+    /**
+     * Called to update the active segment to reflect the annotation selection
+     */
+    public void syncActiveSegment(int i) {
+        activeSegment = getSegments().get(i);
     }
 
     /**
@@ -147,7 +159,7 @@ public class AudioEditor extends SelectableWaveformPane {
     public List<WaveSegment> getSegments() {
         List<WaveSegment> segments = new ArrayList<>();
 
-        //Create the start of the file
+        //Create a waveform time to represent the start of the file
         WaveformTime start = new WaveformTime();
         start.setFrame(0);
 
@@ -156,7 +168,7 @@ public class AudioEditor extends SelectableWaveformPane {
             start = splitTimes.get(i);
         }
 
-        //Create the end of the file
+        //Create a waveform time to represent the end of the file
         WaveformTime end = new WaveformTime();
         end.setFrame(audioPlayer.getEndFrame());
 
@@ -192,14 +204,14 @@ public class AudioEditor extends SelectableWaveformPane {
     }
 
     public interface ActiveWaveSegmentListener {
-        void onChange(WaveSegment active);
+        void onChange(int segIndex);
     }
 
     protected List<ActiveWaveSegmentListener> changeListeners = new ArrayList<>();
 
     protected void notifyChange() {
         for (ActiveWaveSegmentListener listener : changeListeners) {
-            listener.onChange(getActiveSegment());
+            listener.onChange(getSegments().indexOf(getActiveSegment()));
         }
     }
 

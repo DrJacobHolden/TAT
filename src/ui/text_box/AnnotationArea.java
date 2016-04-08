@@ -15,8 +15,20 @@ public class AnnotationArea extends TextFlow {
     private List<Annotation> segments = new ArrayList<>();
 
     private Annotation activeSegment;
+
+    /**
+     * Called to change the active segment
+     */
     public void setActiveSegment(Annotation a) {
         activeSegment = a;
+        notifyChange();
+    }
+
+    /**
+     * Called to update the active segment to reflect the audio file
+     */
+    public void syncActiveSegment(int i) {
+        activeSegment = segments.get(i);
     }
     public Annotation getActiveSegment() {
         return activeSegment;
@@ -57,10 +69,6 @@ public class AnnotationArea extends TextFlow {
         update();
     }
 
-    public void join() {
-
-    }
-
     /**
      * Populates the current segments list based on the contents of the given string. Additional segments are
      * created for each instance of the split character.
@@ -95,14 +103,14 @@ public class AnnotationArea extends TextFlow {
     }
 
     public interface ActiveAnnotationListener {
-        void onChange(Annotation active);
+        void onChange(int segIndex);
     }
 
     protected List<ActiveAnnotationListener> changeListeners = new ArrayList<>();
 
     protected void notifyChange() {
         for (ActiveAnnotationListener listener : changeListeners) {
-            listener.onChange(getActiveSegment());
+            listener.onChange(segments.indexOf(activeSegment));
         }
     }
 
