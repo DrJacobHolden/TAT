@@ -17,6 +17,13 @@ import java.util.*;
  */
 public class AudioEditor extends SelectableWaveformPane {
 
+    /**
+     * This is number of frames that act as a buffer zone so that
+     * you can use the skip buttons to move forwards and backwards
+     * between sections while the audio is playing.
+     */
+    long PREV_BUFFER = 6000;
+
     //All undoable actions should be performed on this. Must be set.
     protected UndoRedoController undoRedoController;
 
@@ -30,12 +37,16 @@ public class AudioEditor extends SelectableWaveformPane {
      * Called to update the active segment to reflect the annotation selection
      */
     public void syncActiveSegment(int pos) {
-        Iterator<WaveformTime> time = splitTimes.iterator();
-        long frame = 0;
-        for (int i=0; i<pos; i++){
-            frame = time.next().getFrame();
+        if (pos < splitTimes.size()) {
+            Iterator<WaveformTime> time = splitTimes.iterator();
+            long frame = 0;
+            for (int i = 0; i < pos; i++) {
+                frame = time.next().getFrame();
+            }
+            cursorPosition.setFrame(frame, false);
+        } else {
+            //TODO: Notify user
         }
-        cursorPosition.setFrame(frame, false);
     }
 
     /**
@@ -51,13 +62,6 @@ public class AudioEditor extends SelectableWaveformPane {
     }
 
     private AudioPlayer audioPlayer;
-
-    /**
-     * This is number of frames that act as a buffer zone so that
-     * you can use the skip buttons to move forwards and backwards
-     * between sections while the audio is playing.
-     */
-    private final int SKIP_OFFSET = 1000;
 
     public AudioEditor() {
         super();
@@ -117,23 +121,31 @@ public class AudioEditor extends SelectableWaveformPane {
     }
 
     public void goToPrevSection() {
-        int closestMatch = 0;
-        for (SelectableWaveformPane.WaveformTime t : splitTimes) {
-            if(t.getFrame() < audioPlayer.getCurrentFrame() - SKIP_OFFSET && t.getFrame() > closestMatch) {
-                closestMatch = (int)t.getFrame();
+        long currentTime = 0;
+        for (WaveformTime time : splitTimes) {
+            if (time.getFrame() < playPosition.getFrame() - PREV_BUFFER) {
+                currentTime = time.getFrame();
+            } else {
+                break;
             }
         }
-        audioPlayer.goToSection(closestMatch);
+        jumpTopPosition(currentTime);
+    }
+
+    public void jumpTopPosition(long pos) {
+        //Move audio player to position, needed if currently playing
+        audioPlayer.goToSection(pos);
+        //Move cursor to position, needed if currently paused
+        cursorPosition.setFrame(pos);
     }
 
     public void goToNextSection() {
-        int closestMatch = (int)audioPlayer.getEndFrame();
-        for (SelectableWaveformPane.WaveformTime t : splitTimes) {
-            if(t.getFrame() > audioPlayer.getCurrentFrame() + SKIP_OFFSET && t.getFrame() < closestMatch) {
-                closestMatch = (int)t.getFrame();
+        for (WaveformTime time : splitTimes) {
+            if (time.getFrame() > playPosition.getFrame()) {
+                jumpTopPosition(time.getFrame());
+                break;
             }
         }
-        audioPlayer.goToSection(closestMatch);
     }
 
     private class SplitAudioAction implements UndoableAction {
@@ -173,6 +185,7 @@ public class AudioEditor extends SelectableWaveformPane {
     public void addChangeListener(ActiveWaveSegmentListener listener) {
         changeListeners.add(listener);
     }
+
     public interface ActiveWaveSegmentListener {
         void onChange(int segIndex);
     }
