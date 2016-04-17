@@ -37,4 +37,7 @@ public class IconLoader {
     public Image splitIcon = new Image(getClass().getResourceAsStream("/ui/icon/icons/arrows.png"));
     public Image joinIcon = new Image(getClass().getResourceAsStream("/ui/icon/icons/arrows_inv.png"));
 
+    //Program Icon
+    public Image logoIcon = new Image(getClass().getResourceAsStream("/ui/icon/icons/logo_raw.png"));
+
 }
