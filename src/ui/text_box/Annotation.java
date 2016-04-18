@@ -11,29 +11,27 @@ import java.util.List;
  */
 public class Annotation extends TextField {
 
-    public Annotation(String s) {
+    private AnnotationArea annotationArea;
+
+    public Annotation(AnnotationArea annotationArea, String s) {
         super(s);
+        this.annotationArea = annotationArea;
         unhighlight();
         textProperty().addListener(new TextFieldTextListener());
         focusedProperty().addListener(new TextFieldFocusListener());
     }
 
-    private boolean isActive = false;
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void highlight() {
+    public void highlight(boolean notify) {
         setStyle("-fx-text-inner-color: green;");
-        isActive = true;
-        for (Annotation a : AnnotationArea.getInstance().getSegments()) {
+        for (Annotation a : annotationArea.getSegments()) {
             if(!a.equals(this))
                 a.unhighlight();
         }
+        if(notify)
+            annotationArea.setActiveSegment(this);
     }
 
     public void unhighlight() {
-        isActive = false;
         setStyle("-fx-text-inner-color: red;");
     }
 
@@ -61,9 +59,8 @@ public class Annotation extends TextField {
                 addCaret(getCaretPosition());
             } else {
                 removeCaret();
-                highlight();
+                highlight(true);
             }
         }
     }
-
 }
