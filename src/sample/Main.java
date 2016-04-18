@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import ui.AudioEditor;
 import ui.AudioToolBar;
+import ui.icon.IconLoader;
 import undo.UndoRedoController;
 import ui.text_box.AnnotationArea;
 
@@ -30,6 +31,7 @@ public class Main extends Application {
 
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
+
         //This is what is used for editing audio
         AudioEditor editor = new AudioEditor();
         editor.setUndoRedoController(undoRedoController);
@@ -52,7 +54,10 @@ public class Main extends Application {
         //Create a scene
         Scene scene = new Scene(vbox);
 
+        //Set the program title
         primaryStage.setTitle("Transcription Assistance Toolkit");
+        //Set the program logo
+        primaryStage.getIcons().add(IconLoader.getInstance().logoIcon);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.show();
