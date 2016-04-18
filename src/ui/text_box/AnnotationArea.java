@@ -13,32 +13,32 @@ import java.util.List;
 public class AnnotationArea extends TextFlow {
 
     private List<Annotation> segments = new ArrayList<>();
-
     private Annotation activeSegment;
-
-    /**
-     * Called to change the active segment
-     */
-    public void setActiveSegment(Annotation a) {
-        activeSegment = a;
-        notifyChange();
-    }
-
-    /**
-     * Called to update the active segment to reflect the audio file
-     */
-    public void syncActiveSegment(int i) {
-        activeSegment = segments.get(i);
-        activeSegment.highlight(false);
-    }
-    public Annotation getActiveSegment() {
-        return activeSegment;
-    }
 
     private String text;
 
     public static final String SPLIT_CHAR = "\\|";
     public static final double TEXT_WIDTH = 5.7;
+
+    /**
+     * Called to change the active segment
+     */
+    public void setActiveSegment(int i) {
+        if (i < segments.size()) {
+            activeSegment = segments.get(i);
+        }
+    }
+
+    /**
+     * Called to change the active segment
+     */
+    public void setActiveSegment(Annotation ann) {
+        activeSegment = ann;
+    }
+
+    public int getActiveSegment() {
+        return segments.indexOf(activeSegment);
+    }
 
     public AnnotationArea(String text) {
         this.text = text;
@@ -47,27 +47,27 @@ public class AnnotationArea extends TextFlow {
     }
 
     public void split() {
-
         //Check the active segment exists
-        if(getActiveSegment() == null) {
+        //TODO: confirm it is never null
+        if(activeSegment == null) {
             System.out.println("You must select where to split your text.");
             return;
         }
 
-        String[] halfs = getActiveSegment().getText().split(SPLIT_CHAR);
+        String[] halfs = activeSegment.getText().split(SPLIT_CHAR);
         if(halfs.length < 2) {
             //Do nothing if there aren't two halves in the active text field
             return;
         }
-        int oldIndex = segments.indexOf(getActiveSegment());
+        int oldIndex = getActiveSegment();
         segments.remove(getActiveSegment());
         segments.add(oldIndex, new Annotation(this, halfs[0]));
         segments.add(oldIndex+1, new Annotation(this, halfs[1]));
 
         //Set a new active segment
-        setActiveSegment(segments.get(oldIndex));
-
+        setActiveSegment(oldIndex);
         update();
+        resizeAll();
     }
 
     /**
@@ -82,12 +82,18 @@ public class AnnotationArea extends TextFlow {
         String[] splits = text.split(SPLIT_CHAR);
         for (String s : splits) {
             Annotation t = new Annotation(this, s);
-            t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
             segments.add(t);
         }
+        resizeAll();
 
         //Draw the next segments
         update();
+    }
+
+    private void resizeAll() {
+        for (Annotation t : segments) {
+            t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
+        }
     }
 
     /**
@@ -102,21 +108,4 @@ public class AnnotationArea extends TextFlow {
     public List<Annotation> getSegments() {
         return segments;
     }
-
-    public interface ActiveAnnotationListener {
-        void onChange(int segIndex);
-    }
-
-    protected List<ActiveAnnotationListener> changeListeners = new ArrayList<>();
-
-    protected void notifyChange() {
-        for (ActiveAnnotationListener listener : changeListeners) {
-            listener.onChange(segments.indexOf(activeSegment));
-        }
-    }
-
-    public void addChangeListener(ActiveAnnotationListener listener) {
-        changeListeners.add(listener);
-    }
-
 }

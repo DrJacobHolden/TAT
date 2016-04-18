@@ -1,8 +1,12 @@
 package ui;
 
 import audio_player.AudioPlayer;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import ui.text_box.Annotation;
+import ui.text_box.AnnotationArea;
 import ui.waveform.SelectableWaveformPane;
+import ui.waveform.WaveformTime;
 import undo.UndoRedoController;
 import undo.UndoableAction;
 
@@ -11,27 +15,46 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created by max on 29/03/16.
- * GUI for splitting, joining and playing back audio
- */
-public class AudioEditor extends SelectableWaveformPane {
 
+public class AudioEditor extends StackPane {
     /**
      * This is number of frames that act as a buffer zone so that
      * you can use the skip buttons to move forwards and backwards
      * between sections while the audio is playing.
      */
-    long PREV_BUFFER = 6000;
+    long PREV_BUFFER = 9000;
 
-    //All undoable actions should be performed on this. Must be set.
-    protected UndoRedoController undoRedoController;
+    /**
+     * A sorted set of all splits.
+     */
+    private Set<WaveformTime> splitTimes = new TreeSet<>();
 
-    protected WaveformTime playPosition = new WaveformTime(){{
+    /**
+     * All undoable actions should be performed on this. Must be set.
+     */
+    protected UndoRedoController undoRedoController = new UndoRedoController();
+
+    /**
+     * The enclosed waveform pane
+     */
+    SelectableWaveformPane waveformPane = new SelectableWaveformPane();
+
+    /**
+     * Cursor for current playback time
+     */
+    protected WaveformTime playPosition = new WaveformTime(waveformPane){{
         setStroke(Color.BLUE);
     }};
 
-    private Set<WaveformTime> splitTimes = new TreeSet<>();
+    /**
+     * Used for playing audio files
+     */
+    private AudioPlayer audioPlayer;
+
+    /**
+     *
+     */
+    private AnnotationArea annotationArea;
 
     /**
      * Called to update the active segment to reflect the annotation selection
@@ -43,7 +66,7 @@ public class AudioEditor extends SelectableWaveformPane {
             for (int i = 0; i < pos; i++) {
                 frame = time.next().getFrame();
             }
-            cursorPosition.setFrame(frame, false);
+            waveformPane.getCursorPosition().setFrame(frame, false);
         } else {
             //TODO: Notify user
         }
@@ -55,38 +78,30 @@ public class AudioEditor extends SelectableWaveformPane {
     public int getActiveSegment() {
         int i = 0;
         Iterator<WaveformTime> iterator = splitTimes.iterator();
-        while (iterator.hasNext() && iterator.next().getFrame() < cursorPosition.getFrame()) {
+        while (iterator.hasNext() && iterator.next().getFrame() < waveformPane.getCursorPosition().getFrame()) {
             i++;
         }
         return i;
     }
 
-    private AudioPlayer audioPlayer;
-
-    public AudioEditor() {
+    public AudioEditor(AnnotationArea annotationArea) {
         super();
-        addWaveformTime(playPosition);
+        this.getChildren().add(waveformPane);
+        this.annotationArea = annotationArea;
+        waveformPane.addWaveformTime(playPosition);
 
-        //Add a listener to the cursor position to check if we have changed segment
-        cursorPosition.addChangeListener(new WaveformTimeListener() {
-            @Override
-            public void onChange(WaveformTime time) {
-                notifyChange();
-            }
-        });
-    }
-
-    public void setUndoRedoController(UndoRedoController c) {
-        undoRedoController = c;
+        waveformPane.getCursorPosition().addChangeListener(time ->
+            annotationArea.setActiveSegment(getActiveSegment())
+        );
     }
 
     public void play() {
-        audioPlayer.play(cursorPosition.getFrame());
+        audioPlayer.play(waveformPane.getCursorPosition().getFrame());
     }
 
     public void pause() {
         audioPlayer.pause();
-        cursorPosition.setFrame(audioPlayer.getCurrentFrame());
+        waveformPane.getCursorPosition().setFrame(audioPlayer.getCurrentFrame());
     }
 
     public void stop() {
@@ -98,7 +113,7 @@ public class AudioEditor extends SelectableWaveformPane {
         if (audioPlayer.isPlaying()) {
             frame = audioPlayer.getCurrentFrame();
         } else {
-            frame = cursorPosition.getFrame();
+            frame = waveformPane.getCursorPosition().getFrame();
         }
 
         //Prevent duplicate splits
@@ -112,7 +127,7 @@ public class AudioEditor extends SelectableWaveformPane {
     }
 
     public void setAudioFile(File audioFile) throws IOException, UnsupportedAudioFileException {
-        setAudioStream(audioFile);
+        waveformPane.setAudioStream(audioFile);
         audioPlayer = new AudioPlayer(audioFile);
 
         audioPlayer.addAudioPositionListener(frame -> {
@@ -132,13 +147,6 @@ public class AudioEditor extends SelectableWaveformPane {
         jumpTopPosition(currentTime);
     }
 
-    public void jumpTopPosition(long pos) {
-        //Move audio player to position, needed if currently playing
-        audioPlayer.goToSection(pos);
-        //Move cursor to position, needed if currently paused
-        cursorPosition.setFrame(pos);
-    }
-
     public void goToNextSection() {
         for (WaveformTime time : splitTimes) {
             if (time.getFrame() > playPosition.getFrame()) {
@@ -148,45 +156,37 @@ public class AudioEditor extends SelectableWaveformPane {
         }
     }
 
+    public void jumpTopPosition(long pos) {
+        //Move audio player to position, needed if currently playing
+        audioPlayer.goToSection(pos);
+        //Move cursor to position, needed if currently paused
+        waveformPane.getCursorPosition().setFrame(pos);
+    }
+
     private class SplitAudioAction implements UndoableAction {
 
-        private SelectableWaveformPane.WaveformTime split;
+        private WaveformTime split;
 
         public SplitAudioAction(long frame) {
-            split = new SelectableWaveformPane.WaveformTime();
+            split = new WaveformTime(waveformPane);
             split.setFrame(frame);
         }
 
         @Override
         public void doAction() {
-            addWaveformTime(split);
+            waveformPane.addWaveformTime(split);
             splitTimes.add(split);
+            annotationArea.split();
         }
 
         @Override
         public void undoAction() {
-            removeWaveformTime(split);
+            waveformPane.removeWaveformTime(split);
             splitTimes.remove(split);
         }
 
         public String toString() {
             return "Split at " + split;
         }
-    }
-
-    protected List<ActiveWaveSegmentListener> changeListeners = new ArrayList<>();
-
-    protected void notifyChange() {
-        for (ActiveWaveSegmentListener listener : changeListeners) {
-            listener.onChange(getActiveSegment());
-        }
-    }
-
-    public void addChangeListener(ActiveWaveSegmentListener listener) {
-        changeListeners.add(listener);
-    }
-
-    public interface ActiveWaveSegmentListener {
-        void onChange(int segIndex);
     }
 }

@@ -73,7 +73,6 @@ public class ZoomableWaveformPane extends StackPane {
         setupZoomCentering();
 
         addContents();
-
     }
 
     /**

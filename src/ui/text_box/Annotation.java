@@ -63,5 +63,4 @@ public class Annotation extends TextField {
             }
         }
     }
-
 }
