@@ -2,10 +2,8 @@ package ui.waveform;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,9 +13,13 @@ import java.util.List;
  */
 public class SelectableWaveformPane extends ZoomableWaveformPane {
 
-    protected WaveformTime cursorPosition = new WaveformTime(){{
+    protected WaveformTime cursorPosition = new WaveformTime(this){{
         setStroke(Color.MAGENTA);
     }};
+
+    /**
+     * Used purely for GUI updates.
+     */
     protected List<WaveformTime> waveformTimes = new ArrayList<>();
 
     /**
@@ -32,23 +34,25 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
     @Override
     protected void initialize(WaveformImageView wf) {
         super.initialize(wf);
+        //Respond to mouse click events
         waveformImageView.setOnMouseClicked(event -> clicked(event));
     }
 
     protected void imageChanged() {
         super.imageChanged();
+        //Add after the image has been added
         addWaveformTime(cursorPosition);
     }
 
     /**
      * Adds a line to the waveform scroll pane
      */
-    protected void addWaveformTime(WaveformTime w) {
+    public void addWaveformTime(WaveformTime w) {
         waveformPane.getChildren().add(w);
         waveformTimes.add(w);
     }
 
-    protected void removeWaveformTime(WaveformTime w) {
+    public void removeWaveformTime(WaveformTime w) {
         waveformPane.getChildren().remove(w);
         waveformTimes.remove(w);
     }
@@ -56,6 +60,7 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
     @Override
     protected void resizeWaveform(double zoom) {
         super.resizeWaveform(zoom);
+        //Move grid lines to the correct positions when resizing
         for (WaveformTime waveformTime : waveformTimes){
             waveformTime.updateGui();
         }
@@ -69,73 +74,6 @@ public class SelectableWaveformPane extends ZoomableWaveformPane {
         cursorPosition.setPercent(percent);
 
         System.out.println(cursorPosition);
-    }
-
-    /**
-     * Represents a time position  within a waveform
-     */
-    protected class WaveformTime extends Line {
-        long frame = 0;
-        double percent = 0;
-
-        public WaveformTime() {
-            setStartX(0);
-            setEndX(0);
-            setStartY(1);
-        }
-
-        protected List<WaveformTimeListener> changeListeners = new ArrayList<>();
-
-        public double getPercent() {
-            return percent;
-        }
-
-        public long getFrame() {
-            return frame;
-        }
-
-        public void setFrame(long frame) throws IllegalArgumentException {
-            long length = waveformImageView.getAudioStream().getFrameLength();
-            if (frame > length) {
-                throw new IllegalArgumentException();
-            } else {
-                this.frame = frame;
-                percent = frame/((double) length);
-            }
-            updateGui();
-            notifyChange();
-        }
-
-        public void setPercent(double percent) throws  IllegalArgumentException {
-            if (percent > 1) {
-                throw new IllegalArgumentException();
-            } else {
-                this.percent = percent;
-                this.frame = (long) (percent * (double) waveformImageView.getAudioStream().getFrameLength());
-            }
-            updateGui();
-            notifyChange();
-        }
-
-        protected void notifyChange() {
-            for (WaveformTimeListener listener : changeListeners) {
-                listener.onChange(this);
-            }
-        }
-
-        protected void updateGui() {
-            setEndY(waveformPane.getHeight());
-            setStartX(waveformImageView.getFitWidth() * percent);
-            setEndX(waveformImageView.getFitWidth() * percent);
-        }
-
-        public void addChangeListener(WaveformTimeListener listener) {
-            changeListeners.add(listener);
-        }
-
-        public String toString() {
-            return "" + percent + " Frame " + frame + "/" + waveformImageView.getAudioStream().getFrameLength();
-        }
     }
 
     public interface WaveformTimeListener {

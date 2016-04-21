@@ -1,13 +1,7 @@
 package sample;
 
-import alignment.AlignmentProvider;
-import alignment.maus.WebMaus;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.*;
-import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -16,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import ui.AudioEditor;
 import ui.AudioToolBar;
+import ui.icon.IconLoader;
 import undo.UndoRedoController;
 import ui.text_box.AnnotationArea;
 
@@ -25,6 +20,12 @@ import static javafx.scene.input.KeyCode.T;
 
 public class Main extends Application {
 
+    final String text = "Hello Max. This is Tate. " +
+            "I'm just leaving you a voicemail message to test the voicemail functionality. " +
+            "Complicated words. Made up of many vowels and sylables. And letters. Thank you. " +
+            "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. " +
+            "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -32,8 +33,9 @@ public class Main extends Application {
 
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-        //This is what is used for editing audio
-        AudioEditor editor = new AudioEditor(undoRedoController);
+
+        AnnotationArea annotation = new AnnotationArea(text);
+        AudioEditor editor = new AudioEditor(undoRedoController, annotation);
 
         VBox vbox = new VBox();
         vbox.getChildren().add(editor);
@@ -43,17 +45,15 @@ public class Main extends Application {
 
         vbox.getChildren().add(new AudioToolBar(editor));
 
-        AnnotationArea.getInstance().setText("Hello Max. This is Tate. | " +
-                "I'm just leaving you a voicemail message to test the voicemail functionality. | " +
-                "Complicated words. Made up of many vowels and sylables. And letters. Thank you. |" +
-                "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. |" +
-                "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n");
-        vbox.getChildren().add(AnnotationArea.getInstance());
+        vbox.getChildren().add(annotation);
 
         //Create a scene
         Scene scene = new Scene(vbox);
 
+        //Set the program title
         primaryStage.setTitle("Transcription Assistance Toolkit");
+        //Set the program logo
+        primaryStage.getIcons().add(IconLoader.getInstance().logoIcon);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         primaryStage.show();
@@ -70,8 +70,9 @@ public class Main extends Application {
             }
         });
     }
-
+    
     public static void main(String[] args) {
         launch(args);
     }
+
 }

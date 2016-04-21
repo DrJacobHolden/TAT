@@ -1,16 +1,9 @@
 package ui.text_box;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,57 +12,62 @@ import java.util.List;
  */
 public class AnnotationArea extends TextFlow {
 
-    private static AnnotationArea instance = null;
-    public static AnnotationArea getInstance() {
-        if (instance == null)
-            instance = new AnnotationArea();
-        return instance;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-        createSegments();
-    }
-
     private List<Annotation> segments = new ArrayList<>();
+    private Annotation activeSegment;
+
     private String text;
 
     public static final String SPLIT_CHAR = "\\|";
     public static final double TEXT_WIDTH = 5.7;
 
-    private AnnotationArea() {
+    /**
+     * Called to change the active segment
+     */
+    public void setActiveSegment(int i) {
+        if (i < segments.size()) {
+            activeSegment = segments.get(i);
+        }
+    }
+
+    /**
+     * Called to change the active segment
+     */
+    public void setActiveSegment(Annotation ann) {
+        activeSegment = ann;
+    }
+
+    public int getActiveSegment() {
+        return segments.indexOf(activeSegment);
+    }
+
+    public AnnotationArea(String text) {
+        this.text = text;
         VBox.setVgrow(this, Priority.ALWAYS);
+        createSegments();
     }
 
     public void split() {
-
-        //Get the currently active text segment
-        Annotation active = null;
-        for (Annotation s : segments) {
-            if(s.isActive())
-                active = s;
-        }
-
         //Check the active segment exists
-        if(active == null) {
+        //TODO: confirm it is never null
+        if(activeSegment == null) {
             System.out.println("You must select where to split your text.");
             return;
         }
 
-        String[] halfs = active.getText().split(SPLIT_CHAR);
+        String[] halfs = activeSegment.getText().split(SPLIT_CHAR);
         if(halfs.length < 2) {
             //Do nothing if there aren't two halves in the active text field
             return;
         }
-        int oldIndex = segments.indexOf(active);
-        segments.remove(active);
-        segments.add(oldIndex, new Annotation(halfs[0]));
-        segments.add(oldIndex+1, new Annotation(halfs[1]));
+        int oldIndex = getActiveSegment();
+        segments.remove(getActiveSegment());
+        segments.add(oldIndex, new Annotation(this, halfs[0]));
+        segments.add(oldIndex+1, new Annotation(this, halfs[1]));
+
+        //Set a new active segment
+        setActiveSegment(oldIndex);
         update();
-    }
-
-    public void join() {
-
+        resizeAll();
     }
 
     /**
@@ -83,13 +81,19 @@ public class AnnotationArea extends TextFlow {
         //Get the segments by splitting on the split character
         String[] splits = text.split(SPLIT_CHAR);
         for (String s : splits) {
-            Annotation t = new Annotation(s);
-            t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
+            Annotation t = new Annotation(this, s);
             segments.add(t);
         }
+        resizeAll();
 
         //Draw the next segments
         update();
+    }
+
+    private void resizeAll() {
+        for (Annotation t : segments) {
+            t.setPrefWidth(t.getText().length() * TEXT_WIDTH);
+        }
     }
 
     /**
@@ -104,5 +108,4 @@ public class AnnotationArea extends TextFlow {
     public List<Annotation> getSegments() {
         return segments;
     }
-
 }
