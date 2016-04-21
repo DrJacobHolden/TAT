@@ -1,5 +1,7 @@
 package sample;
 
+import alignment.AlignmentProvider;
+import alignment.maus.WebMaus;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -31,8 +33,7 @@ public class Main extends Application {
         //This is the audio file that will be used throughout the application
         File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
         //This is what is used for editing audio
-        AudioEditor editor = new AudioEditor();
-        editor.setUndoRedoController(undoRedoController);
+        AudioEditor editor = new AudioEditor(undoRedoController);
 
         VBox vbox = new VBox();
         vbox.getChildren().add(editor);

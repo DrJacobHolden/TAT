@@ -1,7 +1,9 @@
 package ui;
 
+import alignment.AlignmentProvider;
 import audio_player.AudioPlayer;
 import javafx.scene.paint.Color;
+import sun.audio.AudioStream;
 import ui.waveform.SelectableWaveformPane;
 import undo.UndoRedoController;
 import undo.UndoableAction;
@@ -35,13 +37,10 @@ public class AudioEditor extends SelectableWaveformPane {
      */
     private final int SKIP_OFFSET = 1000;
 
-    public AudioEditor() {
+    public AudioEditor(UndoRedoController undo) {
         super();
         addWaveformTime(playPosition);
-    }
-
-    public void setUndoRedoController(UndoRedoController c) {
-        undoRedoController = c;
+        this.undoRedoController = undo;
     }
 
     public void play() {

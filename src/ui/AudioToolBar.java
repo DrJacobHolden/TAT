@@ -1,10 +1,12 @@
 package ui;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import sample.Configuration;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 
@@ -27,7 +29,6 @@ public class AudioToolBar extends HBox {
         addSplitControls();
     }
 
-    //TODO: The menu controls section should be more OO
     private void addMenuControls() {
         this.getChildren().add(new ToolBar(new fileButton(), new saveButton(), new configButton(), new uploadButton()));
     }
@@ -105,6 +106,12 @@ public class AudioToolBar extends HBox {
     protected class uploadButton extends Button {
         public uploadButton() {
             super("", new Icon(IconLoader.getInstance().uploadIcon));
+            setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    //TODO: Make perform for list of files and transcriptions
+                }
+            });
         }
     }
 
