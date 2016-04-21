@@ -43,7 +43,7 @@ public class Main extends Application {
         //TODO: Prevent height hardcoding, possibly configurable?
         editor.setMinHeight(256);
 
-        vbox.getChildren().add(new AudioToolBar(editor));
+        vbox.getChildren().add(new AudioToolBar(editor, annotation));
 
         vbox.getChildren().add(annotation);
 

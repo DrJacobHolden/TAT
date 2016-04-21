@@ -6,6 +6,7 @@ import alignment.Language;
 import alignment.formats.AlignmentFormat;
 import alignment.formats.TextGrid;
 
+import javax.sound.sampled.AudioInputStream;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -28,7 +29,7 @@ public class WebMaus implements AlignmentProvider {
     }
 
     @Override
-    public Object generateAlignment(String transcription, File audiofile) throws IOException, AlignmentException {
+    public Object generateAlignment(String transcription, AudioInputStream audioStream) throws IOException, AlignmentException {
         String url = "http://clarin.phonetik.uni-muenchen.de/BASWebServices/services/runMAUS";
         String charset = "UTF-8";
 
@@ -40,7 +41,7 @@ public class WebMaus implements AlignmentProvider {
         multipart.addFormField("LANGUAGE", language.isoLanguage);
         //Pretend transcription is a file
         multipart.addFilePart("TEXT", "transcription.txt", new ByteArrayInputStream(transcription.getBytes(StandardCharsets.UTF_8)));
-        multipart.addFilePart("SIGNAL", audiofile);
+        multipart.addAudioPart("SIGNAL", "audio.wav", audioStream);
 
         try {
             return new MausResponse(multipart.finish());

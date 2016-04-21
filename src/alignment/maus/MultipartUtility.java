@@ -1,5 +1,6 @@
 package alignment.maus;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.xml.ws.WebServiceException;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -64,6 +65,39 @@ public class MultipartUtility {
                 LINE_FEED);
         writer.append(LINE_FEED);
         writer.append(value).append(LINE_FEED);
+        writer.flush();
+    }
+
+    /**
+     * Adds a upload audioStream section to the request
+     *
+     * @param fieldName name attribute in <input type="file" name="..." />
+     * @param audioStream a stream to be uploaded
+     */
+    public void addAudioPart(String fieldName, String audioName, AudioInputStream audioStream)
+        throws IOException {
+        writer.append("--" + boundary).append(LINE_FEED);
+        writer.append(
+                "Content-Disposition: form-data; name=\"" + fieldName
+                        + "\"; filename=\"" + audioName + "\"")
+                .append(LINE_FEED);
+        writer.append(
+                "Content-Type: "
+                        + "audio/wave")
+                .append(LINE_FEED);
+        writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
+        writer.append(LINE_FEED);
+        writer.flush();
+
+        byte[] buffer = new byte[4096];
+        int bytesRead = -1;
+        while ((bytesRead = audioStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        outputStream.flush();
+        audioStream.close();
+
+        writer.append(LINE_FEED);
         writer.flush();
     }
 

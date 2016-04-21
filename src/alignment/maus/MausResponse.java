@@ -1,6 +1,7 @@
 package alignment.maus;
 
 import alignment.formats.AlignmentFormat;
+import alignment.formats.TextGrid;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -41,10 +42,16 @@ public class MausResponse {
         return responseXml.getElementsByTagName("downloadLink").item(0).getNodeName();
     }
 
-    public Object getResult(Class<? extends AlignmentFormat> format) throws IOException {
+    public Class<? extends AlignmentFormat> getResult() throws IOException {
+
         URL url = new URL(getResultLink());
         URLConnection connection = url.openConnection();
         InputStream in = connection.getInputStream();
+
+        //TODO: Should depend on something
+        AlignmentFormat format = TextGrid.load(in);
+
+        in.close();
 
         return null;
     }

@@ -1,16 +1,15 @@
 package ui;
 
-import alignment.AlignmentProvider;
 import audio_player.AudioPlayer;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import ui.text_box.Annotation;
 import ui.text_box.AnnotationArea;
 import ui.waveform.SelectableWaveformPane;
 import ui.waveform.WaveformTime;
 import undo.UndoRedoController;
 import undo.UndoableAction;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +56,7 @@ public class AudioEditor extends StackPane {
      */
     private AnnotationArea annotationArea;
 
-    /**
+     /**
      * Called to update the active segment to reflect the annotation selection
      */
     public void syncActiveSegment(int pos) {
@@ -83,6 +82,15 @@ public class AudioEditor extends StackPane {
             i++;
         }
         return i;
+    }
+
+    /**
+     * Returns a list of files that match the current audio segments open in the editor
+     */
+    public List<AudioInputStream> getAudioSegments() {
+        List<AudioInputStream> audioList = new ArrayList<>();
+        audioList.add(waveformPane.getAudioStream());
+        return audioList;
     }
 
     public AudioEditor(UndoRedoController undo, AnnotationArea annotationArea) {

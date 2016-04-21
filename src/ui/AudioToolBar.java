@@ -9,6 +9,7 @@ import javafx.scene.layout.Priority;
 import sample.Configuration;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
+import ui.text_box.AnnotationArea;
 
 /**
  * Created by Tate on 5/04/2016.
@@ -22,8 +23,11 @@ public class AudioToolBar extends HBox {
      */
     private AudioEditor audioEditor;
 
-    public AudioToolBar(AudioEditor audioEditor) {
+    private AnnotationArea annotationArea;
+
+    public AudioToolBar(AudioEditor audioEditor, AnnotationArea annotationArea) {
         this.audioEditor = audioEditor;
+        this.annotationArea = annotationArea;
         addMenuControls();
         addPlayControls();
         addSplitControls();
@@ -110,6 +114,11 @@ public class AudioToolBar extends HBox {
                 @Override
                 public void handle(ActionEvent e) {
                     //TODO: Make perform for list of files and transcriptions
+                    try {
+                        Configuration.getInstance().alignmentProvider.generateAlignment(annotationArea.getSegments().get(0).getText(), audioEditor.getAudioSegments().get(0));
+                    } catch(Exception a) {
+                        a.printStackTrace();
+                    }
                 }
             });
         }

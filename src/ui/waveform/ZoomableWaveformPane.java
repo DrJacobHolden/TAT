@@ -95,6 +95,10 @@ public class ZoomableWaveformPane extends StackPane {
         imageChanged();
     }
 
+    public AudioInputStream getAudioStream() {
+        return waveformImageView.getAudioStream();
+    }
+
     /**
      * Called when the waveform image is changed
      */
