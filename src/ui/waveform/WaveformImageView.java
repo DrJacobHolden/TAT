@@ -28,7 +28,13 @@ public class WaveformImageView extends ImageView {
         generateAndDisplayWaveform();
     }
 
+
+    /**
+     * ONLY EVER USE FOR METADATA. THE STREAM HAS ALREADY BEEN READ
+     * @return
+     */
     public AudioInputStream getAudioStream() {
+        //TODO: Find a better way
         return audioStream;
     }
 

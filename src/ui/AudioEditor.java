@@ -10,6 +10,7 @@ import undo.UndoRedoController;
 import undo.UndoableAction;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +56,9 @@ public class AudioEditor extends StackPane {
      * The annotation area
      */
     private AnnotationArea annotationArea;
+    private File audioFile;
 
-     /**
+    /**
      * Called to update the active segment to reflect the annotation selection
      */
     public void syncActiveSegment(int pos) {
@@ -89,7 +91,11 @@ public class AudioEditor extends StackPane {
      */
     public List<AudioInputStream> getAudioSegments() {
         List<AudioInputStream> audioList = new ArrayList<>();
-        audioList.add(waveformPane.getAudioStream());
+        try {
+            audioList.add(AudioSystem.getAudioInputStream(audioFile));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return audioList;
     }
 
@@ -137,6 +143,7 @@ public class AudioEditor extends StackPane {
     }
 
     public void setAudioFile(File audioFile) throws IOException, UnsupportedAudioFileException {
+        this.audioFile = audioFile;
         waveformPane.setAudioStream(audioFile);
         audioPlayer = new AudioPlayer(audioFile);
 

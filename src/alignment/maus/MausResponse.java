@@ -9,12 +9,16 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
 
 /**
  * Created by kalda on 8/04/2016.
@@ -22,6 +26,7 @@ import java.net.URLConnection;
 public class MausResponse {
 
     private Element responseXml;
+    private XPath xPath = XPathFactory.newInstance().newXPath();
 
     public MausResponse(InputStreamReader reader) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
@@ -31,7 +36,7 @@ public class MausResponse {
 
     public boolean getSuccess() {
         try {
-            return responseXml.getElementsByTagName("success").item(0).getNodeValue().equals("true");
+            return (boolean) xPath.evaluate("/WebServiceResponseLink/success", responseXml, XPathConstants.BOOLEAN);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -39,11 +44,16 @@ public class MausResponse {
     }
 
     public String getResultLink() {
-        return responseXml.getElementsByTagName("downloadLink").item(0).getNodeName();
+        try {
+            return (String) xPath.evaluate("/WebServiceResponseLink/downloadLink", responseXml, XPathConstants.STRING);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public Class<? extends AlignmentFormat> getResult() throws IOException {
-
+    public AlignmentFormat getResult() throws IOException, ParseException {
+        System.out.println(getResultLink());
         URL url = new URL(getResultLink());
         URLConnection connection = url.openConnection();
         InputStream in = connection.getInputStream();
@@ -53,6 +63,6 @@ public class MausResponse {
 
         in.close();
 
-        return null;
+        return format;
     }
 }

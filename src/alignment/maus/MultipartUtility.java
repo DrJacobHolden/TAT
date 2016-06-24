@@ -1,6 +1,10 @@
 package alignment.maus;
 
+import sun.audio.AudioStream;
+
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.xml.ws.WebServiceException;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -88,12 +92,10 @@ public class MultipartUtility {
         writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
         writer.append(LINE_FEED);
         writer.flush();
+        outputStream.flush();
 
-        byte[] buffer = new byte[4096];
-        int bytesRead = -1;
-        while ((bytesRead = audioStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
+        AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, outputStream);
+
         outputStream.flush();
         audioStream.close();
 
