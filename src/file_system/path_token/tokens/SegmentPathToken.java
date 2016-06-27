@@ -8,7 +8,7 @@ import file_system.path_token.PathToken;
  */
 public class SegmentPathToken implements PathToken {
     public String getToken() {
-        return "%n";
+        return "%d";
     }
 
     public String getValue(Segment segment) {

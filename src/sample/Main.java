@@ -48,9 +48,12 @@ public class Main extends Application {
         //Create the undoRedoController
         UndoRedoController undoRedoController = new UndoRedoController();
 
-        FileSystem fileSystem = new FileSystem();
 
-
+        final DirectoryChooser rootDirChooser = new DirectoryChooser();
+        File file = rootDirChooser.showDialog(primaryStage);
+        if (file != null) {
+            FileSystem fileSystem = new FileSystem(file.getAbsolutePath());
+        }
 
         //This is the audio file that will be used throughout the application
         //File audioFile = new File(this.getClass().getResource("recording.wav").getFile());

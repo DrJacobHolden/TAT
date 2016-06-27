@@ -39,16 +39,16 @@ public class FileSystem {
     /**
      * The root directory of corpus
      */
-    private String rootDir = "C:/TestingDir/";
+    private String rootDir;
 
     private String config = "config.txt";
 
     /**
      * The storage rules for the different FileSystemElements
      */
-    private String audioStorageRule = "%n/-%d-%s";
-    private String annotationStorageRule = "%n/-%d-%s";
-    private String alignmentStorageRule = "%n/-%d-%s";
+    private String audioStorageRule = "%n/%d-%s";
+    private String annotationStorageRule = "%n/%d-%s";
+    private String alignmentStorageRule = "%n/%d-%s";
 
     public String getAudioStorageRule() {
         return audioStorageRule;
@@ -85,9 +85,13 @@ public class FileSystem {
         //Find positions of tokens in the string. We have to do this because we can't have multiple named groups with
         //the same name.
         List<TokenMatch> matches = new ArrayList<>();
+
         for (PathToken token : pathTokens) {
-            int index;
-            while ((index=audioString.indexOf(token.getToken())) != -1) {
+            //Tokens are two digits long
+            int index = -2;
+            //Find each index of token
+            while ((index=audioString.indexOf(token.getToken(), index+token.getToken().length())) != -1) {
+                System.out.println("Matched token "+token.getToken()+" in rule: "+audioString);
                 matches.add(new TokenMatch(index, token));
             }
         }
@@ -100,13 +104,19 @@ public class FileSystem {
             //Create regex group
             audioString = audioString.replace(token.getToken(), "("+token.getRegex()+")");
         }
+        //Three or four digit file extension
+        audioString += "\\.[a-zA-Z0-9]{3,4}";
+        System.out.println("Built audio regex: "+audioString);
         Pattern audioRegex = Pattern.compile(audioString);
 
         //See if matches. Build segment if it does.
         for (Path filePath : files) {
-            String relativePath = filePath.relativize(Paths.get(rootDir)).toString();
+            String relativePath = Paths.get(rootDir).relativize(filePath).toString();
+            System.out.println(relativePath);
+
             Matcher matcher = audioRegex.matcher(relativePath);
             if (matcher.matches()) {
+                System.out.println(relativePath+" matches "+audioString);
                 //TODO: add audio file
                 Segment segment = new Segment(this);
                 //Sorted, so groups should be in correct order
@@ -128,7 +138,8 @@ public class FileSystem {
         segmentsFromFiles(filePaths);
     }
 
-    public FileSystem(String root) throws IOException {
+    public FileSystem(String rootDir) throws IOException {
+        this.rootDir = rootDir;
         //ASK USER FOR ROOT DIRECTORY
 
         //---- Existing Dir w Config -----//
