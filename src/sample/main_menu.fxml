@@ -44,7 +44,7 @@
             <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
          <children>
-            <Button fx:id="fileButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="100.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="fileButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="150.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
          </children>
       </GridPane>
       <AnchorPane id="textArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;" VBox.vgrow="NEVER">
