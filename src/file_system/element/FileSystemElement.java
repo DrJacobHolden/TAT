@@ -10,4 +10,5 @@ import java.io.FileNotFoundException;
  */
 public interface FileSystemElement {
     public void save() throws FileNotFoundException;
+    public String[] getFileExtensions();
 }

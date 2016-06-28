@@ -1,6 +1,7 @@
 package sample;
 
 import file_system.FileSystem;
+import file_system.Segment;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -57,11 +58,9 @@ public class Main extends Application {
                 fileSystem = new FileSystem(file.getAbsolutePath());
             }
         }
+        Segment defaultSegment = fileSystem.segments.get(0);
 
-        //This is the audio file that will be used throughout the application
-        //File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-
-        AnnotationArea annotation = new AnnotationArea(text);
+        AnnotationArea annotation = new AnnotationArea(defaultSegment.getAnnotationFile().getString());
         AudioEditor editor = new AudioEditor(undoRedoController, annotation);
 
         VBox vbox = new VBox();
@@ -81,7 +80,7 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
-        editor.setAudioFile(fileSystem.segments.get(0).getAudioFile().getFile());
+        editor.setAudioFile(defaultSegment.getAudioFile().getFile());
 
         KeyCodeCombination ctrlz = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
         KeyCodeCombination ctrly = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);

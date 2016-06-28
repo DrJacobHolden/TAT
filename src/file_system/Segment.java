@@ -8,6 +8,7 @@ import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -65,7 +66,7 @@ public class Segment {
     public AnnotationFile getAnnotationFile() {
         if (annotationFile == null) {
             annotationFile = new AnnotationFile(this, getPath(AnnotationFile.class));
-        } //TODO: Catch error opening
+        }
         return annotationFile;
     }
 

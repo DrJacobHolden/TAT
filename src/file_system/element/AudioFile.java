@@ -14,9 +14,9 @@ import java.nio.file.Path;
 /**
  * Created by Tate on 21/05/2016.
  */
-public class AudioFile implements FileSystemElement {
+public class AudioFile extends BaseFileSystemElement {
 
-    public static final String[] FILE_EXTENSIONS = {".wav"};
+    public static final String[] FILE_EXTENSIONS = new String[]{".wav"};
 
     private Segment segment;
 
@@ -27,15 +27,9 @@ public class AudioFile implements FileSystemElement {
     }
 
     public AudioFile(Segment segment, Path path) throws FileNotFoundException {
+        this.segment = segment;
         //Try to load file with file extensions
-        for (String ext : FILE_EXTENSIONS) {
-            File possibleFile = new File(path.toString()+ext);
-            if (possibleFile.exists()) {
-                file = possibleFile;
-                return;
-            }
-        }
-        throw new FileNotFoundException();
+        file = getFileForPath(path);
     }
 
     public File getFile() {
@@ -54,5 +48,10 @@ public class AudioFile implements FileSystemElement {
     @Override
     public void save() {
         Path path = segment.getPath(this);
+    }
+
+    @Override
+    public String[] getFileExtensions() {
+        return FILE_EXTENSIONS;
     }
 }
