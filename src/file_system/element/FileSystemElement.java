@@ -1,8 +1,5 @@
 package file_system.element;
 
-import file_system.FileSystem;
-
-import java.io.File;
 import java.io.FileNotFoundException;
 
 /**

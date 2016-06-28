@@ -18,14 +18,30 @@ import java.nio.file.Path;
  */
 public class Segment {
 
+    //EEK. Lots of associations. BEWARE! Constant for safety.
     private final FileSystem fileSystem;
+    private Recording recording;
 
     public FileSystem getFileSystem() {
         return fileSystem;
     }
 
-    private int segmentNumber;
-    private int speakerId;
+    public Recording getRecording() {
+        return recording;
+    }
+
+    public void setRecording(Recording recording) {
+        if (this.recording != null) {
+            throw new UnsupportedOperationException("Re-assignment of recording is not allowed.");
+        }
+        this.recording = recording;
+    }
+
+    //Default to 0
+    private int segmentNumber = 0;
+    private int speakerId = 0;
+
+    //This is only used if the segment is not yet associated with a recording yet.
     private String baseName;
 
     public int getSegmentNumber() {
@@ -37,6 +53,10 @@ public class Segment {
     }
 
     public String getBaseName() {
+        //Return the basename of the recording if the recording has been set
+        if (recording != null) {
+            return recording.getBaseName();
+        }
         return baseName;
     }
 
@@ -49,6 +69,9 @@ public class Segment {
     }
 
     public void setBaseName(String baseName) {
+        if (recording != null) {
+            throw new UnsupportedOperationException("Set the basename of the recording instead");
+        }
         this.baseName = baseName;
     }
 

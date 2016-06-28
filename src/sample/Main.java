@@ -1,6 +1,7 @@
 package sample;
 
 import file_system.FileSystem;
+import file_system.Recording;
 import file_system.Segment;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,12 +31,6 @@ import static javafx.scene.input.KeyCode.T;
 
 public class Main extends Application {
 
-    final String text = "Hello Max. This is Tate. " +
-            "I'm just leaving you a voicemail message to test the voicemail functionality. " +
-            "Complicated words. Made up of many vowels and sylables. And letters. Thank you. " +
-            "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. " +
-            "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -58,7 +53,9 @@ public class Main extends Application {
                 fileSystem = new FileSystem(file.getAbsolutePath());
             }
         }
-        Segment defaultSegment = fileSystem.segments.get(0);
+
+        Recording defaultRecording = fileSystem.recordings.get("tate1");
+        Segment defaultSegment = defaultRecording.getSegment(1);
 
         AnnotationArea annotation = new AnnotationArea(defaultSegment.getAnnotationFile().getString());
         AudioEditor editor = new AudioEditor(undoRedoController, annotation);

@@ -15,10 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,12 +74,11 @@ public class FileSystem {
         return new File(new File(rootDir), path).toPath();
     }
 
-    /**
-     * All the files in the corpus. Files are a collection of segments.
-     */
-    public List<Segment> segments = new ArrayList<>();
+    public Map<String, Recording> recordings;
 
-    private void segmentsFromAudioFiles(List<Path> files) {
+    private List<Segment> segmentsFromAudioFiles(List<Path> files) {
+        List<Segment> segments = new ArrayList<>();
+
         //From http://stackoverflow.com/questions/10664434/escaping-special-characters-in-java-regular-expressions
         Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]");
         String audioString = SPECIAL_REGEX_CHARS.matcher(audioStorageRule).replaceAll("\\$0");
@@ -133,17 +129,20 @@ public class FileSystem {
                 segments.add(segment);
             }
         }
+        return segments;
     }
 
-    private void importFiles() throws IOException {
+    private List<Segment> importFiles() throws IOException {
         List<Path> filePaths = Files.walk(Paths.get(rootDir))
                 .filter(Files::isRegularFile)
                 //Is audio file
                 .filter(path -> Arrays.stream(AudioFile.FILE_EXTENSIONS).anyMatch(ext -> path.toString().endsWith(ext)))
                 .collect(Collectors.toList());
         //TODO: Filter to only be audio files
-        segmentsFromAudioFiles(filePaths);
+        return segmentsFromAudioFiles(filePaths);
     }
+
+
 
     public FileSystem(String rootDir) throws IOException {
         this.rootDir = rootDir;
@@ -154,7 +153,9 @@ public class FileSystem {
         //Import config file
         loadConfig();
         //Import files
-        importFiles();
+        recordings = Recording.groupSegments(importFiles());
+        //Check recordings aren't missing any segments
+
         //Start program
 
         //---- Existing Dir wo Config ----//
