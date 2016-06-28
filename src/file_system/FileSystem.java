@@ -9,14 +9,17 @@ import file_system.path_token.tokens.NamePathToken;
 import file_system.path_token.tokens.SegmentPathToken;
 import file_system.path_token.tokens.SpeakerIdPathToken;
 import javafx.collections.transformation.SortedList;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -24,11 +27,13 @@ import java.util.stream.Collectors;
 import static java.nio.file.FileVisitResult.CONTINUE;
 
 /**
- * Created by Tate on 21/05/2016.
+ * Created by Tate and Max on 21/05/2016.
  *
  * PATHS MUST BE IN UNIX FORMAT. / INSTEAD OF \
  */
 public class FileSystem {
+
+    private static Logger LOGGER = Logger.getLogger(FileSystem.class.getName());
 
     private final PathToken[] pathTokens = {
             new NamePathToken(),
@@ -62,25 +67,25 @@ public class FileSystem {
         return alignmentStorageRule;
     }
 
-    public String pathFromString(Segment segment, String rule) {
+    public Path pathFromString(Segment segment, String rule) {
         String path = rule;
 
         for (PathToken token : pathTokens) {
             path = path.replace(token.getToken(), token.getValue(segment));
         }
         //Join paths
-        return new File(new File(rootDir), path).getPath();
+        return new File(new File(rootDir), path).toPath();
     }
 
     /**
      * All the files in the corpus. Files are a collection of segments.
      */
-    private List<Segment> segments = new ArrayList<>();
+    public List<Segment> segments = new ArrayList<>();
 
-    private void segmentsFromFiles(List<Path> files) {
+    private void segmentsFromAudioFiles(List<Path> files) {
         //From http://stackoverflow.com/questions/10664434/escaping-special-characters-in-java-regular-expressions
         Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]");
-        String audioString = SPECIAL_REGEX_CHARS.matcher(audioStorageRule).replaceAll("\\\\$0");
+        String audioString = SPECIAL_REGEX_CHARS.matcher(audioStorageRule).replaceAll("\\$0");
 
         //Find positions of tokens in the string. We have to do this because we can't have multiple named groups with
         //the same name.
@@ -91,7 +96,7 @@ public class FileSystem {
             int index = -2;
             //Find each index of token
             while ((index=audioString.indexOf(token.getToken(), index+token.getToken().length())) != -1) {
-                System.out.println("Matched token "+token.getToken()+" in rule: "+audioString);
+                LOGGER.info("Matched token "+token.getToken()+" in rule: "+audioString);
                 matches.add(new TokenMatch(index, token));
             }
         }
@@ -104,25 +109,24 @@ public class FileSystem {
             //Create regex group
             audioString = audioString.replace(token.getToken(), "("+token.getRegex()+")");
         }
-        //Three or four digit file extension
-        audioString += "\\.[a-zA-Z0-9]{3,4}";
-        System.out.println("Built audio regex: "+audioString);
+        //Three or four character file extension
+        audioString += "\\.[a-z]{3,4}";
+        LOGGER.info("Built audio regex: "+audioString);
         Pattern audioRegex = Pattern.compile(audioString);
 
         //See if matches. Build segment if it does.
         for (Path filePath : files) {
-            String relativePath = Paths.get(rootDir).relativize(filePath).toString();
-            System.out.println(relativePath);
+            //Convert \ to / for unix like paths
+            String relativePath = Paths.get(rootDir).relativize(filePath).toString().replace('\\', '/');
 
             Matcher matcher = audioRegex.matcher(relativePath);
             if (matcher.matches()) {
-                System.out.println(relativePath+" matches "+audioString);
-                //TODO: add audio file
+                LOGGER.info(relativePath+" matches "+audioString);
                 Segment segment = new Segment(this);
                 //Sorted, so groups should be in correct order
                 for (int i=0; i<matches.size(); i++) {
                     PathToken token = matches.get(i).token;
-                    String textMatch = matcher.group(i);
+                    String textMatch = matcher.group(i+1);
                     //TODO: find inconsistency, throw error
                     token.setValue(segment, textMatch);
                 }
@@ -134,8 +138,11 @@ public class FileSystem {
     private void importFiles() throws IOException {
         List<Path> filePaths = Files.walk(Paths.get(rootDir))
                 .filter(Files::isRegularFile)
+                //Is audio file
+                .filter(path -> Arrays.stream(AudioFile.FILE_EXTENSIONS).anyMatch(ext -> path.toString().endsWith(ext)))
                 .collect(Collectors.toList());
-        segmentsFromFiles(filePaths);
+        //TODO: Filter to only be audio files
+        segmentsFromAudioFiles(filePaths);
     }
 
     public FileSystem(String rootDir) throws IOException {

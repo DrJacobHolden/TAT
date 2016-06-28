@@ -5,6 +5,7 @@ import file_system.Segment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 
 /**
  * Created by Tate on 21/05/2016.
@@ -19,14 +20,14 @@ public class AnnotationFile implements FileSystemElement {
         this.annotation = annotation;
     }
 
-    @Override
-    public void save() throws FileNotFoundException {
-        String path = segment.getPath(this);
-        PrintWriter out = new PrintWriter(path);
-        out.println(annotation);
+    public AnnotationFile(Segment segment, Path path) {
+
     }
 
-    public static AnnotationFile load(String path) {
-        return null;
+    @Override
+    public void save() throws FileNotFoundException {
+        Path path = segment.getPath(this);
+        PrintWriter out = new PrintWriter(path.toFile());
+        out.println(annotation);
     }
 }

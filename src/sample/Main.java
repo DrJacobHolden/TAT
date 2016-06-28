@@ -49,16 +49,19 @@ public class Main extends Application {
         UndoRedoController undoRedoController = new UndoRedoController();
 
 
+        FileSystem fileSystem = null;
         final DirectoryChooser rootDirChooser = new DirectoryChooser();
-        File file = rootDirChooser.showDialog(primaryStage);
-        if (file != null) {
-            FileSystem fileSystem = new FileSystem(file.getAbsolutePath());
+        while (fileSystem == null) {
+            File file = rootDirChooser.showDialog(primaryStage);
+            if (file != null) {
+                fileSystem = new FileSystem(file.getAbsolutePath());
+            }
         }
 
         //This is the audio file that will be used throughout the application
         //File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
 
-        /*AnnotationArea annotation = new AnnotationArea(text);
+        AnnotationArea annotation = new AnnotationArea(text);
         AudioEditor editor = new AudioEditor(undoRedoController, annotation);
 
         VBox vbox = new VBox();
@@ -78,7 +81,7 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
-        editor.setAudioFile(audioFile);
+        editor.setAudioFile(fileSystem.segments.get(0).getAudioFile().getFile());
 
         KeyCodeCombination ctrlz = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
         KeyCodeCombination ctrly = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
@@ -88,7 +91,7 @@ public class Main extends Application {
             } else if (ctrly.match(event)) {
                 undoRedoController.redo();
             }
-        });*/
+        });
     }
     
     public static void main(String[] args) {

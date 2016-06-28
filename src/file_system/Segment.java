@@ -8,6 +8,7 @@ import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
 
 /**
  * Created by kalda on 25/06/2016.
@@ -54,24 +55,28 @@ public class Segment {
     private AnnotationFile annotationFile;
     private AudioFile audioFile;
 
-    private AlignmentFile getAlignmentFile() {
+    public AlignmentFile getAlignmentFile() {
         if (alignmentFile == null) {
-            alignmentFile = AlignmentFile.load(getPath(AlignmentFile.class));
+            alignmentFile = new AlignmentFile(this, getPath(AlignmentFile.class));
         } //TODO: Catch error opening
         return alignmentFile;
     }
 
-    private AnnotationFile getAnnotationFile() {
+    public AnnotationFile getAnnotationFile() {
         if (annotationFile == null) {
-            annotationFile = AnnotationFile.load(getPath(AnnotationFile.class));
+            annotationFile = new AnnotationFile(this, getPath(AnnotationFile.class));
         } //TODO: Catch error opening
         return annotationFile;
     }
 
-    private AudioFile getAudioFile() {
+    public AudioFile getAudioFile() {
         if (audioFile == null) {
-            audioFile = AudioFile.load(getPath(AudioFile.class));
-        } //TODO: Catch error opening
+            try {
+                audioFile = new AudioFile(this, getPath(AudioFile.class));
+            } catch (FileNotFoundException e) {
+                return null;
+            }
+        }
         return audioFile;
     }
 
@@ -113,11 +118,11 @@ public class Segment {
         }
     }
 
-    public String getPath(FileSystemElement element) {
+    public Path getPath(FileSystemElement element) {
         return getPath(element.getClass());
     }
 
-    public String getPath(Class<? extends FileSystemElement> cls) {
+    public Path getPath(Class<? extends FileSystemElement> cls) {
         if (AudioFile.class.isAssignableFrom(cls)) {
             return fileSystem.pathFromString(this, fileSystem.getAudioStorageRule());
         } else if (AnnotationFile.class.isAssignableFrom(cls)) {
