@@ -40,4 +40,8 @@ public class IconLoader {
     //Program Icon
     public Image logoIcon = new Image(getClass().getResourceAsStream("/ui/icon/icons/logo_raw.png"));
 
+    ///NEW ICONS///
+    public Image mainFileIcon = new Image(getClass().getResourceAsStream("/ui/icon/icons/Browse_Released.png"));
+    public Image mainFileIconPressed = new Image(getClass().getResourceAsStream("/ui/icon/icons/Browse_Pressed.png"));
+
 }
