@@ -1,4 +1,4 @@
-package sample;
+package tat;
 
 import alignment.AlignmentProvider;
 import alignment.maus.WebMaus;

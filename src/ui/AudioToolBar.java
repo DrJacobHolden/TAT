@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import sample.Configuration;
+import tat.Configuration;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 import ui.text_box.AnnotationArea;
@@ -91,7 +91,7 @@ public class AudioToolBar extends HBox {
 
     protected class fileButton extends Button {
         public fileButton() {
-            super("", new Icon(IconLoader.getInstance().fileIcon));
+            super("", new Icon(IconLoader.getInstance().mainFileIcon));
         }
     }
 
@@ -103,13 +103,13 @@ public class AudioToolBar extends HBox {
 
     protected class configButton extends Button {
         public configButton() {
-            super("", new Icon(IconLoader.getInstance().configIcon));
+            super("", new Icon(IconLoader.getInstance().settingsIcon));
         }
     }
 
     protected class uploadButton extends Button {
         public uploadButton() {
-            super("", new Icon(IconLoader.getInstance().uploadIcon));
+            super("", new Icon(IconLoader.getInstance().alignIcon));
             setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
