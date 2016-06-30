@@ -1,6 +1,7 @@
 package tat.view;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import tat.Main;
@@ -76,6 +77,24 @@ public class EditorMenuController {
         settingsButton.setIcons(new Icon(IconLoader.getInstance().settingsIcon), new Icon(IconLoader.getInstance().settingsIconPressed));
     }
 
+    private void loadTooltips() {
+        System.out.println("Tooltips Loaded");
+        splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the selected point.\n"));
+        joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the selected point.\n"));
+        alignButton.setTooltip(new Tooltip("Sends the audio and transcription to the alignment\n" +
+                "system. When complete the results will be displayed."));
+        zoomInButton.setTooltip(new Tooltip("Zoom in.\n"));
+        zoomOutButton.setTooltip(new Tooltip("Zoom out.\n"));
+        openFileSelectorButton.setTooltip(new Tooltip("Open a new file.\n"));
+        saveButton.setTooltip(new Tooltip("Save the corpus in the current state.\n"));
+        prevSegmentButton.setTooltip(new Tooltip("Previous segment.\n"));
+        playButton.setTooltip(new Tooltip("Begin playback.\n"));
+        pauseButton.setTooltip(new Tooltip("Pause at current point.\n"));
+        stopButton.setTooltip(new Tooltip("Stop playback.\n"));
+        nextSegmentButton.setTooltip(new Tooltip("Next segment.\n"));
+        settingsButton.setTooltip(new Tooltip("Open the configuration menu.\n"));
+    }
+
     /**
      * The constructor is called before the initialize() method.
      */
@@ -88,6 +107,7 @@ public class EditorMenuController {
     @FXML
     private void initialize() {
         loadIcons();
+        loadTooltips();
     }
 
     /**

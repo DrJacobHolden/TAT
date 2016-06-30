@@ -2,6 +2,7 @@ package tat.view;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import tat.Main;
 import ui.icon.Icon;
@@ -28,6 +29,11 @@ public class MainMenuController {
         fileButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
     }
 
+    private void loadTooltips() {
+        System.out.println("Tooltips Loaded");
+        fileButton.setTooltip(new Tooltip("Open the file/directory selector.\n"));
+    }
+
     /**
      * The constructor is called before the initialize() method.
      */
@@ -40,6 +46,7 @@ public class MainMenuController {
     @FXML
     private void initialize() {
         loadIcons();
+        loadTooltips();
     }
 
     /**
