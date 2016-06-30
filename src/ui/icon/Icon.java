@@ -17,7 +17,7 @@ public class Icon extends ImageView {
         setFitWidth(DEFAULT_X);
     }
 
-    public Icon resizeIcon(int x, int y) {
+    public Icon resizeIcon(double x, double y) {
         setFitHeight(y);
         setFitWidth(x);
         return this;

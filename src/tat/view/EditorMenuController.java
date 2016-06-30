@@ -64,15 +64,15 @@ public class EditorMenuController {
         splitButton.setIcons(new Icon(IconLoader.getInstance().splitIcon), new Icon(IconLoader.getInstance().splitIconPressed));
         joinButton.setIcons(new Icon(IconLoader.getInstance().joinIcon), new Icon(IconLoader.getInstance().joinIconPressed));
         alignButton.setIcons(new Icon(IconLoader.getInstance().alignIcon), new Icon(IconLoader.getInstance().alignIconPressed));
-        zoomInButton.setIcons(new Icon(IconLoader.getInstance().zoomInIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().zoomInIconPressed).resizeIcon(62, 62));
-        zoomOutButton.setIcons(new Icon(IconLoader.getInstance().zoomOutIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().zoomOutIconPressed).resizeIcon(62, 62));
+        zoomInButton.setIcons(new Icon(IconLoader.getInstance().zoomInIcon), new Icon(IconLoader.getInstance().zoomInIconPressed));
+        zoomOutButton.setIcons(new Icon(IconLoader.getInstance().zoomOutIcon), new Icon(IconLoader.getInstance().zoomOutIconPressed));
         openFileSelectorButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
         saveButton.setIcons(new Icon(IconLoader.getInstance().saveIcon), new Icon(IconLoader.getInstance().saveIconPressed));
-        prevSegmentButton.setIcons(new Icon(IconLoader.getInstance().prevIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().prevIconPressed).resizeIcon(62, 62));
-        playButton.setIcons(new Icon(IconLoader.getInstance().playIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().playIconPressed).resizeIcon(62, 62));
-        pauseButton.setIcons(new Icon(IconLoader.getInstance().pauseIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().pauseIconPressed).resizeIcon(62, 62));
-        stopButton.setIcons(new Icon(IconLoader.getInstance().stopIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().stopIconPressed).resizeIcon(62, 62));
-        nextSegmentButton.setIcons(new Icon(IconLoader.getInstance().nextIcon).resizeIcon(62, 62), new Icon(IconLoader.getInstance().nextIconPressed).resizeIcon(62, 62));
+        prevSegmentButton.setIcons(new Icon(IconLoader.getInstance().prevIcon), new Icon(IconLoader.getInstance().prevIconPressed));
+        playButton.setIcons(new Icon(IconLoader.getInstance().playIcon), new Icon(IconLoader.getInstance().playIconPressed));
+        pauseButton.setIcons(new Icon(IconLoader.getInstance().pauseIcon), new Icon(IconLoader.getInstance().pauseIconPressed));
+        stopButton.setIcons(new Icon(IconLoader.getInstance().stopIcon), new Icon(IconLoader.getInstance().stopIconPressed));
+        nextSegmentButton.setIcons(new Icon(IconLoader.getInstance().nextIcon), new Icon(IconLoader.getInstance().nextIconPressed));
         settingsButton.setIcons(new Icon(IconLoader.getInstance().settingsIcon), new Icon(IconLoader.getInstance().settingsIconPressed));
     }
 
