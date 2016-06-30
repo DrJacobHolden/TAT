@@ -84,9 +84,6 @@
                   <HBox alignment="CENTER" maxHeight="125.0" minHeight="62.5" prefHeight="125.0">
                      <children>
                         <IconButton fx:id="openFileSelectorButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0">
-                           <HBox.margin>
-                              <Insets right="25.0" />
-                           </HBox.margin>
                         </IconButton>
                         <IconButton fx:id="saveButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
                         <Pane minHeight="62.5" HBox.hgrow="ALWAYS" />
