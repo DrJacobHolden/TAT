@@ -1,6 +1,8 @@
 package file_system;
 
 import alignment.formats.TextGrid;
+import file_system.attribute.CustomAttribute;
+import file_system.attribute.CustomAttributeInstance;
 import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
@@ -10,6 +12,8 @@ import sun.audio.AudioStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kalda on 25/06/2016.
@@ -21,6 +25,7 @@ public class Segment {
     //EEK. Lots of associations. BEWARE! Constant for safety.
     private final FileSystem fileSystem;
     private Recording recording;
+    public List<CustomAttributeInstance> customAttributes = new ArrayList<>();
 
     public FileSystem getFileSystem() {
         return fileSystem;

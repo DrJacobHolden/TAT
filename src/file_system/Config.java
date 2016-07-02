@@ -1,5 +1,6 @@
 package file_system;
 
+import file_system.attribute.CustomAttribute;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -7,19 +8,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -45,6 +42,7 @@ public class Config {
     public final String audioStorageRule;
     public final String annotationStorageRule;
     public final String alignmentStorageRule;
+    public final List<CustomAttribute> customAttributes = new ArrayList<>();
 
     public Config() {
         this(DEFAULT_AUDIO_STORAGE_RULE, DEFAULT_ANNOTATION_STORAGE_RULE, DEFAULT_ALIGNMENT_STORAGE_RULE);
@@ -71,6 +69,7 @@ public class Config {
             root.appendChild(createXmlTagElement(document, AUDIO_RULE_TAG_NAME, audioStorageRule));
             root.appendChild(createXmlTagElement(document, ANNOTATION_RULE_TAG_NAME, annotationStorageRule));
             root.appendChild(createXmlTagElement(document, ALIGNMENT_RULE_TAG_NAME, alignmentStorageRule));
+            root.appendChild(CustomAttribute.listToXMLElement(document, customAttributes));
 
             //Write to file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -98,11 +97,14 @@ public class Config {
             String audioRule = xmlDoc.getElementsByTagName(AUDIO_RULE_TAG_NAME).item(0).getTextContent();
             String annotationRule = xmlDoc.getElementsByTagName(ANNOTATION_RULE_TAG_NAME).item(0).getTextContent();
             String alignmentRule = xmlDoc.getElementsByTagName(ALIGNMENT_RULE_TAG_NAME).item(0).getTextContent();
+            Element customAttributesElement = (Element) xmlDoc.getElementsByTagName(CustomAttribute.CUSTOM_ATTRIBUTES_TAG_NAME).item(0);
 
-            return new Config(audioRule, annotationRule, alignmentRule);
+            Config config = new Config(audioRule, annotationRule, alignmentRule);
+            config.customAttributes.addAll(CustomAttribute.XMLElementsToList(customAttributesElement));
+
+            return config;
         } catch (SAXException | ParserConfigurationException e) {
             throw new IOException();
         }
     }
-
 }

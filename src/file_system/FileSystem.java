@@ -1,5 +1,6 @@
 package file_system;
 
+import file_system.attribute.CustomAttribute;
 import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
@@ -32,12 +33,17 @@ public class FileSystem {
 
     private static Logger LOGGER = Logger.getLogger(FileSystem.class.getName());
     private static final String CONFIG_FILE = "config.xml";
-
-    private final PathToken[] pathTokens = {
+    private static final PathToken[] defaultPathTokens = {
             new NamePathToken(),
             new SegmentPathToken(),
             new SpeakerIdPathToken()
     };
+
+    public List<PathToken> getPathTokens() {
+        List<PathToken> tokens = Arrays.asList(defaultPathTokens);
+        tokens.addAll(config.customAttributes);
+        return tokens;
+    }
 
     private final Path rootDir;
     private final Config config;
@@ -63,7 +69,7 @@ public class FileSystem {
     public Path pathFromString(Segment segment, String rule) {
         String path = rule;
 
-        for (PathToken token : pathTokens) {
+        for (PathToken token : getPathTokens()) {
             path = path.replace(token.getToken(), token.getValue(segment));
         }
         //Join paths
@@ -88,7 +94,7 @@ public class FileSystem {
         //the same name.
         List<TokenMatch> matches = new ArrayList<>();
 
-        for (PathToken token : pathTokens) {
+        for (PathToken token : getPathTokens()) {
             //Tokens are two digits long
             int index = -2;
             //Find each index of token
