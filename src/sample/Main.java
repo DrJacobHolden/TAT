@@ -1,22 +1,17 @@
 package sample;
 
+import file_system.Config;
 import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ui.AudioEditor;
 import ui.AudioToolBar;
@@ -25,9 +20,8 @@ import undo.UndoRedoController;
 import ui.text_box.AnnotationArea;
 
 import java.io.File;
-import java.util.Optional;
-
-import static javafx.scene.input.KeyCode.T;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main extends Application {
 
@@ -50,7 +44,14 @@ public class Main extends Application {
         while (fileSystem == null) {
             File file = rootDirChooser.showDialog(primaryStage);
             if (file != null) {
-                fileSystem = new FileSystem(file.getAbsolutePath());
+                Path path = Paths.get(file.getAbsolutePath());
+                if (FileSystem.corpusExists(path)) {
+                    fileSystem = new FileSystem(path);
+                } else {
+                    //TODO: Ask user about settings
+                    fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
+                            Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
+                }
             }
         }
 

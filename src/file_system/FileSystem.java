@@ -31,6 +31,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 public class FileSystem {
 
     private static Logger LOGGER = Logger.getLogger(FileSystem.class.getName());
+    private static final String CONFIG_FILE = "config.xml";
 
     private final PathToken[] pathTokens = {
             new NamePathToken(),
@@ -38,32 +39,27 @@ public class FileSystem {
             new SpeakerIdPathToken()
     };
 
-    /**
-     * The root directory of corpus
-     */
-    private String rootDir;
-
-    private String config = "config.txt";
-
-    /**
-     * The storage rules for the different FileSystemElements
-     */
-    private String audioStorageRule = "%n/%d-%s";
-    private String annotationStorageRule = "%n/%d-%s";
-    private String alignmentStorageRule = "%n/%d-%s";
+    private final Path rootDir;
+    private final Config config;
 
     public String getAudioStorageRule() {
-        return audioStorageRule;
+        return config.audioStorageRule;
     }
 
     public String getAnnotationStorageRule() {
-        return annotationStorageRule;
+        return config.annotationStorageRule;
     }
 
     public String getAlignmentStorageRule() {
-        return alignmentStorageRule;
+        return config.alignmentStorageRule;
     }
 
+    /**
+     * Generate a path for a segment from a given rule.
+     * @param segment The segment to generate a path for
+     * @param rule The rule to use
+     * @return The path
+     */
     public Path pathFromString(Segment segment, String rule) {
         String path = rule;
 
@@ -71,17 +67,22 @@ public class FileSystem {
             path = path.replace(token.getToken(), token.getValue(segment));
         }
         //Join paths
-        return new File(new File(rootDir), path).toPath();
+        return rootDir.relativize(Paths.get(path));
     }
 
     public Map<String, Recording> recordings;
 
+    /**
+     * Builds a list of segments from a list of audio files
+     * @param files
+     * @return The found segments
+     */
     private List<Segment> segmentsFromAudioFiles(List<Path> files) {
         List<Segment> segments = new ArrayList<>();
 
         //From http://stackoverflow.com/questions/10664434/escaping-special-characters-in-java-regular-expressions
         Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]");
-        String audioString = SPECIAL_REGEX_CHARS.matcher(audioStorageRule).replaceAll("\\$0");
+        String audioString = SPECIAL_REGEX_CHARS.matcher(getAudioStorageRule()).replaceAll("\\$0");
 
         //Find positions of tokens in the string. We have to do this because we can't have multiple named groups with
         //the same name.
@@ -113,7 +114,7 @@ public class FileSystem {
         //See if matches. Build segment if it does.
         for (Path filePath : files) {
             //Convert \ to / for unix like paths
-            String relativePath = Paths.get(rootDir).relativize(filePath).toString().replace('\\', '/');
+            String relativePath = rootDir.relativize(filePath).toString().replace('\\', '/');
 
             Matcher matcher = audioRegex.matcher(relativePath);
             if (matcher.matches()) {
@@ -132,8 +133,13 @@ public class FileSystem {
         return segments;
     }
 
-    private List<Segment> importFiles() throws IOException {
-        List<Path> filePaths = Files.walk(Paths.get(rootDir))
+    /**
+     * Construct a list of segments from the root directory
+     * @return a list of segments
+     * @throws IOException
+     */
+    private List<Segment> loadSegments() throws IOException {
+        List<Path> filePaths = Files.walk(rootDir)
                 .filter(Files::isRegularFile)
                 //Is audio file
                 .filter(path -> Arrays.stream(AudioFile.FILE_EXTENSIONS).anyMatch(ext -> path.toString().endsWith(ext)))
@@ -142,47 +148,56 @@ public class FileSystem {
         return segmentsFromAudioFiles(filePaths);
     }
 
+    private void importRecordings() throws IOException {
+        recordings = Recording.groupSegments(loadSegments());
+        checkForMissingSegments();
+    }
 
+    /**
+     * Checks that all required segments exist
+     */
+    private void checkForMissingSegments() {
+        recordings.values().stream().filter(recording -> recording.missingSegments()).forEach(recording -> {
+            //TODO: Alert user
+        });
+    }
 
-    public FileSystem(String rootDir) throws IOException {
+    /**
+     * Does the corpus already exist?
+     * @param path
+     * @return
+     */
+    public static boolean corpusExists(Path path) {
+        return path.resolve(CONFIG_FILE).toFile().exists();
+    }
+
+    /**
+     * When the corpus already exists
+     * @param rootDir The root directory of the corpus
+     * @throws IOException
+     */
+    public FileSystem(Path rootDir) throws IOException {
         this.rootDir = rootDir;
-        //ASK USER FOR ROOT DIRECTORY
-
-        //---- Existing Dir w Config -----//
-
-        //Import config file
-        loadConfig();
-        //Import files
-        recordings = Recording.groupSegments(importFiles());
-        //Check recordings aren't missing any segments
-
-        //Start program
-
-        //---- Existing Dir wo Config ----//
-
-        //"No config file was found, are you creating a new corpus?"
-
-        //---- Yes ----//
-        //Dir is empty?
-
-        //---- Yes ----//
-        //setupNewCorpus();
-
-        //---- No ----//
-        //Out of scope
-        //"This directory is not empty. Please create your new corpus in an empty directory."
-
-        //---- No ----//
-        //Out of scope
-        //"Please relocate your config file or reimport your corpus into a new corpus."
-
-        //---- Non-existing Dir ----//
-        //setupNewCorpus();
+        config = Config.load(rootDir.resolve(CONFIG_FILE));
+        loadSegments();
     }
 
-    private void loadConfig() {
-        //TODO: Read storage rules and other settings from a file
+    /**
+     * Construct a new corpus
+     * @param rootDir
+     * @param audioStorageRule
+     * @param annotationStorageRule
+     * @param alignmentStorageRule
+     */
+    public FileSystem(Path rootDir, String audioStorageRule, String annotationStorageRule, String alignmentStorageRule) throws IOException {
+        this.rootDir = rootDir;
+        config = new Config(audioStorageRule, annotationStorageRule, alignmentStorageRule);
+        config.save(rootDir.resolve(CONFIG_FILE));
+
+        //In case files aready exist
+        loadSegments();
     }
+
 }
 
 class TokenMatch implements Comparable<TokenMatch> {
