@@ -8,8 +8,8 @@ import javafx.scene.image.ImageView;
  */
 public class Icon extends ImageView {
 
-    private final int DEFAULT_X = 25;
-    private final int DEFAULT_Y = 25;
+    private final int DEFAULT_X = 125;
+    private final int DEFAULT_Y = 125;
 
     public Icon(Image icon) {
         setImage(icon);
@@ -17,7 +17,7 @@ public class Icon extends ImageView {
         setFitWidth(DEFAULT_X);
     }
 
-    public Icon resizeIcon(int x, int y) {
+    public Icon resizeIcon(double x, double y) {
         setFitHeight(y);
         setFitWidth(x);
         return this;
