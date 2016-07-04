@@ -26,31 +26,20 @@ import java.nio.file.Paths;
 
 public class Main extends Application {
 
+    public VBox rootLayout;
+    public FileSystem fileSystem;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-       UndoRedoController undoRedoController = new UndoRedoController();
-
-        /*//This is the audio file that will be used throughout the application
-        File audioFile = new File(this.getClass().getResource("recording.wav").getFile());
-        AnnotationArea annotation = new AnnotationArea(text);
-        AudioEditor editor = new AudioEditor(undoRedoController, annotation);
-        VBox vbox = new VBox();
-        vbox.getChildren().add(editor);
-        //TODO: Prevent height hardcoding, possibly configurable?
-        editor.setMinHeight(256);
-        vbox.getChildren().add(new AudioToolBar(editor, annotation));
-        vbox.getChildren().add(annotation);
-        editor.setAudioFile(audioFile);*/
 
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("view/EditorMenu.fxml"));
-            VBox rootLayout = loader.load();
+            loader.setLocation(Main.class.getResource("view/MainMenu.fxml"));
+            rootLayout = loader.load();
 
-            EditorMenuController controller = loader.getController();
-            controller.setMainApp(this);
+            MainMenuController controller = loader.getController();
+            controller.setup(this, primaryStage);
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
@@ -59,35 +48,6 @@ public class Main extends Application {
             primaryStage.setTitle("Transcription Assistance Toolkit");
             //Set the program logo
             primaryStage.getIcons().add(IconLoader.getInstance().logoIcon);
-
-            FileSystem fileSystem = null;
-            final DirectoryChooser rootDirChooser = new DirectoryChooser();
-            while (fileSystem == null) {
-                File file = rootDirChooser.showDialog(primaryStage);
-                if (file != null) {
-                    Path path = Paths.get(file.getAbsolutePath());
-                    if (FileSystem.corpusExists(path)) {
-                        fileSystem = new FileSystem(path);
-                    } else {
-                        //TODO: Ask user about settings
-                        fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
-                                Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
-                    }
-                }
-            }
-
-            //Recording defaultRecording = fileSystem.recordings.get("tate1");
-            //Segment defaultSegment = defaultRecording.getSegment(1);
-
-            KeyCodeCombination ctrlz = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-            KeyCodeCombination ctrly = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
-            scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-                if (ctrlz.match(event)) {
-                    undoRedoController.undo();
-                } else if (ctrly.match(event)) {
-                    undoRedoController.redo();
-                }
-            });
 
             primaryStage.show();
         } catch (IOException e) {

@@ -9,6 +9,10 @@ import java.util.Map;
  */
 public class Recording {
 
+    public Map<Integer, Segment> getSegments() {
+        return segments;
+    }
+
     private String baseName;
     private Map<Integer, Segment> segments = new HashMap<>();
     private int size = 0;

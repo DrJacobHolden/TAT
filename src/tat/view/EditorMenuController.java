@@ -1,17 +1,27 @@
 package tat.view;
 
+import file_system.FileSystem;
+import file_system.Recording;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import tat.Main;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 
+import java.util.Set;
+
 /**
  * Created by Tate on 29/06/2016.
  */
-public class EditorMenuController {
+public class EditorMenuController implements FileSelectedHandler {
 
     @FXML
     private IconButton splitButton;
@@ -58,7 +68,16 @@ public class EditorMenuController {
     @FXML
     private TextFlow textArea;
 
+    @FXML
+    private MenuButton fileMenu;
+
     private Main main;
+    private Stage primaryStage;
+    private String activeRecording;
+
+    public Recording getRecording() {
+        return main.fileSystem.recordings.get(activeRecording);
+    }
 
     private void loadIcons() {
         System.out.println("Icons loaded");
@@ -115,8 +134,30 @@ public class EditorMenuController {
      *
      * @param main
      */
-    public void setMainApp(Main main) {
+    public void setup(Main main, Stage ps, String activeRecording) {
         this.main = main;
+        this.primaryStage = ps;
+        this.activeRecording = activeRecording;
+        populateFileMenu(this, main.fileSystem, fileMenu);
+        fileMenu.setText(activeRecording);
     }
 
+    public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu) {
+        ObservableList<MenuItem> menuItems = fileMenu.getItems();
+        menuItems.clear();
+        Set<String> recordings = fileSystem.recordings.keySet();
+        for(String name : recordings) {
+            MenuItem mu = new MenuItem(name);
+            menuItems.add(mu);
+            mu.setOnAction(event -> handler.fileSelected(mu.getText()));
+        }
+        if(recordings.size() > 0) {
+            fileMenu.setText(recordings.size() + " File(s)");
+        }
+    }
+
+    @Override
+    public void fileSelected(String file) {
+        System.out.println("File selected");
+    }
 }

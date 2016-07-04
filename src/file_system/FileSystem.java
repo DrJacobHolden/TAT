@@ -155,6 +155,7 @@ public class FileSystem {
     }
 
     private void importRecordings() throws IOException {
+        System.out.println("called");
         recordings = Recording.groupSegments(loadSegments());
         checkForMissingSegments();
     }
@@ -185,7 +186,7 @@ public class FileSystem {
     public FileSystem(Path rootDir) throws IOException {
         this.rootDir = rootDir;
         config = Config.load(rootDir.resolve(CONFIG_FILE));
-        loadSegments();
+        importRecordings();
     }
 
     /**
@@ -201,7 +202,7 @@ public class FileSystem {
         config.save(rootDir.resolve(CONFIG_FILE));
 
         //In case files aready exist
-        loadSegments();
+        importRecordings();
     }
 
 }
