@@ -1,5 +1,9 @@
 package tat;
 
+import file_system.Config;
+import file_system.FileSystem;
+import file_system.Recording;
+import file_system.Segment;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
@@ -8,21 +12,19 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import tat.view.EditorMenuController;
 import tat.view.MainMenuController;
 import ui.icon.IconLoader;
 import undo.UndoRedoController;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main extends Application {
-
-    final String text = "Hello Max. This is Tate. " +
-            "I'm just leaving you a voicemail message to test the voicemail functionality. " +
-            "Complicated words. Made up of many vowels and sylables. And letters. Thank you. " +
-            "Please call me back on oh m two one, four five six, seven, eight, nine. Thanks. " +
-            "Thanks. Thanks. Poos and wees. Bye. This is a run on sentence.\n";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -57,6 +59,25 @@ public class Main extends Application {
             primaryStage.setTitle("Transcription Assistance Toolkit");
             //Set the program logo
             primaryStage.getIcons().add(IconLoader.getInstance().logoIcon);
+
+            FileSystem fileSystem = null;
+            final DirectoryChooser rootDirChooser = new DirectoryChooser();
+            while (fileSystem == null) {
+                File file = rootDirChooser.showDialog(primaryStage);
+                if (file != null) {
+                    Path path = Paths.get(file.getAbsolutePath());
+                    if (FileSystem.corpusExists(path)) {
+                        fileSystem = new FileSystem(path);
+                    } else {
+                        //TODO: Ask user about settings
+                        fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
+                                Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
+                    }
+                }
+            }
+
+            //Recording defaultRecording = fileSystem.recordings.get("tate1");
+            //Segment defaultSegment = defaultRecording.getSegment(1);
 
             KeyCodeCombination ctrlz = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
             KeyCodeCombination ctrly = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
