@@ -3,9 +3,7 @@ package tat.view;
 import file_system.FileSystem;
 import file_system.Recording;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
@@ -71,11 +69,14 @@ public class EditorMenuController implements FileSelectedHandler {
     @FXML
     private MenuButton fileMenu;
 
+    @FXML
+    private WaveformDisplay waveformDisplay;
+
     private Main main;
     private Stage primaryStage;
     private String activeRecording;
 
-    public Recording getRecording() {
+    public Recording getActiveRecording() {
         return main.fileSystem.recordings.get(activeRecording);
     }
 
@@ -139,7 +140,8 @@ public class EditorMenuController implements FileSelectedHandler {
         this.primaryStage = ps;
         this.activeRecording = activeRecording;
         populateFileMenu(this, main.fileSystem, fileMenu);
-        fileMenu.setText(activeRecording);
+        fileSelected(activeRecording);
+        waveformDisplay.setRecording(getActiveRecording());
     }
 
     public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu) {
@@ -158,6 +160,7 @@ public class EditorMenuController implements FileSelectedHandler {
 
     @Override
     public void fileSelected(String file) {
-        System.out.println("File selected");
+        fileMenu.setText(activeRecording);
     }
+
 }

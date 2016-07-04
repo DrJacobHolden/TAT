@@ -72,8 +72,9 @@ public class FileSystem {
         for (PathToken token : getPathTokens()) {
             path = path.replace(token.getToken(), token.getValue(segment));
         }
+
         //Join paths
-        return rootDir.relativize(Paths.get(path));
+        return rootDir.resolve(path);
     }
 
     public Map<String, Recording> recordings;
