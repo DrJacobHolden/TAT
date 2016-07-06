@@ -2,7 +2,10 @@ package tat.view;
 
 import file_system.FileSystem;
 import file_system.Recording;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -128,6 +131,7 @@ public class EditorMenuController implements FileSelectedHandler {
     private void initialize() {
         loadIcons();
         loadTooltips();
+        bindZoomButtons();
     }
 
     /**
@@ -141,7 +145,6 @@ public class EditorMenuController implements FileSelectedHandler {
         this.activeRecording = activeRecording;
         populateFileMenu(this, main.fileSystem, fileMenu);
         fileSelected(activeRecording);
-        waveformDisplay.setRecording(getActiveRecording());
     }
 
     public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu) {
@@ -161,6 +164,17 @@ public class EditorMenuController implements FileSelectedHandler {
     @Override
     public void fileSelected(String file) {
         fileMenu.setText(activeRecording);
+        waveformDisplay.setRecording(getActiveRecording());
+        waveformDisplay.drawWaveform();
     }
 
+    private void bindZoomButtons() {
+        double zoomFactor = 1.2;
+        zoomInButton.setOnAction(event -> {
+            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()*zoomFactor);
+        });
+        zoomOutButton.setOnAction(event -> {
+            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()/zoomFactor);
+        });
+    }
 }

@@ -50,7 +50,6 @@
                      </HBox.margin>
                      <children>
                         <WaveformDisplay fx:id="waveformDisplay" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" StackPane.alignment="BOTTOM_RIGHT">
-                           <children />
                         </WaveformDisplay>
                         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="31.25" minWidth="62.5" prefHeight="62.5" prefWidth="125.0" StackPane.alignment="TOP_RIGHT">
                            <children>
