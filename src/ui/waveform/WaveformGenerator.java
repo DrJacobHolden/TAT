@@ -66,19 +66,25 @@ public class WaveformGenerator {
         Color colour = Color.color(0, 1, 0);
 
         int sampleSize = (int) Math.pow(2, 16);
+        double verticalScaling = height/(double)sampleSize;
+        int halfHeight = height/2;
 
         WritableImage waveformImage = new WritableImage(width, height);
-
         PixelWriter pixelWriter = waveformImage.getPixelWriter();
 
         for (int x=0; x<width; x++) {
-            int amplitude = 0;
-            for (int i=x*resolution; i<(x+1) *resolution; i++) {
-                if (frames[i] > amplitude) {
-                    amplitude = (int) (frames[i] * ((height/2)/(double)sampleSize));
+            int maxAmplitude = 0, minAmplitude = 0;
+            for (int i=x*resolution; i<(x+1)*resolution; i++) {
+                int offset = frames[i];
+                if (offset > maxAmplitude) {
+                    maxAmplitude = offset;
+                } else if (offset < minAmplitude) {
+                    minAmplitude = offset;
                 }
             }
-            for (int y=(height/2)-amplitude; y<=(height/2)+amplitude; y++) {
+            int minY = (int) (minAmplitude*verticalScaling)+halfHeight;
+            int maxY = (int) (maxAmplitude*verticalScaling)+halfHeight;
+            for (int y=minY; y<=maxY; y++) {
                 pixelWriter.setColor(x, y, colour);
             }
         }
