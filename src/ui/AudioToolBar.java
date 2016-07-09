@@ -1,12 +1,13 @@
 package ui;
 
+import alignment.maus.WebMaus;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import tat.Configuration;
+import tat.GlobalConfiguration;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 import ui.text_box.AnnotationArea;
@@ -115,7 +116,7 @@ public class AudioToolBar extends HBox {
                 public void handle(ActionEvent e) {
                     //TODO: Make perform for list of files and transcriptions
                     try {
-                        Configuration.getInstance().alignmentProvider.generateAlignment(annotationArea.getSegments().get(0).getText(), audioEditor.getAudioSegments().get(0));
+                        new WebMaus().generateAlignment(annotationArea.getSegments().get(0).getText(), audioEditor.getAudioSegments().get(0));
                     } catch(Exception a) {
                         a.printStackTrace();
                     }

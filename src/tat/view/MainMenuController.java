@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import tat.GlobalConfiguration;
 import tat.Main;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
@@ -107,6 +108,7 @@ public class MainMenuController implements FileSelectedHandler {
     }
 
     private void engageCorpus(Path path) throws IOException {
+        GlobalConfiguration.getInstance().setCorpusPath(path);
         main.fileSystem = new FileSystem(path);
         corpus.setText("Corpus: " + path);
         settingsButton.setDisable(false);
@@ -133,6 +135,17 @@ public class MainMenuController implements FileSelectedHandler {
         loadFunctionality();
     }
 
+    private void setCorpusPath() {
+        Path path = GlobalConfiguration.getInstance().getCorpusPath();
+        if (path != null) {
+            try {
+                engageCorpus(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Is called by the main application to give a reference back to itself.
      *
@@ -141,8 +154,9 @@ public class MainMenuController implements FileSelectedHandler {
     public void setup(Main main, Stage primaryStage) {
         this.main = main;
         this.primaryStage = primaryStage;
+
+        //Main must be set before setting main.filesystem
+        setCorpusPath();
     }
-
-
 }
 
