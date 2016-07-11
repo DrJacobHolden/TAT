@@ -5,11 +5,18 @@ import file_system.FileSystem;
 import file_system.Recording;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import tat.GlobalConfiguration;
@@ -17,16 +24,19 @@ import tat.Main;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by Tate on 29/06/2016.
  */
 public class MainMenuController implements FileSelectedHandler {
+
+    @FXML
+    private VBox window;
 
     @FXML
     private IconButton fileButton;
@@ -115,8 +125,8 @@ public class MainMenuController implements FileSelectedHandler {
         //TODO: Make settings button highlighted to the user
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
-        EditorMenuController.
-        populateFileMenu(this, main.fileSystem, fileMenu);
+        initialiseDragAndDrop();
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
     }
 
     /**
@@ -157,6 +167,37 @@ public class MainMenuController implements FileSelectedHandler {
 
         //Main must be set before setting main.filesystem
         setCorpusPath();
+    }
+
+    public void initialiseDragAndDrop() {
+            window.setOnDragOver(new EventHandler <DragEvent>()  {
+                public String[] acceptedTypes = { ".wav", ".txt" };
+
+                @Override
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    boolean invalidFileFound = false;
+                    if (db.hasFiles()) {
+                        for(File file:db.getFiles()) {
+                            String absolutePath = file.getAbsolutePath();
+                            if (!file.isDirectory()) {
+                                boolean fileValid = false;
+                                for (String s : acceptedTypes) {
+                                    if (absolutePath.endsWith(s)) {
+                                        fileValid = true;
+                                        break;
+                                    }
+                                }
+                                if (!fileValid)
+                                    invalidFileFound = true;
+                            }
+                        }
+                        if (!invalidFileFound)
+                            event.acceptTransferModes(TransferMode.ANY);
+                    }
+                    event.consume();
+                }
+            });
     }
 }
 
