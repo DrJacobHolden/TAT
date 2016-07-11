@@ -81,18 +81,23 @@ public class MainMenuController implements FileSelectedHandler {
             rootDirChooser.setTitle("Select Corpus Root Directory");
             File file = rootDirChooser.showDialog(primaryStage);
             if (file != null) {
-                Path path = Paths.get(file.getAbsolutePath());
-                if (!FileSystem.corpusExists(path)) {
-                    main.fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
-                            Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
-                }
-                engageCorpus(path);
+                setCorpus(file);
             }
         } catch(IOException e) {
             //TODO: Create error message
             //ErrorHandler.getInstance().showError("Failed to load corpus.");
             e.printStackTrace();
         }
+    }
+
+    //TODO: Generic or specific error messages?
+    public void setCorpus(File file) throws IOException {
+        Path path = Paths.get(file.getAbsolutePath());
+        if (!FileSystem.corpusExists(path)) {
+            main.fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
+                    Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
+        }
+        engageCorpus(path);
     }
 
     public void fileSelected(String file) {
@@ -178,7 +183,7 @@ public class MainMenuController implements FileSelectedHandler {
                     Dragboard db = event.getDragboard();
                     boolean invalidFileFound = false;
                     if (db.hasFiles()) {
-                        for(File file:db.getFiles()) {
+                        for(File file : db.getFiles()) {
                             String absolutePath = file.getAbsolutePath();
                             if (!file.isDirectory()) {
                                 boolean fileValid = false;
@@ -190,6 +195,11 @@ public class MainMenuController implements FileSelectedHandler {
                                 }
                                 if (!fileValid)
                                     invalidFileFound = true;
+                            } else {
+                                //Only accept a single item if the item is a directory
+                                if (db.getFiles().size() != 1) {
+                                    invalidFileFound = true;
+                                }
                             }
                         }
                         if (!invalidFileFound)
@@ -198,6 +208,25 @@ public class MainMenuController implements FileSelectedHandler {
                     event.consume();
                 }
             });
+
+        window.setOnDragDropped(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                for(File f : db.getFiles()) {
+                    System.out.println("User dropped: " + f.getName());
+                    if (f.isDirectory()) {
+                        try {
+                            setCorpus(f);
+                        } catch(IOException e) {
+                            //TODO: Error handling
+                            e.printStackTrace();
+                        }
+                    }
+                    //TODO: Add file to file system
+                }
+            }
+        });
     }
 }
 
