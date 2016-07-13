@@ -3,6 +3,8 @@ package tat.view;
 import file_system.Config;
 import file_system.FileSystem;
 import file_system.Recording;
+import file_system.element.AnnotationFile;
+import file_system.element.AudioFile;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -23,12 +25,15 @@ import tat.GlobalConfiguration;
 import tat.Main;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
+import ui.text_box.Annotation;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -58,6 +63,9 @@ public class MainMenuController implements FileSelectedHandler {
 
     private Main main;
     private Stage primaryStage;
+
+    //Used if annotation file is dragged in before audio
+    private File annotationFile;
 
     private void loadIcons() {
         System.out.println("Icons loaded");
@@ -176,7 +184,10 @@ public class MainMenuController implements FileSelectedHandler {
 
     public void initialiseDragAndDrop() {
             window.setOnDragOver(new EventHandler <DragEvent>()  {
-                public String[] acceptedTypes = { ".wav", ".txt" };
+                public String[] acceptedTypes = Stream.concat(
+                        Arrays.stream(AudioFile.FILE_EXTENSIONS),
+                        Arrays.stream(AnnotationFile.FILE_EXTENSIONS))
+                        .toArray(String[]::new);
 
                 @Override
                 public void handle(DragEvent event) {
@@ -186,15 +197,7 @@ public class MainMenuController implements FileSelectedHandler {
                         for(File file : db.getFiles()) {
                             String absolutePath = file.getAbsolutePath();
                             if (!file.isDirectory()) {
-                                boolean fileValid = false;
-                                for (String s : acceptedTypes) {
-                                    if (absolutePath.endsWith(s)) {
-                                        fileValid = true;
-                                        break;
-                                    }
-                                }
-                                if (!fileValid)
-                                    invalidFileFound = true;
+                                invalidFileFound = !isValidExtension(file, acceptedTypes);
                             } else {
                                 //Only accept a single item if the item is a directory
                                 if (db.getFiles().size() != 1) {
@@ -209,24 +212,27 @@ public class MainMenuController implements FileSelectedHandler {
                 }
             });
 
-        window.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                for(File f : db.getFiles()) {
-                    System.out.println("User dropped: " + f.getName());
-                    if (f.isDirectory()) {
-                        try {
-                            setCorpus(f);
-                        } catch(IOException e) {
-                            //TODO: Error handling
-                            e.printStackTrace();
-                        }
+        window.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            for(File f : db.getFiles()) {
+                System.out.println("User dropped: " + f.getName());
+                if (f.isDirectory()) {
+                    try {
+                        setCorpus(f);
+                    } catch(IOException e) {
+                        //TODO: Error handling
+                        e.printStackTrace();
                     }
-                    //TODO: Add file to file system
+                } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
+                    main.fileSystem.importExternalRecording(f, null);
+                    EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
                 }
             }
         });
+    }
+
+    private boolean isValidExtension(File file, String[] extensions) {
+        return Arrays.stream(extensions).anyMatch(e -> file.toString().endsWith(e));
     }
 }
 

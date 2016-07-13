@@ -206,6 +206,26 @@ public class FileSystem {
         importRecordings();
     }
 
+    public Recording importExternalRecording(File audioFile, File annotationFile) {
+        Segment segment = new Segment(this);
+        //Strip file extension
+        String baseName = audioFile.getPath().substring(0, audioFile.getPath().lastIndexOf('.'));
+
+        if (recordings.get(baseName) != null) {
+            //TODO: Throw error
+        }
+        segment.setBaseName(baseName);
+        segment.loadExternalAudioFile(audioFile);
+        if (annotationFile != null) {
+            segment.loadExternalAnnotationFile(annotationFile);
+        }
+
+        Recording recording = new Recording(baseName);
+        recording.addSegment(segment);
+        recordings.put(baseName, recording);
+        return recording;
+    }
+
 }
 
 class TokenMatch implements Comparable<TokenMatch> {

@@ -2,6 +2,7 @@ package file_system.element;
 
 import file_system.Segment;
 import sun.plugin.javascript.navig.Array;
+import ui.text_box.Annotation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +19,8 @@ import java.util.logging.Logger;
  * Created by Tate on 21/05/2016.
  */
 public class AnnotationFile extends BaseFileSystemElement {
+
+    public static final String[] FILE_EXTENSIONS = new String[]{".txt"};
 
     private static Logger LOGGER = Logger.getLogger(AnnotationFile.class.getName());
 
@@ -58,6 +61,6 @@ public class AnnotationFile extends BaseFileSystemElement {
 
     @Override
     public String[] getFileExtensions() {
-        return new String[]{".txt"};
+        return FILE_EXTENSIONS;
     }
 }
