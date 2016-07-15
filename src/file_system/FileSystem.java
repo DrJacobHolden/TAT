@@ -156,6 +156,7 @@ public class FileSystem {
     }
 
     private void importRecordings() throws IOException {
+        System.out.println("called");
         recordings = Recording.groupSegments(loadSegments());
         checkForMissingSegments();
     }
@@ -208,16 +209,12 @@ public class FileSystem {
     public Recording importExternalRecording(File audioFile, File annotationFile) {
         Segment segment = new Segment(this);
         //Strip file extension
-        String baseName = audioFile.getPath().substring(audioFile.getPath().lastIndexOf(File.separator)+1, audioFile.getPath().lastIndexOf('.'));
-        System.out.println(baseName);
+        String baseName = audioFile.getPath().substring(0, audioFile.getPath().lastIndexOf('.'));
+
         if (recordings.get(baseName) != null) {
             //TODO: Throw error
         }
         segment.setBaseName(baseName);
-        //TODO: Move file to Corpus
-        System.out.println(pathFromString(segment, getAudioStorageRule()));
-        //audioFile.renameTo(pathFromString(segment, getAudioStorageRule()).toFile());
-
         segment.loadExternalAudioFile(audioFile);
         if (annotationFile != null) {
             segment.loadExternalAnnotationFile(annotationFile);
