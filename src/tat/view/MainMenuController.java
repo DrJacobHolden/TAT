@@ -31,10 +31,7 @@ import ui.text_box.Annotation;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -217,9 +214,11 @@ public class MainMenuController implements FileSelectedHandler {
 
         window.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
-            List<File> nonAudioFiles = new ArrayList<File>();
+            List<File> audioFiles = new ArrayList<File>();
+            Map<String, File> annotationFiles = new HashMap<String, File>();
+            Map<String, File> alignmentFiles = new HashMap<String, File>();
+
             for(File f : db.getFiles()) {
-                System.out.println("User dropped: " + f.getName());
                 if (f.isDirectory()) {
                     try {
                         setCorpus(f);
@@ -228,37 +227,55 @@ public class MainMenuController implements FileSelectedHandler {
                         e.printStackTrace();
                     }
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
-                    main.fileSystem.importExternalRecording(f, null);
-                    EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
-                } else {
-                    nonAudioFiles.add(f);
+                    audioFiles.add(f);
+                } else if (isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
+                    annotationFiles.put(f.getName().substring(0, f.getName().lastIndexOf('.')), f);
+                } else if (isValidExtension(f, AlignmentFile.FILE_EXTENSIONS)) {
+                    alignmentFiles.put(f.getName().substring(0, f.getName().lastIndexOf('.')), f);
                 }
             }
+
             //Loop through audioFiles
-            for(File f : nonAudioFiles) {
+            for(File f : audioFiles) {
                 String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
-                System.out.println(name);
                 Recording r = main.fileSystem.recordings.get(name);
                 if(r != null) {
-                    //TODO: Solve problem - External audio files are named with their directory. If this is changed
-                    //the file cannot be located. If this isn't changed, how do we reliably assign annotations and
-                    //transcriptions to the recording?
+                    //TODO: Error about duplicate file
+                    return;
+                }
+                main.fileSystem.importExternalRecording(f, annotationFiles.remove(name), alignmentFiles.remove(name));
+                EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+            }
 
-                    //TODO: Query on overwrite
+            //Handle remaining files
+            for (File f: annotationFiles.values()) {
+                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                Recording r = main.fileSystem.recordings.get(name);
+                if(r != null) {
                     int segmentId = 0;
-                    if(r.getSegments().size() != 1) {
-                        //TODO: Ask user for assigning segment id
+                    if (r.getSegments().size() != 0) {
+                        //TODO: Ask user which segment to assign the annotation to
                     }
-                    if(isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
-                        //TODO: Ensure this copies the file and removes old annotation file if existing
-                        //r.getSegment(segmentId).setAnnotation(f);
-                    } else {
-                        //TODO: Ensure this copies the file and removes old annotation file if existing
-                        //r.getSegment(segmentId).setAlignment(f);
+                    main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
+                } else {
+                    //TODO: Inform user that annotations require a matching audio file to be imported
+                }
+            }
+            for (File f: alignmentFiles.values()) {
+                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                Recording r = main.fileSystem.recordings.get(name);
+                if(r != null) {
+                    int segmentId = 0;
+                    if (r.getSegments().size() != 0) {
+                        //TODO: Ask user which segment to assign the alignment to
                     }
+                    main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
+                } else {
+                    //TODO: Inform user that alignments require a matching audio file to be imported
                 }
             }
         });
+
     }
 
     private boolean isValidExtension(File file, String[] extensions) {

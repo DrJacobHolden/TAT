@@ -205,28 +205,41 @@ public class FileSystem {
         importRecordings();
     }
 
-    public Recording importExternalRecording(File audioFile, File annotationFile) {
+    public Recording importExternalRecording(File audioFile, File annotationFile, File alignmentFile) {
         Segment segment = new Segment(this);
-        //Strip file extension
+        //Strip file extension and path
         String baseName = audioFile.getPath().substring(audioFile.getPath().lastIndexOf(File.separator)+1, audioFile.getPath().lastIndexOf('.'));
-        System.out.println(baseName);
         if (recordings.get(baseName) != null) {
             //TODO: Throw error
         }
         segment.setBaseName(baseName);
-        //TODO: Move file to Corpus
-        System.out.println(pathFromString(segment, getAudioStorageRule()));
-        //audioFile.renameTo(pathFromString(segment, getAudioStorageRule()).toFile());
 
         segment.loadExternalAudioFile(audioFile);
+
         if (annotationFile != null) {
             segment.loadExternalAnnotationFile(annotationFile);
+        }
+
+        if (alignmentFile != null) {
+            segment.loadExternalAlignmentFile(alignmentFile);
         }
 
         Recording recording = new Recording(baseName);
         recording.addSegment(segment);
         recordings.put(baseName, recording);
         return recording;
+    }
+
+    public void importExternalAnnotation(Segment segment, File annotationFile) {
+        if (annotationFile != null) {
+            segment.loadExternalAnnotationFile(annotationFile);
+        }
+    }
+
+    public void importExternalAlignment(Segment segment, File alignmentFile) {
+        if (alignmentFile != null) {
+            segment.loadExternalAlignmentFile(alignmentFile);
+        }
     }
 
 }

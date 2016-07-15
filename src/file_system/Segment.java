@@ -101,7 +101,12 @@ public class Segment {
 
     protected void loadExternalAnnotationFile(File file) {
         //When saved will use generated file name
-        this.annotationFile = new AnnotationFile(this, file.toPath());
+        this.annotationFile = new AnnotationFile(this, file);
+    }
+
+    protected void loadExternalAlignmentFile(File file) {
+        //When saved will use generated file name
+        this.alignmentFile = new AlignmentFile(this, file);
     }
 
     public AudioFile getAudioFile() {

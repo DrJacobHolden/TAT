@@ -36,6 +36,17 @@ public class AnnotationFile extends BaseFileSystemElement {
         this.annotation = annotation;
     }
 
+    public AnnotationFile(Segment segment, File file) {
+        this.segment = segment;
+        try {
+            byte[] encoded = Files.readAllBytes(file.toPath());
+            this.annotation = new String(encoded, ENCODING);
+        } catch (IOException e) {
+            //Meh, we tried. Annotation can be empty string.
+            LOGGER.info("Failed to load annotation file.");
+        }
+    }
+
     public AnnotationFile(Segment segment, Path path) {
         this.segment = segment;
         try {
