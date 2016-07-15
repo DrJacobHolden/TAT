@@ -10,6 +10,8 @@ import java.nio.file.Path;
  */
 public class AlignmentFile extends BaseFileSystemElement {
 
+    public static final String[] FILE_EXTENSIONS = new String[]{};
+
     public AlignmentFile(Segment segment, TextGrid grid) {
 
     }

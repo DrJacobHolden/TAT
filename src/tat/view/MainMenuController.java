@@ -3,6 +3,7 @@ package tat.view;
 import file_system.Config;
 import file_system.FileSystem;
 import file_system.Recording;
+import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
 import javafx.collections.ObservableList;
@@ -30,6 +31,7 @@ import ui.text_box.Annotation;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -186,7 +188,8 @@ public class MainMenuController implements FileSelectedHandler {
             window.setOnDragOver(new EventHandler <DragEvent>()  {
                 public String[] acceptedTypes = Stream.concat(
                         Arrays.stream(AudioFile.FILE_EXTENSIONS),
-                        Arrays.stream(AnnotationFile.FILE_EXTENSIONS))
+                        Stream.concat(Arrays.stream(AnnotationFile.FILE_EXTENSIONS),
+                        Arrays.stream(AlignmentFile.FILE_EXTENSIONS)))
                         .toArray(String[]::new);
 
                 @Override
@@ -214,6 +217,7 @@ public class MainMenuController implements FileSelectedHandler {
 
         window.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
+            List<File> nonAudioFiles = new ArrayList<File>();
             for(File f : db.getFiles()) {
                 System.out.println("User dropped: " + f.getName());
                 if (f.isDirectory()) {
@@ -226,6 +230,32 @@ public class MainMenuController implements FileSelectedHandler {
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
                     main.fileSystem.importExternalRecording(f, null);
                     EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+                } else {
+                    nonAudioFiles.add(f);
+                }
+            }
+            //Loop through audioFiles
+            for(File f : nonAudioFiles) {
+                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                System.out.println(name);
+                Recording r = main.fileSystem.recordings.get(name);
+                if(r != null) {
+                    //TODO: Solve problem - External audio files are named with their directory. If this is changed
+                    //the file cannot be located. If this isn't changed, how do we reliably assign annotations and
+                    //transcriptions to the recording?
+
+                    //TODO: Query on overwrite
+                    int segmentId = 0;
+                    if(r.getSegments().size() != 1) {
+                        //TODO: Ask user for assigning segment id
+                    }
+                    if(isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
+                        //TODO: Ensure this copies the file and removes old annotation file if existing
+                        //r.getSegment(segmentId).setAnnotation(f);
+                    } else {
+                        //TODO: Ensure this copies the file and removes old annotation file if existing
+                        //r.getSegment(segmentId).setAlignment(f);
+                    }
                 }
             }
         });
