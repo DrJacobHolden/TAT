@@ -6,15 +6,12 @@ import file_system.Recording;
 import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -26,13 +23,15 @@ import tat.GlobalConfiguration;
 import tat.Main;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
-import ui.text_box.Annotation;
+import tat.view.Colours;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static com.sun.xml.internal.bind.api.impl.NameConverter.standard;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -62,6 +61,8 @@ public class MainMenuController implements FileSelectedHandler {
 
     private Main main;
     private Stage primaryStage;
+    private boolean menuFlash = false;
+    private boolean menuFlashing = false;
 
     //Used if annotation file is dragged in before audio
     private File annotationFile;
@@ -80,6 +81,13 @@ public class MainMenuController implements FileSelectedHandler {
 
     private void loadFunctionality() {
         fileButton.setOnAction(event -> corpusSelect());
+        settingsButton.setOnAction(event -> showSettingsMenu());
+    }
+
+    private void showSettingsMenu() {
+        //TODO: Create settings menu and display
+        settingsButton.setFlashing(false);
+        menuFlash();
     }
 
     private void corpusSelect() {
@@ -276,6 +284,39 @@ public class MainMenuController implements FileSelectedHandler {
             }
         });
 
+    }
+
+    /**
+     * Tells the menu button to start flashing
+     * This does not need to be disabled as using the file menu causes a transition
+     * to the editorMenu and currently there is no way to return to the mainMenu. As
+     * a result the user will never see the button flashing forever.
+     */
+    private void menuFlash() {
+        //TODO: Make timer usage not cause application to run forever
+        if(!menuFlashing) {
+            menuFlashing = true;
+            new Timer().schedule(
+                    new TimerTask() {
+                        @Override
+                        public void run() {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (menuFlash) {
+                                        fileMenu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;");
+                                        fileMenu.setTextFill(Colours.WHITE);
+                                        menuFlash = false;
+                                    } else {
+                                        fileMenu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #ff7c00;");
+                                        fileMenu.setTextFill(Colours.ORANGE);
+                                        menuFlash = true;
+                                    }
+                                }
+                            });
+                        }
+                    }, 0, 500);
+        }
     }
 
     private boolean isValidExtension(File file, String[] extensions) {
