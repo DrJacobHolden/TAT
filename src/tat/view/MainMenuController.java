@@ -134,7 +134,7 @@ public class MainMenuController implements FileSelectedHandler {
         main.fileSystem = new FileSystem(path);
         corpus.setText("Corpus: " + path);
         settingsButton.setDisable(false);
-        //TODO: Make settings button highlighted to the user
+        settingsButton.setFlashing(true);
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
         initialiseDragAndDrop();
