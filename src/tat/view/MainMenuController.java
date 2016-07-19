@@ -21,6 +21,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import tat.GlobalConfiguration;
 import tat.Main;
+import tat.TimerHandler;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 import tat.view.Colours;
@@ -204,7 +205,7 @@ public class MainMenuController implements FileSelectedHandler {
                     if (db.hasFiles()) {
                         for(File file : db.getFiles()) {
                             String absolutePath = file.getAbsolutePath();
-                            if (!file.isDirectory()) {
+                            if (!file.isDirectory() && !invalidFileFound) {
                                 invalidFileFound = !isValidExtension(file, acceptedTypes);
                             } else {
                                 //Only accept a single item if the item is a directory
@@ -228,24 +229,30 @@ public class MainMenuController implements FileSelectedHandler {
 
             for(File f : db.getFiles()) {
                 if (f.isDirectory()) {
-                    try {
-                        setCorpus(f);
-                    } catch(IOException e) {
-                        //TODO: Error handling
-                        e.printStackTrace();
+                    if(FileSystem.corpusExists(f.toPath())) {
+                        try {
+                            setCorpus(f);
+                        } catch (IOException e) {
+                            //TODO: Error handling
+                            e.printStackTrace();
+                        }
+                    } else {
+                        //TODO: Tell user that directory must be a corpus
+                        //to create a new corpus use the corpus selector
+                        //make corpus selector flash
                     }
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
                     audioFiles.add(f);
                 } else if (isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
-                    annotationFiles.put(f.getName().substring(0, f.getName().lastIndexOf('.')), f);
+                    annotationFiles.put(getBasename(f), f);
                 } else if (isValidExtension(f, AlignmentFile.FILE_EXTENSIONS)) {
-                    alignmentFiles.put(f.getName().substring(0, f.getName().lastIndexOf('.')), f);
+                    alignmentFiles.put(getBasename(f), f);
                 }
             }
 
             //Loop through audioFiles
             for(File f : audioFiles) {
-                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                String name = getBasename(f);
                 Recording r = main.fileSystem.recordings.get(name);
                 if(r != null) {
                     //TODO: Error about duplicate file
@@ -257,11 +264,11 @@ public class MainMenuController implements FileSelectedHandler {
 
             //Handle remaining files
             for (File f: annotationFiles.values()) {
-                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                String name = getBasename(f);
                 Recording r = main.fileSystem.recordings.get(name);
                 if(r != null) {
                     int segmentId = 0;
-                    if (r.getSegments().size() != 0) {
+                    if (r.getSegments().size() != 1) {
                         //TODO: Ask user which segment to assign the annotation to
                     }
                     main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
@@ -270,11 +277,11 @@ public class MainMenuController implements FileSelectedHandler {
                 }
             }
             for (File f: alignmentFiles.values()) {
-                String name = f.getName().substring(0, f.getName().lastIndexOf('.'));
+                String name = getBasename(f);
                 Recording r = main.fileSystem.recordings.get(name);
                 if(r != null) {
                     int segmentId = 0;
-                    if (r.getSegments().size() != 0) {
+                    if (r.getSegments().size() != 1) {
                         //TODO: Ask user which segment to assign the alignment to
                     }
                     main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
@@ -296,7 +303,7 @@ public class MainMenuController implements FileSelectedHandler {
         //TODO: Make timer usage not cause application to run forever
         if(!menuFlashing) {
             menuFlashing = true;
-            new Timer().schedule(
+            TimerHandler.getInstance().newTimer().schedule(
                     new TimerTask() {
                         @Override
                         public void run() {
@@ -317,6 +324,10 @@ public class MainMenuController implements FileSelectedHandler {
                         }
                     }, 0, 500);
         }
+    }
+
+    private String getBasename(File f) {
+        return f.getName().substring(0, f.getName().lastIndexOf('.'));
     }
 
     private boolean isValidExtension(File file, String[] extensions) {

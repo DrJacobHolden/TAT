@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import tat.TimerHandler;
 import ui.icon.Icon;
 
 import java.util.Timer;
@@ -53,7 +54,7 @@ public class IconButton extends Button {
         //TODO: Make timer usage not cause application to run forever
 
         //Set up the timer so that icons can flash.
-        new Timer().schedule(
+        TimerHandler.getInstance().newTimer().schedule(
                 new TimerTask() {
                     @Override
                     public void run() {

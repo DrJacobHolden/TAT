@@ -5,6 +5,8 @@ import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.input.KeyCode;
@@ -14,6 +16,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import tat.view.EditorMenuController;
 import tat.view.MainMenuController;
 import ui.icon.IconLoader;
@@ -48,6 +51,14 @@ public class Main extends Application {
             primaryStage.setTitle("Transcription Assistance Toolkit");
             //Set the program logo
             primaryStage.getIcons().add(IconLoader.getInstance().logoIcon);
+
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent t) {
+                    TimerHandler.getInstance().shutdownTimers();
+                    Platform.exit();
+                }
+            });
 
             primaryStage.show();
         } catch (IOException e) {
