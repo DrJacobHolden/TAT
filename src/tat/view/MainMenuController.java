@@ -18,6 +18,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tat.GlobalConfiguration;
 import tat.Main;
@@ -30,6 +31,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.sun.xml.internal.bind.api.impl.NameConverter.standard;
@@ -83,12 +85,35 @@ public class MainMenuController implements FileSelectedHandler {
     private void loadFunctionality() {
         fileButton.setOnAction(event -> corpusSelect());
         settingsButton.setOnAction(event -> showSettingsMenu());
+        soundFileArea.setOnMouseReleased(event -> showAudioSelector());
+        textArea.setOnMouseReleased(event -> showAnnotationSelector());
     }
 
-    private void showSettingsMenu() {
-        //TODO: Create settings menu and display
-        settingsButton.setFlashing(false);
-        menuFlash();
+    private void showAudioSelector() {
+        FileChooser audioChooser = getFileChooser("Audio", AudioFile.FILE_EXTENSIONS);
+        File file = audioChooser.showOpenDialog(primaryStage);
+        if(file != null)
+            addAudioFile(file, null, null);
+    }
+
+    private void showAnnotationSelector() {
+        FileChooser annotationChooser = getFileChooser("Annotation", AnnotationFile.FILE_EXTENSIONS);
+        File file = annotationChooser.showOpenDialog(primaryStage);
+        if(file != null)
+            addAnnotationFile(file);
+    }
+
+    private FileChooser getFileChooser(String type, String[] extensions) {
+        final FileChooser chooser = new FileChooser();
+
+        extensions = Arrays.stream(extensions).map(ext -> "*" + ext).toArray(String[]::new);
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter(type + " Files", extensions);
+        chooser.getExtensionFilters().add(extFilter);
+        chooser.setTitle("Select " + type + " Files");
+
+        return chooser;
     }
 
     private void corpusSelect() {
@@ -105,6 +130,13 @@ public class MainMenuController implements FileSelectedHandler {
             e.printStackTrace();
         }
     }
+
+    private void showSettingsMenu() {
+        //TODO: Create settings menu and display
+        settingsButton.setFlashing(false);
+        menuFlash();
+    }
+
 
     //TODO: Generic or specific error messages?
     public void setCorpus(File file) throws IOException {
@@ -253,28 +285,12 @@ public class MainMenuController implements FileSelectedHandler {
             //Loop through audioFiles
             for(File f : audioFiles) {
                 String name = getBasename(f);
-                Recording r = main.fileSystem.recordings.get(name);
-                if(r != null) {
-                    //TODO: Error about duplicate file
-                    return;
-                }
-                main.fileSystem.importExternalRecording(f, annotationFiles.remove(name), alignmentFiles.remove(name));
-                EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+                addAudioFile(f, annotationFiles.remove(name), alignmentFiles.remove(name));
             }
 
             //Handle remaining files
             for (File f: annotationFiles.values()) {
-                String name = getBasename(f);
-                Recording r = main.fileSystem.recordings.get(name);
-                if(r != null) {
-                    int segmentId = 0;
-                    if (r.getSegments().size() != 1) {
-                        //TODO: Ask user which segment to assign the annotation to
-                    }
-                    main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
-                } else {
-                    //TODO: Inform user that annotations require a matching audio file to be imported
-                }
+                addAnnotationFile(f);
             }
             for (File f: alignmentFiles.values()) {
                 String name = getBasename(f);
@@ -293,6 +309,31 @@ public class MainMenuController implements FileSelectedHandler {
 
     }
 
+    private void addAudioFile(File f, File annotationFile, File alignmentFile) {
+        String name = getBasename(f);
+        Recording r = main.fileSystem.recordings.get(name);
+        if(r != null) {
+            //TODO: Error about duplicate file
+            return;
+        }
+        main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+    }
+
+    private void addAnnotationFile(File f) {
+        String name = getBasename(f);
+        Recording r = main.fileSystem.recordings.get(name);
+        if(r != null) {
+            int segmentId = 0;
+            if (r.getSegments().size() != 1) {
+                //TODO: Ask user which segment to assign the annotation to
+            }
+            main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
+        } else {
+            //TODO: Inform user that annotations require a matching audio file to be imported
+        }
+    }
+
     /**
      * Tells the menu button to start flashing
      * This does not need to be disabled as using the file menu causes a transition
@@ -300,7 +341,6 @@ public class MainMenuController implements FileSelectedHandler {
      * a result the user will never see the button flashing forever.
      */
     private void menuFlash() {
-        //TODO: Make timer usage not cause application to run forever
         if(!menuFlashing) {
             menuFlashing = true;
             TimerHandler.getInstance().newTimer().schedule(

@@ -51,8 +51,6 @@ public class IconButton extends Button {
         heightProperty().addListener(new ResizeListener(this));
         widthProperty().addListener(new ResizeListener(this));
 
-        //TODO: Make timer usage not cause application to run forever
-
         //Set up the timer so that icons can flash.
         TimerHandler.getInstance().newTimer().schedule(
                 new TimerTask() {
