@@ -22,8 +22,9 @@ public class AudioFile extends BaseFileSystemElement {
 
     private File file;
 
-    public AudioFile(Segment segment, AudioStream stream) {
-
+    public AudioFile(Segment segment, File audioFile) {
+        this.segment = segment;
+        this.file = audioFile;
     }
 
     public AudioFile(Segment segment, Path path) throws FileNotFoundException {

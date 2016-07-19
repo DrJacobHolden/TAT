@@ -9,6 +9,7 @@ import file_system.element.AudioFile;
 import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -98,6 +99,16 @@ public class Segment {
         return annotationFile;
     }
 
+    protected void loadExternalAnnotationFile(File file) {
+        //When saved will use generated file name
+        this.annotationFile = new AnnotationFile(this, file);
+    }
+
+    protected void loadExternalAlignmentFile(File file) {
+        //When saved will use generated file name
+        this.alignmentFile = new AlignmentFile(this, file);
+    }
+
     public AudioFile getAudioFile() {
         if (audioFile == null) {
             try {
@@ -109,6 +120,11 @@ public class Segment {
         return audioFile;
     }
 
+    protected void loadExternalAudioFile(File file) {
+        //When saved will use generated file name
+        this.audioFile = new AudioFile(this, file);
+    }
+
     public Segment(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
     }
@@ -118,21 +134,6 @@ public class Segment {
         this.segmentNumber = segmentNumber;
         this.speakerId = speakerId;
         this.baseName = baseName;
-    }
-
-    public Segment addAlignment(TextGrid alignment) {
-        alignmentFile = new AlignmentFile(this, alignment);
-        return this;
-    }
-
-    public Segment addAnnotation(String annotation) {
-        annotationFile = new AnnotationFile(this, annotation);
-        return this;
-    }
-
-    public Segment addAudio(AudioStream stream) {
-        audioFile = new AudioFile(this, stream);
-        return this;
     }
 
     public void save() throws FileNotFoundException {

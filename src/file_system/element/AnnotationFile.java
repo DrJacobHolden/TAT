@@ -2,6 +2,7 @@ package file_system.element;
 
 import file_system.Segment;
 import sun.plugin.javascript.navig.Array;
+import ui.text_box.Annotation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +20,8 @@ import java.util.logging.Logger;
  */
 public class AnnotationFile extends BaseFileSystemElement {
 
+    public static final String[] FILE_EXTENSIONS = new String[]{".txt"};
+
     private static Logger LOGGER = Logger.getLogger(AnnotationFile.class.getName());
 
     private final Charset ENCODING =  StandardCharsets.UTF_8;
@@ -31,6 +34,17 @@ public class AnnotationFile extends BaseFileSystemElement {
     public AnnotationFile(Segment segment, String annotation) {
         this.segment = segment;
         this.annotation = annotation;
+    }
+
+    public AnnotationFile(Segment segment, File file) {
+        this.segment = segment;
+        try {
+            byte[] encoded = Files.readAllBytes(file.toPath());
+            this.annotation = new String(encoded, ENCODING);
+        } catch (IOException e) {
+            //Meh, we tried. Annotation can be empty string.
+            LOGGER.info("Failed to load annotation file.");
+        }
     }
 
     public AnnotationFile(Segment segment, Path path) {
@@ -58,6 +72,6 @@ public class AnnotationFile extends BaseFileSystemElement {
 
     @Override
     public String[] getFileExtensions() {
-        return new String[]{".txt"};
+        return FILE_EXTENSIONS;
     }
 }
