@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import tat.view.Colours;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -61,9 +62,10 @@ public class WaveformGenerator {
         int[] frames = getFrameArray();
 
         //All configurable
-        int height = 256;
+        int height = 400;
         int width = frames.length / resolution;
-        Color colour = Color.color(0, 1, 0);
+        Color background = Colours.SECONDARY_GRAY;
+        Color colour = Colours.TRANSPARENT;
 
         int sampleSize = (int) Math.pow(2, 16);
         double verticalScaling = height/(double)sampleSize;
@@ -84,8 +86,12 @@ public class WaveformGenerator {
             }
             int minY = (int) (minAmplitude*verticalScaling)+halfHeight;
             int maxY = (int) (maxAmplitude*verticalScaling)+halfHeight;
-            for (int y=minY; y<=maxY; y++) {
-                pixelWriter.setColor(x, y, colour);
+            for (int y=0; y<height; y++) {
+                if (y >=minY && y <= maxY) {
+                    pixelWriter.setColor(x, y, colour);
+                } else {
+                    pixelWriter.setColor(x, y, background);
+                }
             }
         }
 
