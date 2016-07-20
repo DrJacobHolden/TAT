@@ -102,8 +102,8 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void loadTooltips() {
         System.out.println("Tooltips Loaded");
-        splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the selected point.\n"));
-        joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the selected point.\n"));
+        splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the setColourSelected point.\n"));
+        joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the setColourSelected point.\n"));
         alignButton.setTooltip(new Tooltip("Sends the audio and transcription to the alignment\n" +
                 "system. When complete the results will be displayed."));
         zoomInButton.setTooltip(new Tooltip("Zoom in.\n"));
