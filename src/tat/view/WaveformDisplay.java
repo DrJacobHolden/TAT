@@ -80,25 +80,22 @@ public class WaveformDisplay extends ScrollPane {
             resizeHeight();
         });
 
-        //Doesnt't work
         widthProperty().addListener(observable -> {
-            //TODO: Make more elegant
             setZoomFactor(1);
         });
     }
 
     private double getInternalWidth() {
-        System.out.println("getWidth " + getWidth());
         return getWidth()-getInsets().getLeft()-getInsets().getRight();
     }
 
     private double getInternalHeight() {
+        //Scroll bar is 13 pixels tall
+        //TODO: Obtain dynamically
         return getHeight()-getInsets().getBottom()-getInsets().getTop()-13;
     }
 
     private void resizeHeight() {
-        //Scroll bar is 13 pixels tall
-        //TODO: Obtain dynamically
         scale.setY(getInternalHeight()/getImageHeight());
     }
 
@@ -134,8 +131,6 @@ public class WaveformDisplay extends ScrollPane {
             }
         }
 
-        //TODO: Remove
-        imageViews.get(0).setColourSelected();
         resizeHeight();
         setColours();
     }
