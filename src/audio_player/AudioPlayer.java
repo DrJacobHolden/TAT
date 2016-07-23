@@ -7,6 +7,7 @@ import tat.Position;
 import tat.PositionListener;
 
 import javax.sound.sampled.*;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,10 +29,10 @@ public class AudioPlayer implements PositionListener {
     /**
      * Sets up an audio player to play the specified sound file.
      */
-    public AudioPlayer(Position position, Recording recording) {
+    public AudioPlayer(Position position) {
         this.position = position;
+        position.addSelectedListener(this);
         mixer = AudioSystem.getMixer(AudioSystem.getMixerInfo()[0]);
-        loadSegment(recording.getSegment(0));
     }
 
     private void setUpListenerEvents() {
@@ -75,6 +76,9 @@ public class AudioPlayer implements PositionListener {
     }
 
     public boolean isPlaying() {
+        if (clip == null) {
+            return false;
+        }
         return clip.isRunning();
     }
 
@@ -87,16 +91,21 @@ public class AudioPlayer implements PositionListener {
     }
 
     @Override
-    public void positionChanged(Segment segment, double frame) {
-        boolean isPlaying = isPlaying();
+    public void positionChanged(Segment segment, double frame, Object initiator) {
+        if (initiator != this) {
+            boolean isPlaying = isPlaying();
 
-        if (this.segment != segment) {
-            loadSegment(segment);
-        }
-        clip.setFramePosition((int) frame);
+            if (this.segment != segment) {
+                if (isPlaying) {
+                    clip.stop();
+                }
+                loadSegment(segment);
+            }
+            clip.setFramePosition((int) frame);
 
-        if (isPlaying) {
-            play();
+            if (isPlaying) {
+                play();
+            }
         }
     }
 
@@ -109,8 +118,7 @@ public class AudioPlayer implements PositionListener {
             AudioInputStream audioStream = segment.getAudioFile().getStream();
             clip.open(audioStream);
             setUpListenerEvents();
-        } catch(Exception e)
-        {
+        } catch (LineUnavailableException | IOException e) {
             e.printStackTrace();
         }
     }

@@ -17,8 +17,8 @@ public class Position {
     }
 
     public void setSelected(Segment segment, double frame, Object initiator) {
-        positionListeners.stream().filter(l -> l != initiator).forEach(l -> {
-            l.positionChanged(segment, frame);
+        positionListeners.stream().forEach(l -> {
+            l.positionChanged(segment, frame, initiator);
         });
     }
 }

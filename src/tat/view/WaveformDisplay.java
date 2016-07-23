@@ -36,7 +36,12 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
 
     protected Rectangle cursor = new Rectangle();
 
-    private Position position = new Position();
+    private Position position;
+
+    public void setPosition(Position position) {
+        this.position = position;
+        position.addSelectedListener(this);
+    }
 
     public WaveformDisplay() {
         super();
@@ -66,8 +71,6 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         cursor.setFill(Colours.ORANGE);
         //Use exact sizes specified
         cursor.setStrokeWidth(0);
-
-        position.addSelectedListener(this);
     }
 
     public double getZoomFactor() {
@@ -158,7 +161,9 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
 
     private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
         Segment segment = iv.getSegment();
-        position.setSelected(segment, (ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength(), this);
+
+        double frame = (ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength();
+        position.setSelected(segment, frame, this);
     }
 
     private void updateCursorPosition(double newX) {
@@ -191,7 +196,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     @Override
-    public void positionChanged(Segment segment, double frame) {
+    public void positionChanged(Segment segment, double frame, Object initiator) {
         WaveformSegment iv = imageViewForSegment(segment);
 
         resetColours();
