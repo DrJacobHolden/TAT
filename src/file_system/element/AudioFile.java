@@ -9,7 +9,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.*;
 
 /**
  * Created by Tate on 21/05/2016.
@@ -47,8 +47,11 @@ public class AudioFile extends BaseFileSystemElement {
     }
 
     @Override
-    public void save() {
-        Path path = segment.getPath(this);
+    public void save() throws IOException {
+        File newFile = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
+        //Ensure directory exists
+        newFile.toPath().getParent().toFile().mkdirs();
+        Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override

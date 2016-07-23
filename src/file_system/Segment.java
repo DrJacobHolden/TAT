@@ -43,8 +43,8 @@ public class Segment {
         this.recording = recording;
     }
 
-    //Default to 0
-    private int segmentNumber = 0;
+    //Default to 1
+    private int segmentNumber = 1;
     private int speakerId = 0;
 
     //This is only used if the segment is not yet associated with a recording yet.
@@ -136,7 +136,7 @@ public class Segment {
         this.baseName = baseName;
     }
 
-    public void save() throws FileNotFoundException {
+    public void save() throws FileNotFoundException, IOException {
         if (annotationFile != null) {
             annotationFile.save();
         }

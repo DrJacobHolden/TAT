@@ -1,5 +1,6 @@
 package file_system;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,5 +71,11 @@ public class Recording {
             recording.addSegment(segment);
         }
         return recordingMap;
+    }
+
+    public void save() throws IOException {
+        for (Segment segment : segments.values()) {
+            segment.save();
+        }
     }
 }

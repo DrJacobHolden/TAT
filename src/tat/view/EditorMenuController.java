@@ -21,6 +21,7 @@ import tat.PositionListener;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -141,6 +142,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         loadTooltips();
         bindZoomButtons();
         bindPlayerButtons();
+        bindSaveButton();
     }
 
     /**
@@ -209,6 +211,16 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         });
         zoomOutButton.setOnAction(event -> {
             waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()/zoomFactor);
+        });
+    }
+
+    private void bindSaveButton() {
+        saveButton.setOnAction(event -> {
+            try {
+                getActiveRecording().save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
