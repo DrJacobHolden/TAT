@@ -74,8 +74,8 @@ public class AnnotationFile extends BaseFileSystemElement {
         return annotation;
     }
 
-    public void setString(String str) {
-        annotation = str;
+    public void setString(String s) {
+        annotation = s;
     }
 
     @Override
