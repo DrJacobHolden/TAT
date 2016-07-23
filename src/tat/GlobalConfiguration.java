@@ -1,8 +1,5 @@
 package tat;
 
-import alignment.AlignmentProvider;
-import alignment.maus.WebMaus;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.prefs.Preferences;

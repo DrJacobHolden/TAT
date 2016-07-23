@@ -9,6 +9,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import tat.Position;
+import tat.PositionListener;
 import ui.waveform.WaveformSegment;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -19,7 +21,7 @@ import java.util.List;
 /**
  * Created by Tate on 4/07/2016.
  */
-public class WaveformDisplay extends ScrollPane implements SelectedListener {
+public class WaveformDisplay extends ScrollPane implements PositionListener {
 
     public Recording recording;
     private List<WaveformSegment> imageViews = new ArrayList<>();
@@ -34,7 +36,7 @@ public class WaveformDisplay extends ScrollPane implements SelectedListener {
 
     protected Rectangle cursor = new Rectangle();
 
-    private Selected selected = new Selected();
+    private Position position = new Position();
 
     public WaveformDisplay() {
         super();
@@ -65,7 +67,7 @@ public class WaveformDisplay extends ScrollPane implements SelectedListener {
         //Use exact sizes specified
         cursor.setStrokeWidth(0);
 
-        selected.addSelectedListener(this);
+        position.addSelectedListener(this);
     }
 
     public double getZoomFactor() {
@@ -156,7 +158,7 @@ public class WaveformDisplay extends ScrollPane implements SelectedListener {
 
     private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
         Segment segment = iv.getSegment();
-        selected.setSelected(segment, (ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength());
+        position.setSelected(segment, (ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength(), this);
     }
 
     private void updateCursorPosition(double newX) {
@@ -189,7 +191,7 @@ public class WaveformDisplay extends ScrollPane implements SelectedListener {
     }
 
     @Override
-    public void selectionChanged(Segment segment, double frame) {
+    public void positionChanged(Segment segment, double frame) {
         WaveformSegment iv = imageViewForSegment(segment);
 
         resetColours();
