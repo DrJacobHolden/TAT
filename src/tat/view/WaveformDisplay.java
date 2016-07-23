@@ -68,7 +68,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
 
         //Cursor
         cursorGroup.getChildren().add(cursor);
-        cursor.setFill(Colours.ORANGE);
+        cursor.setFill(Colours.WHITE);
         //Use exact sizes specified
         cursor.setStrokeWidth(0);
     }
@@ -90,7 +90,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         System.out.println("image width " + getImageWidth());
         System.out.println("new val " + newValue);
 
-        double newScale = (double) newValue * getInternalWidth()/getImageWidth();
+        double newScale = newValue * getInternalWidth()/getImageWidth();
 
         double oldHVal = getHvalue();
         double innerWidth = hBox.getWidth() * newScale;
@@ -173,7 +173,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     private void updateCursorWidth() {
-        cursor.setWidth(1/scale.getX());
+        cursor.setWidth(2/scale.getX());
     }
 
     public void resetColours() {

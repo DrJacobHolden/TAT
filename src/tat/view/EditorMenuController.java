@@ -181,7 +181,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         waveformDisplay.setPosition(position);
 
         player = new AudioPlayer(position);
-        
+
         position.setSelected(getActiveRecording().getSegment(1), 0, this);
     }
 
