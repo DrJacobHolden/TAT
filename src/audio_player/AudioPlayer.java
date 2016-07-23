@@ -94,32 +94,31 @@ public class AudioPlayer implements PositionListener {
     public void positionChanged(Segment segment, double frame, Object initiator) {
         if (initiator != this) {
             boolean isPlaying = isPlaying();
-
-            if (this.segment != segment) {
-                if (isPlaying) {
-                    clip.stop();
+            try {
+                if (this.segment != segment) {
+                    if (isPlaying) {
+                        clip.stop();
+                    }
+                    loadSegment(segment);
                 }
-                loadSegment(segment);
-            }
-            clip.setFramePosition((int) frame);
+                clip.setFramePosition((int) frame);
 
-            if (isPlaying) {
-                play();
+                if (isPlaying) {
+                    play();
+                }
+            } catch (IOException | LineUnavailableException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void loadSegment(Segment segment) {
+    private void loadSegment(Segment segment) throws IOException, LineUnavailableException {
         this.segment = segment;
 
         DataLine.Info dataInfo = new DataLine.Info(Clip.class, null);
-        try {
-            clip = (Clip) mixer.getLine(dataInfo);
-            AudioInputStream audioStream = segment.getAudioFile().getStream();
-            clip.open(audioStream);
-            setUpListenerEvents();
-        } catch (LineUnavailableException | IOException e) {
-            e.printStackTrace();
-        }
+        clip = (Clip) mixer.getLine(dataInfo);
+        AudioInputStream audioStream = segment.getAudioFile().getStream();
+        clip.open(audioStream);
+        setUpListenerEvents();
     }
 }

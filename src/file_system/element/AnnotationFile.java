@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -61,13 +62,20 @@ public class AnnotationFile extends BaseFileSystemElement {
 
     @Override
     public void save() throws FileNotFoundException {
-        Path path = segment.getPath(this);
-        PrintWriter out = new PrintWriter(path.toFile());
+        File saveFile = Paths.get(segment.getPath(this).toString() + (FILE_EXTENSIONS[0])).toFile();
+        //Ensure directory exists
+        saveFile.toPath().getParent().toFile().mkdirs();
+        PrintWriter out = new PrintWriter(saveFile);
         out.println(annotation);
+        out.close();
     }
 
     public String getString() {
         return annotation;
+    }
+
+    public void setString(String str) {
+        annotation = str;
     }
 
     @Override
