@@ -178,6 +178,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
         textArea.setRecording(getActiveRecording());
+        textArea.setPosition(position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 
