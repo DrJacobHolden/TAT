@@ -71,7 +71,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private IconButton settingsButton;
 
     @FXML
-    private TextFlow textArea;
+    private AnnotationDisplay textArea;
 
     @FXML
     private MenuButton fileMenu;
@@ -177,6 +177,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
+        textArea.setRecording(getActiveRecording());
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 
