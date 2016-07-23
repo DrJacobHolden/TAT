@@ -1,7 +1,9 @@
 package tat.view;
 
+import audio_player.AudioPlayer;
 import file_system.FileSystem;
 import file_system.Recording;
+import file_system.Segment;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +16,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import tat.Main;
+import tat.Position;
+import tat.PositionListener;
 import ui.icon.Icon;
 import ui.icon.IconLoader;
 
@@ -22,7 +26,7 @@ import java.util.Set;
 /**
  * Created by Tate on 29/06/2016.
  */
-public class EditorMenuController implements FileSelectedHandler {
+public class EditorMenuController implements FileSelectedHandler, PositionListener {
 
     @FXML
     private IconButton splitButton;
@@ -79,6 +83,10 @@ public class EditorMenuController implements FileSelectedHandler {
     private Stage primaryStage;
     private String activeRecording;
 
+    private AudioPlayer player;
+    private Segment currentSegment;
+    private Position position;
+
     public Recording getActiveRecording() {
         return main.fileSystem.recordings.get(activeRecording);
     }
@@ -132,6 +140,7 @@ public class EditorMenuController implements FileSelectedHandler {
         loadIcons();
         loadTooltips();
         bindZoomButtons();
+        bindPlayerButtons();
     }
 
     /**
@@ -163,9 +172,32 @@ public class EditorMenuController implements FileSelectedHandler {
 
     @Override
     public void fileSelected(String file) {
+        position = new Position();
+        position.addSelectedListener(this);
+
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
         waveformDisplay.drawWaveform();
+        waveformDisplay.setPosition(position);
+
+        player = new AudioPlayer(position);
+
+        position.setSelected(getActiveRecording().getSegment(1), 0, this);
+    }
+
+    private void bindPlayerButtons() {
+        playButton.setOnAction(event -> player.play());
+        pauseButton.setOnAction(event -> player.pause());
+        stopButton.setOnAction(event -> player.stop());
+        nextSegmentButton.setOnAction(event -> maybeChangeSegment(+1));
+        prevSegmentButton.setOnAction(event -> maybeChangeSegment(-1));
+    }
+
+    private void maybeChangeSegment(int offset) {
+        Segment newSegment = getActiveRecording().getSegment(currentSegment.getSegmentNumber() + offset);
+        if (newSegment != null) {
+            position.setSelected(newSegment, 0, this);
+        }
     }
 
     private void bindZoomButtons() {
@@ -176,5 +208,10 @@ public class EditorMenuController implements FileSelectedHandler {
         zoomOutButton.setOnAction(event -> {
             waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()/zoomFactor);
         });
+    }
+
+    @Override
+    public void positionChanged(Segment segment, double frame, Object initiator) {
+        this.currentSegment = segment;
     }
 }

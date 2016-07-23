@@ -1,5 +1,6 @@
 package ui.waveform;
 
+import file_system.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -22,6 +23,7 @@ public class WaveformSegment extends StackPane {
     private final Background SELECTED_BACKGROUND = new Background(new BackgroundFill(Colours.ORANGE, CornerRadii.EMPTY, Insets.EMPTY));
     private final Background ODD_BACKGROUND = new Background(new BackgroundFill(Colours.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
     private final Background EVEN_BACKGROUND = new Background(new BackgroundFill(Colours.TERTIARY_GRAY, CornerRadii.EMPTY, Insets.EMPTY));
+    private final Segment segment;
 
     public double getImageWidth() {
         return imageView.getImage().getWidth();
@@ -29,12 +31,14 @@ public class WaveformSegment extends StackPane {
 
     public double getImageHeight() { return imageView.getImage().getHeight(); }
 
-    public WaveformSegment() {
+    public WaveformSegment(Segment segment) throws IOException, UnsupportedAudioFileException {
+        this.segment = segment;
+        imageView.setAudioStream(segment.getAudioFile().getFile());
         getChildren().add(imageView);
     }
 
-    public void setAudioStream(File audioFile) throws IOException, UnsupportedAudioFileException {
-        imageView.setAudioStream(AudioSystem.getAudioInputStream(audioFile));
+    public Segment getSegment() {
+        return segment;
     }
 
     public void setColourSelected() {

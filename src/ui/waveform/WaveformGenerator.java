@@ -62,7 +62,7 @@ public class WaveformGenerator {
         int[] frames = getFrameArray();
 
         //All configurable
-        int height = 400;
+        int height = 200;
         int width = frames.length / resolution;
         Color background = Colours.SECONDARY_GRAY;
         Color colour = Colours.TRANSPARENT;
