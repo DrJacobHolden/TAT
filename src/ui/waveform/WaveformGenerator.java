@@ -37,20 +37,7 @@ public class WaveformGenerator {
         frameSize = audioStream.getFormat().getFrameSize();
     }
 
-    public int[] getFrameArray() throws IOException { //With help from http://codeidol.com/java/swing/Audio/Build-an-Audio-Waveform-Display/
 
-        byte[] bytes = new byte[frameLength * frameSize];
-        int[] frames = new int[frameLength];
-
-        audioStream.read(bytes);
-
-        for (int t = 0, sampleIndex=0; t < bytes.length; sampleIndex++) {
-            int sample = getSixteenBitSample((int) bytes[t++], (int) bytes[t++]);
-            frames[sampleIndex] = sample;
-        }
-
-        return frames;
-    }
 
     /**
      * Actually generate an image and return it
@@ -59,7 +46,7 @@ public class WaveformGenerator {
      * @throws IOException
      */
     public Image getWaveformImage(int resolution) throws IOException {
-        int[] frames = getFrameArray();
+        int[] frames = AudioUtil.getFrameArray(audioStream);
 
         //All configurable
         int height = 200;
@@ -96,9 +83,5 @@ public class WaveformGenerator {
         }
 
         return waveformImage;
-    }
-
-    private int getSixteenBitSample(int high, int low) {
-        return (high << 8) + (low & 0x00ff);
     }
 }

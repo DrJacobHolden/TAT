@@ -2,13 +2,14 @@ package file_system.element;
 
 import file_system.Segment;
 import sun.audio.AudioStream;
+import ui.waveform.AudioUtil;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import javax.sound.sampled.spi.AudioFileWriter;
+import java.io.*;
 import java.nio.file.*;
 
 /**
@@ -52,6 +53,25 @@ public class AudioFile extends BaseFileSystemElement {
         //Ensure directory exists
         newFile.toPath().getParent().toFile().mkdirs();
         Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public AudioFile split(Segment newSegment, long frame) throws IOException {
+        File file1 = File.createTempFile("split1", Long.toString(System.nanoTime()));
+        File file2 = File.createTempFile("split2", Long.toString(System.nanoTime()));
+
+        AudioInputStream audioStream = getStream();
+        AudioInputStream audioStream1 = new AudioInputStream(audioStream, audioStream.getFormat(), frame);
+        AudioInputStream audioStream2 = new AudioInputStream(audioStream, audioStream.getFormat(), audioStream.getFrameLength());
+
+        AudioSystem.write(audioStream1, AudioFileFormat.Type.WAVE, file1);
+        AudioSystem.write(audioStream2, AudioFileFormat.Type.WAVE, file2);
+
+        audioStream.close();
+        audioStream1.close();
+        audioStream2.close();
+
+        file = file1;
+        return new AudioFile(newSegment, file2.toPath());
     }
 
     @Override
