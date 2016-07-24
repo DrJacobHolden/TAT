@@ -6,12 +6,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import tat.TimerHandler;
-import ui.icon.Icon;
+import tat.view.icon.Icon;
 
-import java.util.Timer;
 import java.util.TimerTask;
 
 /**

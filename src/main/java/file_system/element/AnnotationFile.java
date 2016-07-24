@@ -1,8 +1,6 @@
 package file_system.element;
 
 import file_system.Segment;
-import sun.plugin.javascript.navig.Array;
-import ui.text_box.Annotation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
