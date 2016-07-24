@@ -92,6 +92,7 @@ public class AudioPlayer implements PositionListener {
 
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
+        System.out.println("B");
         if (initiator != this) {
             boolean isPlaying = isPlaying();
             try {

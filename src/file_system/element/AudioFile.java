@@ -52,6 +52,7 @@ public class AudioFile extends BaseFileSystemElement {
 
     public AudioInputStream getStream() {
         try {
+            System.out.println("getStream called");
             return AudioSystem.getAudioInputStream(file);
         } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
@@ -64,6 +65,9 @@ public class AudioFile extends BaseFileSystemElement {
         File newFile = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
         //Ensure directory exists
         newFile.toPath().getParent().toFile().mkdirs();
+
+        //Are you fucking kidding me? File handle still exists if this isn't called, but I can't figure out where
+        System.gc();
         System.out.println("Copying " + file.toString() + " to " + newFile.toString());
         Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
@@ -76,7 +80,7 @@ public class AudioFile extends BaseFileSystemElement {
 
         AudioInputStream audioStream = getStream();
         AudioInputStream audioStream1 = new AudioInputStream(audioStream, audioStream.getFormat(), frame);
-        AudioInputStream audioStream2 = new AudioInputStream(audioStream, audioStream.getFormat(), audioStream.getFrameLength());
+        AudioInputStream audioStream2 = new AudioInputStream(audioStream, audioStream.getFormat(), audioStream.getFrameLength()-frame);
 
         AudioSystem.write(audioStream1, AudioFileFormat.Type.WAVE, file1);
         AudioSystem.write(audioStream2, AudioFileFormat.Type.WAVE, file2);
@@ -88,6 +92,22 @@ public class AudioFile extends BaseFileSystemElement {
         file = file1;
 
         return new AudioFile(newSegment, file2.toPath());
+    }
+
+    public void join(AudioFile audioFile2) throws IOException {
+        File joinedFile = File.createTempFile("join", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
+        joinedFile.deleteOnExit();
+
+        AudioInputStream audio1 = getStream();
+        AudioInputStream audio2 = audioFile2.getStream();
+        AudioInputStream audioJoined = new AudioInputStream(new SequenceInputStream(audio1, audio2), audio1.getFormat(), audio1.getFrameLength() + audio2.getFrameLength());
+
+        AudioSystem.write(audioJoined, AudioFileFormat.Type.WAVE, joinedFile);
+        audioJoined.close();
+        audio1.close();
+        audio2.close();
+
+        file = joinedFile;
     }
 
     @Override

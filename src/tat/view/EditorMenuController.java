@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * Created by Tate on 29/06/2016.
  */
-public class EditorMenuController implements FileSelectedHandler, PositionListener {
+public class EditorMenuController implements FileSelectedHandler {
 
     @FXML
     private IconButton splitButton;
@@ -85,8 +85,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private String activeRecording;
 
     private AudioPlayer player;
-    private Segment currentSegment;
-    private int currentFrame;
     private Position position;
 
     public Recording getActiveRecording() {
@@ -177,7 +175,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     @Override
     public void fileSelected(String file) {
         position = new Position();
-        position.addSelectedListener(this);
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
@@ -200,7 +197,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     }
 
     private void maybeChangeSegment(int offset) {
-        Segment newSegment = getActiveRecording().getSegment(currentSegment.getSegmentNumber() + offset);
+        Segment newSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber() + offset);
         if (newSegment != null) {
             position.setSelected(newSegment, 0, this);
         }
@@ -231,18 +228,13 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
             try {
                 //Allow files to be overridden
                 player.closeOpenFiles();
-                getActiveRecording().split(currentSegment, currentFrame, 0);
+                Segment segment2 = getActiveRecording().split(position.getSegment(), position.getFrame(), 0);
+                //waveformDisplay.onSplit(currentSegment, segment2, currentFrame);
+                //Select the second split segment
+                maybeChangeSegment(+1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-    }
-
-    @Override
-    public void positionChanged(Segment segment, int frame, Object initiator) {
-        this.currentSegment = segment;
-        this.currentFrame = frame;
-
-        System.out.println("Frame " + frame);
     }
 }

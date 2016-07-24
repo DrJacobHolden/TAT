@@ -165,6 +165,20 @@ public class Segment {
         return null;
     }
 
+    public List<Path> getPaths() {
+        List<Path> paths = new ArrayList<>();
+        if (audioFile != null) {
+            paths.add(getPath(audioFile));
+        }
+        if (annotationFile != null) {
+            paths.add(getPath(annotationFile));
+        }
+        if (alignmentFile != null) {
+            paths.add(getPath(annotationFile));
+        }
+        return paths;
+    }
+
     public Segment split(long frame, int stringPos) throws IOException {
         Segment segment2 = new Segment(fileSystem, segmentNumber+1, speakerId, baseName);
         segment2.setRecording(recording);
@@ -176,5 +190,14 @@ public class Segment {
         segment2.annotationFile = annotation2;
 
         return segment2;
+    }
+
+    public void join(Segment segment2) throws IOException {
+        if (segment2.audioFile != null) {
+            audioFile.join(segment2.audioFile);
+        }
+        if (segment2.annotationFile != null) {
+            annotationFile.join(segment2.annotationFile);
+        }
     }
 }

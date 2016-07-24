@@ -198,7 +198,6 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
         WaveformSegment iv = imageViewForSegment(segment);
-
         resetColours();
         iv.setColourSelected();
 
