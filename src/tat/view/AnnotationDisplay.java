@@ -103,7 +103,7 @@ public class AnnotationDisplay extends TextFlow implements PositionListener {
     }
 
     @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
+    public void positionChanged(Segment segment, int frame, Object initiator) {
         if(activeSegment != segment) {
             if(activeSegment != null) {
                 setSegmentColours(annotationList.get(activeSegment.getSegmentNumber() -1));

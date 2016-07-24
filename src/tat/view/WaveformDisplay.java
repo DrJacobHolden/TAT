@@ -162,7 +162,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
         Segment segment = iv.getSegment();
 
-        double frame = (ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength();
+        int frame = (int) ((ev.getX()/iv.getWidth()) * segment.getAudioFile().getStream().getFrameLength());
         position.setSelected(segment, frame, this);
     }
 
@@ -196,14 +196,14 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
+    public void positionChanged(Segment segment, int frame, Object initiator) {
         WaveformSegment iv = imageViewForSegment(segment);
 
         resetColours();
         iv.setColourSelected();
 
         if (iv != null) {
-            double frameOffset = (frame/segment.getAudioFile().getStream().getFrameLength() * iv.getWidth());
+            double frameOffset = ((double) frame/segment.getAudioFile().getStream().getFrameLength() * iv.getWidth());
             updateCursorPosition(iv.getBoundsInParent().getMinX() + frameOffset);
         }
     }

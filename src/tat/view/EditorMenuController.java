@@ -86,6 +86,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
 
     private AudioPlayer player;
     private Segment currentSegment;
+    private int currentFrame;
     private Position position;
 
     public Recording getActiveRecording() {
@@ -143,6 +144,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         bindZoomButtons();
         bindPlayerButtons();
         bindSaveButton();
+        bindSplitAndJoinButtons();
     }
 
     /**
@@ -224,8 +226,21 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         });
     }
 
+    private void bindSplitAndJoinButtons() {
+        splitButton.setOnAction(event -> {
+            try {
+                getActiveRecording().split(currentSegment, currentFrame, 0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
+    public void positionChanged(Segment segment, int frame, Object initiator) {
         this.currentSegment = segment;
+        this.currentFrame = frame;
+
+        System.out.println("Frame " + frame);
     }
 }

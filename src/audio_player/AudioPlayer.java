@@ -82,16 +82,16 @@ public class AudioPlayer implements PositionListener {
         return clip.isRunning();
     }
 
-    public long getCurrentFrame() {
+    public int getCurrentFrame() {
         return clip.getFramePosition();
     }
 
-    public long getEndFrame() {
+    public int getEndFrame() {
         return clip.getFrameLength();
     }
 
     @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
+    public void positionChanged(Segment segment, int frame, Object initiator) {
         if (initiator != this) {
             boolean isPlaying = isPlaying();
             try {
