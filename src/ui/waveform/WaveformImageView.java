@@ -15,7 +15,6 @@ import java.io.IOException;
  */
 public class WaveformImageView extends ImageView {
 
-    protected AudioInputStream audioStream;
     protected WaveformGenerator waveformGenerator;
 
     public void setAudioStream(File audioFile) throws IOException, UnsupportedAudioFileException {
@@ -23,16 +22,7 @@ public class WaveformImageView extends ImageView {
     }
 
     public void setAudioStream(AudioInputStream audioStream) throws UnsupportedAudioFileException {
-        this.audioStream = audioStream;
         this.waveformGenerator = new WaveformGenerator(audioStream);
-        generateAndDisplayWaveform();
-    }
-
-    public AudioInputStream getAudioStream() {
-        return audioStream;
-    }
-
-    private void generateAndDisplayWaveform() {
         try {
             //10 is just a guess at a good resolution. Should really changed depending on zoom.
             int resolution = 10;
@@ -40,6 +30,13 @@ public class WaveformImageView extends ImageView {
             setImage(waveform);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                audioStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 }

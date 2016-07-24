@@ -17,6 +17,7 @@ public class AudioUtil {
         int[] frames = new int[frameLength];
 
         audioStream.read(bytes);
+        audioStream.close();
 
         for (int t = 0, sampleIndex=0; t < bytes.length; sampleIndex++) {
             int sample = getSixteenBitSample((int) bytes[t++], (int) bytes[t++]);

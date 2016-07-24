@@ -229,6 +229,8 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private void bindSplitAndJoinButtons() {
         splitButton.setOnAction(event -> {
             try {
+                //Allow files to be overridden
+                player.closeOpenFiles();
                 getActiveRecording().split(currentSegment, currentFrame, 0);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -38,6 +38,18 @@ public class AudioFile extends BaseFileSystemElement {
         return file;
     }
 
+    public int getNoFrames() {
+        AudioInputStream as = getStream();
+        int no = (int) as.getFrameLength();
+        try {
+            as.close();
+        } catch (IOException e) {
+            //We're really in trouble
+            e.printStackTrace();
+        }
+        return no;
+    }
+
     public AudioInputStream getStream() {
         try {
             return AudioSystem.getAudioInputStream(file);
@@ -52,6 +64,7 @@ public class AudioFile extends BaseFileSystemElement {
         File newFile = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
         //Ensure directory exists
         newFile.toPath().getParent().toFile().mkdirs();
+        System.out.println("Copying " + file.toString() + " to " + newFile.toString());
         Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 

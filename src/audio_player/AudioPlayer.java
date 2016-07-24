@@ -113,6 +113,7 @@ public class AudioPlayer implements PositionListener {
     }
 
     private void loadSegment(Segment segment) throws IOException, LineUnavailableException {
+        closeOpenFiles();
         this.segment = segment;
 
         DataLine.Info dataInfo = new DataLine.Info(Clip.class, null);
@@ -120,5 +121,11 @@ public class AudioPlayer implements PositionListener {
         AudioInputStream audioStream = segment.getAudioFile().getStream();
         clip.open(audioStream);
         setUpListenerEvents();
+    }
+
+    public void closeOpenFiles() throws IOException {
+        if (clip != null) {
+            clip.close();
+        }
     }
 }
