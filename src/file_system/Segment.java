@@ -9,6 +9,7 @@ import file_system.element.AudioFile;
 import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
+import javax.sound.sampled.AudioInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -162,5 +163,18 @@ public class Segment {
         }
         //TODO: Throw error
         return null;
+    }
+
+    public Segment split(long frame, int stringPos) throws IOException {
+        Segment segment2 = new Segment(fileSystem, segmentNumber+1, speakerId, baseName);
+        segment2.setRecording(recording);
+
+        AudioFile audio2 = getAudioFile().split(segment2, frame);
+        AnnotationFile annotation2 = getAnnotationFile().split(segment2, stringPos);
+
+        segment2.audioFile = audio2;
+        segment2.annotationFile = annotation2;
+
+        return segment2;
     }
 }

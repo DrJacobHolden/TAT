@@ -78,4 +78,19 @@ public class Recording {
             segment.save();
         }
     }
+
+    public void split(Segment segment1, long frame, int stringPos) throws IOException {
+        //Split the segment
+        Segment segment2 = segment1.split(frame, stringPos);
+
+        //Move segments along to make room for new one
+        for (int i=segment1.getSegmentNumber()+1; i<=size; i++) {
+            Segment seg = segments.get(i);
+            seg.setSegmentNumber(i+1);
+            segments.put(i+1, seg);
+        }
+
+        //Put segment after first
+        segments.put(segment1.getSegmentNumber()+1, segment2);
+    }
 }
