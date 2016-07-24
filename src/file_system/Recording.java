@@ -1,18 +1,14 @@
 package file_system;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by kalda on 28/06/2016.
  */
-public class Recording {
+public class Recording implements Iterable<Segment> {
 
     public Map<Integer, Segment> getSegments() {
         return segments;
@@ -80,10 +76,10 @@ public class Recording {
     }
 
     public void save() throws IOException {
-        deleteMarked();
-        for (Segment segment : segments.values()) {
+        for (Segment segment : this) {
             segment.save();
         }
+        deleteMarked();
     }
 
     public Segment split(Segment segment1, long frame, int stringPos) throws IOException {
@@ -99,6 +95,7 @@ public class Recording {
 
         //Put segment after first
         segments.put(segment1.getSegmentNumber()+1, segment2);
+        size++;
         return segment2;
     }
 
@@ -111,6 +108,7 @@ public class Recording {
         while (toDeleteOnSave.size() > 0) {
             Path path = toDeleteOnSave.remove(toDeleteOnSave.size()-1);
             try {
+                System.out.println("Deleting file " + path);
                 Files.delete(path);
             } catch (IOException e) {
                 System.out.println("Failed to delete file " + path);
@@ -126,12 +124,31 @@ public class Recording {
             Segment seg = segments.get(i);
             if (i==size()) {
                 //Last item won't be overridden, so mark for delete before changing segment number
-                markFilesForDelete(seg.getPaths());
+                markFilesForDelete(seg.getPossiblePaths());
+                //Last index should be removed
+                segments.remove(i);
             }
             seg.setSegmentNumber(i-1);
             segments.put(i-1, seg);
         }
-
+        size--;
         return segment1;
+    }
+
+    @Override
+    public Iterator<Segment> iterator() {
+        return new Iterator<Segment>() {
+            int index = 1;
+            @Override
+            public boolean hasNext() {
+                return index <= size;
+            }
+
+            @Override
+            public Segment next() {
+                index++;
+                return getSegment(index-1);
+            }
+        };
     }
 }

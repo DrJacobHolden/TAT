@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -165,17 +167,20 @@ public class Segment {
         return null;
     }
 
-    public List<Path> getPaths() {
+    public List<Path> getPossiblePaths() {
         List<Path> paths = new ArrayList<>();
-        if (audioFile != null) {
-            paths.add(getPath(audioFile));
-        }
-        if (annotationFile != null) {
-            paths.add(getPath(annotationFile));
-        }
-        if (alignmentFile != null) {
-            paths.add(getPath(annotationFile));
-        }
+
+        Arrays.stream(new FileSystemElement[]{audioFile, annotationFile, alignmentFile})
+                .filter(element -> element != null)
+                .forEach(element -> {
+                    try {
+                        paths.add(element.getFileForPath(getPath(element)).toPath());
+                    } catch (FileNotFoundException e) {
+                        //Shouldn't really be an issue, but stack trace anyway
+                        e.printStackTrace();
+                    }
+                });
+
         return paths;
     }
 

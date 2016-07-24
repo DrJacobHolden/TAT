@@ -231,7 +231,19 @@ public class EditorMenuController implements FileSelectedHandler {
                 Segment segment2 = getActiveRecording().split(position.getSegment(), position.getFrame(), 0);
                 //waveformDisplay.onSplit(currentSegment, segment2, currentFrame);
                 //Select the second split segment
-                maybeChangeSegment(+1);
+                //maybeChangeSegment(+1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        joinButton.setOnAction(event -> {
+            Segment nextSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber()+1);
+            if (nextSegment == null) {
+                return;
+            }
+            try {
+                player.closeOpenFiles();
+                getActiveRecording().join(position.getSegment(), nextSegment);
             } catch (IOException e) {
                 e.printStackTrace();
             }
