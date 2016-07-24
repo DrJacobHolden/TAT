@@ -63,8 +63,8 @@ public class AnnotationDisplay extends VBox implements PositionListener {
             }
 
             TextArea text = createTextArea(annotationString, s);
-            setColours();
             annotationList.add(text);
+            setColours();
         }
     }
 
