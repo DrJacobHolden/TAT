@@ -70,7 +70,9 @@ public class AudioFile extends BaseFileSystemElement {
 
     public AudioFile split(Segment newSegment, long frame) throws IOException {
         File file1 = File.createTempFile("split1", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
+        file1.deleteOnExit();
         File file2 = File.createTempFile("split2", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
+        file2.deleteOnExit();
 
         AudioInputStream audioStream = getStream();
         AudioInputStream audioStream1 = new AudioInputStream(audioStream, audioStream.getFormat(), frame);
