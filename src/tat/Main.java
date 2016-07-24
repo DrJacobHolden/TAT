@@ -40,7 +40,6 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/MainMenu.fxml"));
             rootLayout = loader.load();
-
             MainMenuController controller = loader.getController();
             controller.setup(this, primaryStage);
 

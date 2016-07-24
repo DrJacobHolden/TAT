@@ -2,12 +2,14 @@ package tat.view;
 
 import file_system.Recording;
 import file_system.Segment;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import tat.Position;
+import tat.PositionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,39 +19,34 @@ import java.util.List;
  * Created by Tate on 23/07/2016.
  * //TODO: Ensure copying new files in with unsaved changes won't result in loss of changes
  */
-public class AnnotationDisplay extends TextFlow {
+public class AnnotationDisplay extends VBox implements PositionListener {
 
     private Recording recording;
     private Position position;
 
-    private List<Annotation> annotationList = new ArrayList<>();
+    private Segment activeSegment;
+
+    private List<TextArea> annotationList = new ArrayList<>();
 
     private final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
-    public static final Font DEFAULT_FONT = Font.font("Levenim MT", 24);
-
 
     public AnnotationDisplay() {
         super();
         setPadding(new Insets(0,0,0,0));
-        widthProperty().addListener((ob) -> {
-            display();
-        });
     };
 
     public void setPosition(Position position) {
         this.position = position;
+        position.addSelectedListener(this);
     }
 
     public void setRecording(Recording recording) {
         this.recording = recording;
+        activeSegment = recording.getSegment(1);
         buildAnnotations();
-        display();
+        getChildren().addAll(annotationList);
     }
 
-    /**
-     * Must be called again on width resizing to ensure textfields are appropriately
-     * sized
-     */
     private void buildAnnotations() {
         if(recording == null) {
             //TODO: Throw error
@@ -65,72 +62,48 @@ public class AnnotationDisplay extends TextFlow {
                 annotationString = s.getAnnotationFile().getString();
             }
 
-            Annotation text = new Annotation(annotationString, s, recording, position, this);
+            TextArea text = createTextArea(annotationString, s);
+            setColours();
             annotationList.add(text);
         }
     }
 
-    public void display() {
-        getChildren().clear();
+    public TextArea createTextArea(String annotation, Segment s) {
+        TextArea t = new TextArea(annotation);
+        t.setPadding(new Insets(0,0,0,0));
+        t.setEditable(true);
+        t.setWrapText(true);
+        t.setPrefRowCount(1);
+        t.textProperty().addListener((ov, prevText, currText) -> {
+            Platform.runLater(() -> {
+                s.getAnnotationFile().setString(currText);
+            });
+        });
+        t.setOnMouseClicked(event -> {
+            position.setSelected(s, 0, t);
+        });
+        return t;
+    }
 
-        //The local x coordinates of the last textfield
-        double lastX = 0;
+    @Override
+    public void positionChanged(Segment segment, double frame, Object initiator) {
+        if(segment != activeSegment) {
+            activeSegment = segment;
+            setColours();
+        }
+    }
 
-        for(Annotation a : annotationList) {
-            TextInfoTuple info = getSizesForString(a.getAnnotation(), lastX);
-            lastX = info.getLastWidth();
-            a.refreshAnnotations(info.getFirstLength(), info.getWidth());
-            for(TextField t : a.getTextFields()) {
-                getChildren().add(t);
-                a.resizeAnnotation();
+    public void setColours() {
+        for(TextArea t : annotationList) {
+            if (annotationList.indexOf(t) == activeSegment.getSegmentNumber() - 1) {
+                t.setStyle("-fx-text-fill: #ff7c00;");
+            } else {
+                if ((annotationList.indexOf(t)+1) % 2 == 0) {
+                    t.setStyle("-fx-text-fill: #5c5a67;");
+                } else {
+                    t.setStyle("-fx-text-fill: #e4e1f0;");
+                }
             }
-        }
-    }
-
-    private TextInfoTuple getSizesForString(String s, double lastX) {
-        Text text = new Text(s);
-        text.setFont(DEFAULT_FONT); // Set the same font, so the size is the same
-        double textLength = text.getLayoutBounds().getWidth() // This big is the Text in the TextField
-                + 2d; // Add some spacing
-        double width = getWidth();
-        if(width == 0) {
-            width = 1870; //Initial width
-        }
-        double lastWidth = textLength;
-        double firstLength = width - lastX;
-        textLength = textLength - firstLength;
-        if(width < textLength) {
-            lastWidth = textLength%width;
-        }
-        return new TextInfoTuple(lastWidth, width, firstLength);
-    }
-
-    class TextInfoTuple {
-        //Length of text spilling onto next line
-        double lastWidth;
-
-        //Width of other lines
-        double width;
-
-        //The length of the first line
-        double firstLength;
-
-        public TextInfoTuple(double lastWidth, double width, double firstLength) {
-            this.lastWidth = lastWidth;
-            this.width = width;
-            this.firstLength = firstLength;
-        }
-
-        public double getLastWidth() {
-            return lastWidth;
-        }
-
-        public double getWidth() {
-            return width;
-        }
-
-        public double getFirstLength() {
-            return firstLength;
         }
     }
 }

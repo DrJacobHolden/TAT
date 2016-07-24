@@ -167,6 +167,7 @@ public class MainMenuController implements FileSelectedHandler {
 
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
+        scene.getStylesheets().add(Main.class.getResource("view/textarea.css").toExternalForm());
         primaryStage.setScene(scene);
     }
 
