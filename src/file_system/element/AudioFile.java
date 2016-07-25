@@ -18,6 +18,7 @@ import java.nio.file.*;
 public class AudioFile extends BaseFileSystemElement {
 
     public static final String[] FILE_EXTENSIONS = new String[]{".wav"};
+    public static final int MIN_SPLIT_FRAMES = 50;
 
     private Segment segment;
 
@@ -52,7 +53,6 @@ public class AudioFile extends BaseFileSystemElement {
 
     public AudioInputStream getStream() {
         try {
-            System.out.println("getStream called");
             return AudioSystem.getAudioInputStream(file);
         } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();

@@ -30,6 +30,7 @@ public class Position {
     public void setSelected(Segment segment, int frame, Object initiator) {
         this.segment = segment;
         this.frame = frame;
+        System.out.println("Selected " + frame);
         positionListeners.stream().forEach(l -> l.positionChanged(segment, frame, initiator));
     }
 }

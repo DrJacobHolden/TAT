@@ -143,12 +143,9 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     public void drawWaveform() {
-        for (Segment segment : recording.getSegments().values()) {
+        for (Segment segment : recording) {
             try {
-                WaveformSegment iv = new WaveformSegment(segment);
-                iv.setOnMouseClicked(e -> segmentClicked(iv, e));
-                hBox.getChildren().add(iv);
-                imageViews.add(iv);
+                addWaveform(new WaveformSegment(segment));
             } catch (UnsupportedAudioFileException | IOException e) {
                 e.printStackTrace();
             }
@@ -159,11 +156,15 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         updateCursorPosition(0);
     }
 
-    private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
-        Segment segment = iv.getSegment();
+    public void addWaveform(WaveformSegment iv) {
+        int index = iv.getSegment().getSegmentNumber()-1;
+        iv.setOnMouseClicked(e -> segmentClicked(iv, e));
+        hBox.getChildren().add(index, iv);
+        imageViews.add(index, iv);
+    }
 
-        int frame = (int) ((ev.getX()/iv.getWidth()) * segment.getAudioFile().getNoFrames());
-        position.setSelected(segment, frame, this);
+    private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
+        position.setSelected(iv.getSegment(), iv.getFrameForPosition(ev.getX()), this);
     }
 
     private void updateCursorPosition(double newX) {
@@ -195,6 +196,15 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         return null;
     }
 
+    public void onSplit(Segment segment1, Segment segment2, int splitFrame) {
+        WaveformSegment splitWaveformSegment = imageViews.get(segment1.getSegmentNumber()-1);
+        WaveformSegment newWaveform = splitWaveformSegment.split(segment2, splitFrame);
+        //Add after segment1
+        addWaveform(newWaveform);
+        //Select will be called after new waveform is selected in EditorMenuController
+        resetColours();
+    }
+
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
         WaveformSegment iv = imageViewForSegment(segment);
@@ -202,8 +212,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         iv.setColourSelected();
 
         if (iv != null) {
-            double frameOffset = ((double) frame/segment.getAudioFile().getNoFrames() * iv.getWidth());
-            updateCursorPosition(iv.getBoundsInParent().getMinX() + frameOffset);
+            updateCursorPosition(iv.getBoundsInParent().getMinX() + iv.getPositionForFrame(frame));
         }
     }
 }

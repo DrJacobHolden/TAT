@@ -4,6 +4,7 @@ import audio_player.AudioPlayer;
 import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
+import file_system.element.AudioFile;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -178,8 +179,8 @@ public class EditorMenuController implements FileSelectedHandler {
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
-        textArea.setRecording(getActiveRecording());
-        textArea.setPosition(position);
+        //textArea.setRecording(getActiveRecording());
+        //textArea.setPosition(position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 
@@ -225,15 +226,18 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void bindSplitAndJoinButtons() {
         splitButton.setOnAction(event -> {
-            try {
-                //Allow files to be overridden
-                player.closeOpenFiles();
-                Segment segment2 = getActiveRecording().split(position.getSegment(), position.getFrame(), 0);
-                //waveformDisplay.onSplit(currentSegment, segment2, currentFrame);
-                //Select the second split segment
-                //maybeChangeSegment(+1);
-            } catch (IOException e) {
-                e.printStackTrace();
+            int frame = position.getFrame();
+            if (frame > AudioFile.MIN_SPLIT_FRAMES) {
+                try {
+                    //Allow files to be overridden
+                    player.closeOpenFiles();
+                    Segment segment2 = getActiveRecording().split(position.getSegment(), frame, 0);
+                    waveformDisplay.onSplit(position.getSegment(), segment2, frame);
+                    //Select the second split segment
+                    maybeChangeSegment(+1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         joinButton.setOnAction(event -> {
