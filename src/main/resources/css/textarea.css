@@ -1,8 +1,11 @@
-.text-area {
-    -fx-font-family: 'Levenim MT';
-    -fx-font-size: 24;
+.orange {
+    -fx-fill: #ff7c00;
 }
 
-.text-area .content {
-    -fx-background-color: #2b2934;
+.white {
+    -fx-fill: #e4e1f0;
+}
+
+.grey {
+    -fx-fill: #5c5a67;
 }

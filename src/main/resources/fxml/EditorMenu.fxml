@@ -123,12 +123,11 @@
                   </HBox>
                </children>
             </VBox>
-            <ScrollPane fx:id="scrollpane" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS" style="-fx-background-color: #2b2934;">
+            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS" style="-fx-background-color: #2b2934;-fx-font-family:'Levenim MT';-fx-font-size: 24;">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>
-               <AnnotationDisplay id="textArea" fx:id="textArea" prefWidth="1870" style="-fx-background-color: #2b2934;"></AnnotationDisplay>
-            </ScrollPane>
+            </AnnotationDisplay>
          </children>
          <VBox.margin>
             <Insets bottom="25.0" left="25.0" right="25.0" />

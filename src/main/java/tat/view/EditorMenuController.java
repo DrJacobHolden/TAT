@@ -77,9 +77,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     @FXML
     private WaveformDisplay waveformDisplay;
 
-    @FXML
-    private ScrollPane scrollpane;
-
     private Main main;
     private Stage primaryStage;
     private String activeRecording;
@@ -140,7 +137,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private void initialize() {
         loadIcons();
         loadTooltips();
-        setupScrollpane();
         bindZoomButtons();
         bindPlayerButtons();
         bindSaveButton();
@@ -157,13 +153,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         this.activeRecording = activeRecording;
         populateFileMenu(this, main.fileSystem, fileMenu);
         fileSelected(activeRecording);
-    }
-
-    public void setupScrollpane() {
-        scrollpane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollpane.widthProperty().addListener((ob, old, neww) -> {
-            textArea.setMaxWidth((Double)neww);
-        });
     }
 
     public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu) {

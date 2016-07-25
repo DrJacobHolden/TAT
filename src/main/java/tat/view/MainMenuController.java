@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.eclipse.swt.graphics.TextStyle;
 import tat.GlobalConfiguration;
 import tat.Main;
 import tat.TimerHandler;
