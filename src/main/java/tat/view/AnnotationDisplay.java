@@ -104,7 +104,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         for(int i = 1; i <= recording.getSegments().size(); i++) {
             Segment s = recording.getSegments().get(i);
             String annotationString = "";
-            if(s == null || s.getAnnotationFile().getString().equals("")) {
+            if(s == null || s.getAnnotationFile().getString().trim().equals("")) {
                 annotationString = DEFAULT_TEXT;
             } else {
                 annotationString = s.getAnnotationFile().getString().trim();
