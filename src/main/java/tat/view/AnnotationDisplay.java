@@ -42,42 +42,64 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private String fullString = "";
 
     private boolean textUpdated = false;
-
+    private boolean initialised = false;
     private final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
 
     public AnnotationDisplay() {
         super();
         setPadding(new Insets(0,0,0,0));
-    };
+
+        textProperty().addListener((observable, oldValue, newValue) -> {
+            if (initialised) {
+                int diff = newValue.length() - oldValue.length();
+
+                //Check if they have deleted a character before start
+                if (diff == -1) {
+                    if (getCaretPosition() == activeRange.getEnd()) {
+                        textUpdated = true;
+                        this.insertText(getCaretPosition(), " ");
+                        return;
+                    }
+                }
+                if (textUpdated) {
+                    textUpdated = false;
+                    return;
+                }
+                updateIndexRanges(activeRange.getStart(), diff);
+            }
+        });
+    }
 
     public void setPosition(tat.Position position) {
         this.position = position;
         position.addSelectedListener(this);
         selectionProperty().addListener((observable) -> {
-            if(previousSegRange != null) {
-                if(getSelection().getStart() == 0 && getSelection().getEnd() == fullString.length()) {
-                    selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
+            if (initialised) {
+                if (previousSegRange != null) {
+                    if (getSelection().getStart() == 0 && getSelection().getEnd() == fullString.length()) {
+                        selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
+                        previousSegRange = null;
+                        return;
+                    }
                     previousSegRange = null;
+                }
+                if (getSelection().getLength() == 0) {
+                    if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
+                        previousSegRange = annotations.get(activeSegment.getSegmentNumber() - 1);
+                    }
+                }
+                if (getSelection().getStart() < activeRange.getStart() || getSelection().getEnd() > activeRange.getEnd()) {
+                    checkActiveSegment();
+                }
+                if (getSelection().getLength() == 0) {
                     return;
                 }
-                previousSegRange = null;
-            }
-            if(getSelection().getLength() == 0) {
-                if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
-                    previousSegRange = annotations.get(activeSegment.getSegmentNumber() - 1);
+                if (getSelection().getEnd() > activeRange.getEnd()) {
+                    selectRange(getSelection().getStart(), activeRange.getEnd());
                 }
-            }
-            if(getSelection().getStart() < activeRange.getStart() || getSelection().getEnd() > activeRange.getEnd()) {
-                checkActiveSegment();
-            }
-            if(getSelection().getLength() == 0) {
-               return;
-            }
-            if(getSelection().getEnd() > activeRange.getEnd()) {
-                selectRange(getSelection().getStart(), activeRange.getEnd());
-            }
-            if(getSelection().getStart() < activeRange.getStart()) {
-                selectRange(activeRange.getStart(), getSelection().getEnd());
+                if (getSelection().getStart() < activeRange.getStart()) {
+                    selectRange(activeRange.getStart(), getSelection().getEnd());
+                }
             }
         });
     }
@@ -91,8 +113,10 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     public void setRecording(Recording recording) {
+        reset();
         this.recording = recording;
         buildAnnotations();
+        initialised = true;
     }
 
     private void buildAnnotations() {
@@ -103,7 +127,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         int lastIndex = 0;
         for(int i = 1; i <= recording.getSegments().size(); i++) {
             Segment s = recording.getSegments().get(i);
-            String annotationString = "";
+            String annotationString;
             if(s == null || s.getAnnotationFile().getString().trim().equals("")) {
                 annotationString = DEFAULT_TEXT;
             } else {
@@ -122,23 +146,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         }
         this.appendText(fullString);
         this.setWrapText(true);
-        textProperty().addListener((observable, oldValue, newValue) -> {
-            int diff = newValue.length() - oldValue.length();
-
-            //Check if they have deleted a character before start
-            if(diff == -1) {
-                if(getCaretPosition() == activeRange.getEnd()) {
-                    textUpdated = true;
-                    this.insertText(getCaretPosition(), " ");
-                    return;
-                }
-            }
-            if(textUpdated) {
-                textUpdated = false;
-                return;
-            }
-            updateIndexRanges(activeRange.getStart(), diff);
-        });
     }
 
     private void updateIndexRanges(int start, int diff) {
@@ -183,5 +190,17 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 }
             }
         }
+    }
+
+    private void reset() {
+        initialised = false;
+        recording = null;
+        activeSegment = null;
+        activeRange = new IndexRange(0,0);
+        previousSegRange = null;
+        annotations.clear();
+        fullString = "";
+        textUpdated = false;
+        replaceText(0, getLength(), "");
     }
 }
