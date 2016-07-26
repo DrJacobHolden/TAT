@@ -217,6 +217,8 @@ public class EditorMenuController implements FileSelectedHandler {
     private void bindSaveButton() {
         saveButton.setOnAction(event -> {
             try {
+                //Allow files to be overridden
+                player.closeOpenFiles();
                 getActiveRecording().save();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -229,8 +231,6 @@ public class EditorMenuController implements FileSelectedHandler {
             int frame = position.getFrame();
             if (frame > AudioFile.MIN_SPLIT_FRAMES) {
                 try {
-                    //Allow files to be overridden
-                    player.closeOpenFiles();
                     Segment segment2 = getActiveRecording().split(position.getSegment(), frame, 0);
                     waveformDisplay.onSplit(position.getSegment(), segment2, frame);
                     //Select the second split segment
@@ -246,9 +246,10 @@ public class EditorMenuController implements FileSelectedHandler {
                 return;
             }
             try {
-                player.closeOpenFiles();
                 getActiveRecording().join(position.getSegment(), nextSegment);
                 waveformDisplay.onJoin(position.getSegment(), nextSegment);
+                //Reselect the current segment
+                maybeChangeSegment(0);
             } catch (IOException e) {
                 e.printStackTrace();
             }

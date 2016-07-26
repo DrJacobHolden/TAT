@@ -139,7 +139,7 @@ public class Segment {
         this.baseName = baseName;
     }
 
-    public void save() throws FileNotFoundException, IOException {
+    public void save() throws IOException {
         if (annotationFile != null) {
             annotationFile.save();
         }

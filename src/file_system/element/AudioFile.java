@@ -66,8 +66,6 @@ public class AudioFile extends BaseFileSystemElement {
         //Ensure directory exists
         newFile.toPath().getParent().toFile().mkdirs();
 
-        //Are you fucking kidding me? File handle still exists if this isn't called, but I can't figure out where
-        System.gc();
         System.out.println("Copying " + file.toString() + " to " + newFile.toString());
         Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }

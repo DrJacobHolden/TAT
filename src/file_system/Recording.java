@@ -120,7 +120,7 @@ public class Recording implements Iterable<Segment> {
         segment1.join(segment2);
 
         //Move segments along to fill gaps. Will overwrite segment2
-        for (int i=segment2.getSegmentNumber()+1; i<=size; i++) {
+        for (int i=segment2.getSegmentNumber(); i<=size; i++) {
             Segment seg = segments.get(i);
             if (i==size()) {
                 //Last item won't be overridden, so mark for delete before changing segment number
@@ -128,8 +128,11 @@ public class Recording implements Iterable<Segment> {
                 //Last index should be removed
                 segments.remove(i);
             }
-            seg.setSegmentNumber(i-1);
-            segments.put(i-1, seg);
+            //Keep segment number and do not overwrite segment1
+            if (seg != segment2) {
+                seg.setSegmentNumber(i - 1);
+                segments.put(i - 1, seg);
+            }
         }
         size--;
         return segment1;
