@@ -1,4 +1,4 @@
-package ui.icon;
+package tat.view.icon;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

@@ -3,8 +3,8 @@ package ui.waveform;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import ui.icon.Icon;
-import ui.icon.IconLoader;
+import tat.view.icon.Icon;
+import tat.view.icon.IconLoader;
 
 /**
  * Created by Tate on 5/04/2016.

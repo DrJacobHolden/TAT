@@ -1,8 +1,6 @@
 package file_system.element;
 
 import file_system.Segment;
-import sun.plugin.javascript.navig.Array;
-import ui.text_box.Annotation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,8 +72,8 @@ public class AnnotationFile extends BaseFileSystemElement {
         return annotation;
     }
 
-    public void setString(String str) {
-        annotation = str;
+    public void setString(String s) {
+        annotation = s;
     }
 
     @Override

@@ -20,21 +20,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.eclipse.swt.graphics.TextStyle;
 import tat.GlobalConfiguration;
 import tat.Main;
 import tat.TimerHandler;
-import ui.icon.Icon;
-import ui.icon.IconLoader;
-import tat.view.Colours;
+import tat.view.icon.Icon;
+import tat.view.icon.IconLoader;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.sun.xml.internal.bind.api.impl.NameConverter.standard;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -154,7 +151,7 @@ public class MainMenuController implements FileSelectedHandler {
 
     private void moveToEditorScene(String file) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("view/EditorMenu.fxml"));
+        loader.setLocation(ClassLoader.getSystemResource("fxml/EditorMenu.fxml"));
         try {
             main.rootLayout = loader.load();
         } catch(IOException e) {
@@ -167,6 +164,7 @@ public class MainMenuController implements FileSelectedHandler {
 
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
+        scene.getStylesheets().add(ClassLoader.getSystemResource("css/textarea.css").toExternalForm());
         primaryStage.setScene(scene);
     }
 
