@@ -176,8 +176,7 @@ public class Segment {
                     try {
                         paths.add(element.getFileForPath(getPath(element)).toPath());
                     } catch (FileNotFoundException e) {
-                        //Shouldn't really be an issue, but stack trace anyway
-                        e.printStackTrace();
+                        //No worries!
                     }
                 });
 

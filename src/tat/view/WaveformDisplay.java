@@ -163,6 +163,11 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         imageViews.add(index, iv);
     }
 
+    public void removeWaveform(WaveformSegment iv) {
+        hBox.getChildren().remove(iv);
+        imageViews.remove(iv);
+    }
+
     private void segmentClicked(WaveformSegment iv, MouseEvent ev) {
         position.setSelected(iv.getSegment(), iv.getFrameForPosition(ev.getX()), this);
     }
@@ -202,6 +207,15 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         //Add after segment1
         addWaveform(newWaveform);
         //Select will be called after new waveform is selected in EditorMenuController
+        resetColours();
+    }
+
+    public void onJoin(Segment segment1, Segment segment2) {
+        WaveformSegment waveform1 = imageViews.get(segment1.getSegmentNumber()-1);
+        WaveformSegment waveform2 = imageViews.get(segment2.getSegmentNumber()-1);
+        waveform1.join(waveform2);
+        removeWaveform(waveform2);
+        //Select will be called after waveform is selected in EditorMenuController
         resetColours();
     }
 

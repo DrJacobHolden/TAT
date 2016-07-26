@@ -120,7 +120,7 @@ public class Recording implements Iterable<Segment> {
         segment1.join(segment2);
 
         //Move segments along to fill gaps. Will overwrite segment2
-        for (int i=segment2.getSegmentNumber(); i<=size; i++) {
+        for (int i=segment2.getSegmentNumber()+1; i<=size; i++) {
             Segment seg = segments.get(i);
             if (i==size()) {
                 //Last item won't be overridden, so mark for delete before changing segment number

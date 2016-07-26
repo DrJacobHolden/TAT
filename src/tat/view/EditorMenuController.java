@@ -248,6 +248,7 @@ public class EditorMenuController implements FileSelectedHandler {
             try {
                 player.closeOpenFiles();
                 getActiveRecording().join(position.getSegment(), nextSegment);
+                waveformDisplay.onJoin(position.getSegment(), nextSegment);
             } catch (IOException e) {
                 e.printStackTrace();
             }
