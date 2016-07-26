@@ -226,7 +226,7 @@ public class EditorMenuController implements FileSelectedHandler {
             int frame = position.getFrame();
             if (frame > AudioFile.MIN_SPLIT_FRAMES) {
                 try {
-                    Segment segment2 = getActiveRecording().split(position.getSegment(), frame, 0);
+                    Segment segment2 = getActiveRecording().split(position.getSegment(), frame, textArea.getCursorPosInCurrentSegment());
                     waveformDisplay.onSplit(position.getSegment(), segment2, frame);
                     //Reset textarea with updated recording
                     textArea.setRecording(getActiveRecording());

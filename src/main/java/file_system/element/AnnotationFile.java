@@ -77,6 +77,8 @@ public class AnnotationFile extends BaseFileSystemElement {
     }
 
     public AnnotationFile split(Segment newSegment, int strPos) {
+        System.out.println(annotation);
+        System.out.println(strPos);
         AnnotationFile newAnnotationFile = new AnnotationFile(newSegment, annotation.substring(strPos));
         annotation = annotation.substring(0, strPos);
         return newAnnotationFile;

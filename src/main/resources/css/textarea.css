@@ -9,3 +9,18 @@
 .grey {
     -fx-fill: #5c5a67;
 }
+
+.caret {
+    -fx-stroke: #e4e1f0;
+}
+
+#textArea {
+    -fx-background-color: #2b2934;
+    -fx-font-family:'Levenim MT';
+    -fx-font-size: 24;
+    -fx-caret-blink-rate: 0.5;
+}
+
+.button {
+    -fx-background-color: transparent;
+}

@@ -68,11 +68,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 updateIndexRanges(activeRange.getStart(), diff);
             }
         });
-    }
 
-    public void setPosition(tat.Position position) {
-        this.position = position;
-        position.addSelectedListener(this);
         selectionProperty().addListener((observable) -> {
             if (initialised) {
                 if (previousSegRange != null) {
@@ -102,6 +98,23 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 }
             }
         });
+
+        focusedProperty().addListener((observable, oldVal, newVal) -> {
+            if (initialised) {
+                if (newVal) {
+                    //TODO: Start blinking
+                } else {
+                    //TODO: Stop blinking
+                }
+            }
+        });
+
+        setShowCaret(CaretVisibility.ON);
+    }
+
+    public void setPosition(tat.Position position) {
+        this.position = position;
+        position.addSelectedListener(this);
     }
 
     private void checkActiveSegment() {
@@ -150,7 +163,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private void updateIndexRanges(int start, int diff) {
         boolean updating = false;
-        for(int j = 0; j < annotations.size(); j++) {
+        for (int j = 0; j < annotations.size(); j++) {
             IndexRange i = annotations.get(j);
             if(i.getStart() == start) {
                 updating = true;
@@ -172,9 +185,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     public void positionChanged(Segment segment, int frame, Object initiator) {
         if(segment != activeSegment) {
             setActiveSegment(segment);
-            Platform.runLater(() -> {
-                setColours();
-            });
+            selectRange(activeRange.getStart(), activeRange.getStart());
+            setColours();
         }
     }
 
@@ -201,6 +213,10 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         annotations.clear();
         fullString = "";
         textUpdated = false;
-        replaceText(0, getLength(), "");
+        replaceText("");
+    }
+
+    public int getCursorPosInCurrentSegment() {
+        return getSelection().getStart() - activeRange.getStart();
     }
 }
