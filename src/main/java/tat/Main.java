@@ -3,15 +3,12 @@ package tat;
 import file_system.FileSystem;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import tat.view.MainMenuController;
-import ui.icon.IconLoader;
-
+import tat.view.icon.IconLoader;
 import java.io.IOException;
 
 public class Main extends Application {
@@ -25,9 +22,8 @@ public class Main extends Application {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("view/MainMenu.fxml"));
+            loader.setLocation(ClassLoader.getSystemResource("fxml/MainMenu.fxml"));
             rootLayout = loader.load();
-
             MainMenuController controller = loader.getController();
             controller.setup(this, primaryStage);
 

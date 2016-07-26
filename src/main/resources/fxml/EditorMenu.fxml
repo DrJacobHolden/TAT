@@ -14,6 +14,7 @@
 <?import tat.view.IconButton?>
 <?import tat.view.WaveformDisplay?>
 <?import tat.view.AnnotationDisplay?>
+<?import javafx.scene.control.ScrollPane?>
 <VBox id="mainFrame" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.view.EditorMenuController">
    <children>
       <AnchorPane id="soundFileArea" minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0" VBox.vgrow="NEVER">
@@ -122,10 +123,11 @@
                   </HBox>
                </children>
             </VBox>
-            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" style="-fx-background-color: #2b2934;" VBox.vgrow="ALWAYS">
+            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS" style="-fx-background-color: #2b2934;-fx-font-family:'Levenim MT';-fx-font-size: 24;">
                <VBox.margin>
                   <Insets top="25.0" />
-               </VBox.margin></AnnotationDisplay>
+               </VBox.margin>
+            </AnnotationDisplay>
          </children>
          <VBox.margin>
             <Insets bottom="25.0" left="25.0" right="25.0" />

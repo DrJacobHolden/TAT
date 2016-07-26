@@ -5,22 +5,17 @@ import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
 import file_system.element.AudioFile;
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import tat.Main;
 import tat.Position;
-import tat.PositionListener;
-import ui.icon.Icon;
-import ui.icon.IconLoader;
+import tat.view.icon.Icon;
+import tat.view.icon.IconLoader;
 
 import java.io.IOException;
 import java.util.Set;
@@ -179,8 +174,8 @@ public class EditorMenuController implements FileSelectedHandler {
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
-        //textArea.setRecording(getActiveRecording());
-        //textArea.setPosition(position);
+        textArea.setRecording(getActiveRecording());
+        textArea.setPosition(position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 

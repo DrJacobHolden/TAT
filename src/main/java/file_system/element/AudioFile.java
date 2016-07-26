@@ -1,14 +1,11 @@
 package file_system.element;
 
 import file_system.Segment;
-import sun.audio.AudioStream;
-import ui.waveform.AudioUtil;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.spi.AudioFileWriter;
 import java.io.*;
 import java.nio.file.*;
 
