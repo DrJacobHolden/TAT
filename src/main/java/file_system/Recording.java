@@ -1,5 +1,7 @@
 package file_system;
 
+import javax.sound.midi.SysexMessage;
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,20 +85,34 @@ public class Recording implements Iterable<Segment> {
     }
 
     public Segment split(Segment segment1, long frame, int stringPos) throws IOException {
+        assertCorrectOrdering();
         //Split the segment
         Segment segment2 = segment1.split(frame, stringPos);
 
         //Move segments along to make room for new one
-        for (int i=segment1.getSegmentNumber()+1; i<=size; i++) {
+        for (int i=size; i>segment1.getSegmentNumber(); i--) {
             Segment seg = segments.get(i);
             seg.setSegmentNumber(i+1);
             segments.put(i+1, seg);
         }
 
         //Put segment after first
-        segments.put(segment1.getSegmentNumber()+1, segment2);
+        segments.put(segment2.getSegmentNumber(), segment2);
         size++;
+        assertCorrectOrdering();
         return segment2;
+    }
+
+    private void assertCorrectOrdering() {
+        int i=1;
+        for (Segment segment : this) {
+            if (segment == null) {
+                throw new IllegalStateException("Segment at position " + i + " is null");
+            } else if (segment.getSegmentNumber() != i++) {
+                throw new IllegalStateException("Segment " + segment.toString() + " has number " + segment.getSegmentNumber()
+                + " when it is in position " + (i-1));
+            }
+        }
     }
 
     //Needs to be called whenever a file has an attribute change, or on a join
@@ -117,6 +133,7 @@ public class Recording implements Iterable<Segment> {
     }
 
     public Segment join(Segment segment1, Segment segment2) throws IOException {
+        assertCorrectOrdering();
         segment1.join(segment2);
 
         //Move segments along to fill gaps. Will overwrite segment2
@@ -135,6 +152,7 @@ public class Recording implements Iterable<Segment> {
             }
         }
         size--;
+        assertCorrectOrdering();
         return segment1;
     }
 
