@@ -9,11 +9,14 @@ import file_system.element.AudioFile;
 import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
+import javax.sound.sampled.AudioInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -113,16 +116,16 @@ public class Segment {
         if (audioFile == null) {
             try {
                 audioFile = new AudioFile(this, getPath(AudioFile.class));
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
                 return null;
             }
         }
         return audioFile;
     }
 
-    protected void loadExternalAudioFile(File file) {
-        //When saved will use generated file name
-        this.audioFile = new AudioFile(this, file);
+    protected void loadExternalAudioFile(File file) throws IOException {
+        this.audioFile = new AudioFile(this, file.toPath());
     }
 
     public Segment(FileSystem fileSystem) {
@@ -136,7 +139,7 @@ public class Segment {
         this.baseName = baseName;
     }
 
-    public void save() throws FileNotFoundException, IOException {
+    public void save() throws IOException {
         if (annotationFile != null) {
             annotationFile.save();
         }
@@ -162,5 +165,43 @@ public class Segment {
         }
         //TODO: Throw error
         return null;
+    }
+
+    public List<Path> getPossiblePaths() {
+        List<Path> paths = new ArrayList<>();
+
+        Arrays.stream(new FileSystemElement[]{audioFile, annotationFile, alignmentFile})
+                .filter(element -> element != null)
+                .forEach(element -> {
+                    try {
+                        paths.add(element.getFileForPath(getPath(element)).toPath());
+                    } catch (FileNotFoundException e) {
+                        //No worries!
+                    }
+                });
+
+        return paths;
+    }
+
+    public Segment split(long frame, int stringPos) throws IOException {
+        Segment segment2 = new Segment(fileSystem, segmentNumber+1, speakerId, baseName);
+        segment2.setRecording(recording);
+
+        AudioFile audio2 = getAudioFile().split(segment2, (int) frame);
+        AnnotationFile annotation2 = getAnnotationFile().split(segment2, stringPos);
+
+        segment2.audioFile = audio2;
+        segment2.annotationFile = annotation2;
+
+        return segment2;
+    }
+
+    public void join(Segment segment2) throws IOException {
+        if (segment2.audioFile != null) {
+            audioFile.join(segment2.audioFile);
+        }
+        if (segment2.annotationFile != null) {
+            annotationFile.join(segment2.annotationFile);
+        }
     }
 }

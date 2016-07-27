@@ -37,33 +37,16 @@ public class WaveformGenerator {
         frameSize = audioStream.getFormat().getFrameSize();
     }
 
-    public int[] getFrameArray() throws IOException { //With help from http://codeidol.com/java/swing/Audio/Build-an-Audio-Waveform-Display/
-
-        byte[] bytes = new byte[frameLength * frameSize];
-        int[] frames = new int[frameLength];
-
-        audioStream.read(bytes);
-
-        for (int t = 0, sampleIndex=0; t < bytes.length; sampleIndex++) {
-            int sample = getSixteenBitSample((int) bytes[t++], (int) bytes[t++]);
-            frames[sampleIndex] = sample;
-        }
-
-        return frames;
-    }
-
     /**
      * Actually generate an image and return it
-     * @param resolution Generate one vertical line per this many frames (larger value is a smaller image)
+     * @param widthResolution Generate one vertical line per this many frames (larger value is a smaller image)
      * @return The image
      * @throws IOException
      */
-    public Image getWaveformImage(int resolution) throws IOException {
-        int[] frames = getFrameArray();
+    public Image getWaveformImage(int widthResolution, int height) throws IOException {
+        int[] frames = AudioUtil.getFrameArray(audioStream);
 
-        //All configurable
-        int height = 200;
-        int width = frames.length / resolution;
+        int width = frames.length / widthResolution;
         Color background = Colours.SECONDARY_GRAY;
         Color colour = Colours.TRANSPARENT;
 
@@ -76,7 +59,7 @@ public class WaveformGenerator {
 
         for (int x=0; x<width; x++) {
             int maxAmplitude = 0, minAmplitude = 0;
-            for (int i=x*resolution; i<(x+1)*resolution; i++) {
+            for (int i=x*widthResolution; i<(x+1)*widthResolution; i++) {
                 int offset = frames[i];
                 if (offset > maxAmplitude) {
                     maxAmplitude = offset;
@@ -96,9 +79,5 @@ public class WaveformGenerator {
         }
 
         return waveformImage;
-    }
-
-    private int getSixteenBitSample(int high, int low) {
-        return (high << 8) + (low & 0x00ff);
     }
 }

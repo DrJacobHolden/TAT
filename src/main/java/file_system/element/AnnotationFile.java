@@ -76,6 +76,18 @@ public class AnnotationFile extends BaseFileSystemElement {
         annotation = s;
     }
 
+    public AnnotationFile split(Segment newSegment, int strPos) {
+        System.out.println(annotation);
+        System.out.println(strPos);
+        AnnotationFile newAnnotationFile = new AnnotationFile(newSegment, annotation.substring(strPos));
+        annotation = annotation.substring(0, strPos);
+        return newAnnotationFile;
+    }
+
+    public void join(AnnotationFile annotationFile2) {
+        annotation = annotation + annotationFile2.annotation;
+    }
+
     @Override
     public String[] getFileExtensions() {
         return FILE_EXTENSIONS;
