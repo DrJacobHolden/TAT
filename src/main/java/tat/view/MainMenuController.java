@@ -31,7 +31,11 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static tat.Main.p;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -293,7 +297,10 @@ public class MainMenuController implements FileSelectedHandler {
                 if(r != null) {
                     int segmentId = 0;
                     if (r.getSegments().size() != 1) {
-                        //TODO: Ask user which segment to assign the alignment to
+                        int id = createSegmentSelectorDialog("Alignment", "name", r.getSegments().size());
+                        if(id == 0) //Cancel/Window close
+                            return;
+                        segmentId = id;
                     }
                     main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
                 } else {
@@ -311,7 +318,6 @@ public class MainMenuController implements FileSelectedHandler {
         if(r != null) {
             Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
                     "this file before reimporting.", Alert.AlertType.INFORMATION);
-            //TODO: Error about duplicate file
             return;
         }
         main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
@@ -324,7 +330,10 @@ public class MainMenuController implements FileSelectedHandler {
         if(r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
-                //TODO: Ask user which segment to assign the annotation to
+                int id = createSegmentSelectorDialog("Annotation", "name", r.getSegments().size());
+                if(id == 0) //Cancel/Window close
+                    return;
+                segmentId = id;
             }
             main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
         } else {
@@ -371,6 +380,27 @@ public class MainMenuController implements FileSelectedHandler {
 
     private boolean isValidExtension(File file, String[] extensions) {
         return Arrays.stream(extensions).anyMatch(e -> file.toString().endsWith(e));
+    }
+
+    public static int createSegmentSelectorDialog(String type, String filename, int count) {
+        ChoiceDialog<Integer> alert = new ChoiceDialog(1, IntStream.range(1, count+1).boxed().
+                collect(Collectors.toList()));
+        alert.setTitle("Assign " + type);
+        alert.setHeaderText(filename + " matched recording " + filename + " which segment\n" +
+                " would you like to assign" +
+                " this " + type.toLowerCase() + " to?");
+        alert.setContentText("Segment: ");
+        alert.setGraphic(null);
+
+        alert.initOwner(p);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
+
+        Optional<Integer> result = alert.showAndWait();
+        if(result.isPresent())
+            return result.get();
+        return 0;
     }
 }
 

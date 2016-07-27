@@ -1,11 +1,21 @@
  .dialog-pane {
-    -fx-background-color: #2b2934;
+    -fx-background-color: #34323d;
  }
 
  .dialog-pane *.label.content {
-    -fx-background-color: #2b2934;
+    -fx-background-color: #34323d;
     -fx-font-family:'Levenim MT';
-    -fx-font-style: bold;
+    -fx-font-size: 16;
+    -fx-text-fill: #e4e1f0;
+ }
+
+.dialog-pane:header .header-panel {
+    -fx-background-color: #34323d;
+ }
+
+ .dialog-pane:header .header-panel .label {
+    -fx-background-color: #34323d;
+    -fx-font-family:'Levenim MT';
     -fx-font-size: 16;
     -fx-text-fill: #e4e1f0;
  }
