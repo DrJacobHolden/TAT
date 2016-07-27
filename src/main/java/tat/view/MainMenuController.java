@@ -265,9 +265,7 @@ public class MainMenuController implements FileSelectedHandler {
                             e.printStackTrace();
                         }
                     } else {
-                        //TODO: Tell user that directory must be a corpus
-                        //to create a new corpus use the corpus selector
-                        //make corpus selector flash
+                        //Make corpus selector flash
                         Main.createInfoDialog("Information", "To create a new corpus please use the file selector button.", Alert.AlertType.INFORMATION);
                     }
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
@@ -299,7 +297,8 @@ public class MainMenuController implements FileSelectedHandler {
                     }
                     main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
                 } else {
-                    //TODO: Inform user that alignments require a matching audio file to be imported
+                    Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
+                            Alert.AlertType.INFORMATION);
                 }
             }
         });
@@ -310,6 +309,8 @@ public class MainMenuController implements FileSelectedHandler {
         String name = getBasename(f);
         Recording r = main.fileSystem.recordings.get(name);
         if(r != null) {
+            Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
+                    "this file before reimporting.", Alert.AlertType.INFORMATION);
             //TODO: Error about duplicate file
             return;
         }
@@ -327,7 +328,8 @@ public class MainMenuController implements FileSelectedHandler {
             }
             main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
         } else {
-            //TODO: Inform user that annotations require a matching audio file to be imported
+            Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
+                    Alert.AlertType.INFORMATION);
         }
     }
 
