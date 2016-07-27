@@ -63,9 +63,6 @@ public class AudioFile extends BaseFileSystemElement {
 
     @Override
     public void save() throws IOException {
-        //Close open file handles Java failed to close. Known bug: https://bugs.openjdk.java.net/browse/JDK-8013586
-        System.gc();
-
         File file = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
         //Ensure directory exists
         file.toPath().getParent().toFile().mkdirs();
