@@ -26,7 +26,6 @@ import static javax.swing.UIManager.get;
 
 /**
  * Created by Tate on 23/07/2016.
- * //TODO: Ensure copying new files in with unsaved changes won't result in loss of changes
  */
 public class AnnotationDisplay extends StyleClassedTextArea implements PositionListener {
 

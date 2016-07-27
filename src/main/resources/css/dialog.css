@@ -1,0 +1,15 @@
+ .dialog-pane {
+    -fx-background-color: #2b2934;
+ }
+
+ .dialog-pane *.label.content {
+    -fx-background-color: #2b2934;
+    -fx-font-family:'Levenim MT';
+    -fx-font-style: bold;
+    -fx-font-size: 16;
+    -fx-text-fill: #e4e1f0;
+ }
+
+ .button {
+     -fx-background-color: #ff7c00;
+  }

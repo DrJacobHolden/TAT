@@ -122,9 +122,7 @@ public class MainMenuController implements FileSelectedHandler {
                 setCorpus(file);
             }
         } catch(IOException e) {
-            //TODO: Create error message
-            //ErrorHandler.getInstance().showError("Failed to load corpus.");
-            e.printStackTrace();
+            Main.createInfoDialog("Error", "Failed to load corpus.", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -155,8 +153,7 @@ public class MainMenuController implements FileSelectedHandler {
         try {
             main.rootLayout = loader.load();
         } catch(IOException e) {
-            //TODO: Handle error PLEASE REINSTALL
-            e.printStackTrace();
+            Main.createInfoDialog("Error", "Program error, please reinstall.", Alert.AlertType.INFORMATION);
         }
 
         EditorMenuController controller = loader.getController();
@@ -165,6 +162,7 @@ public class MainMenuController implements FileSelectedHandler {
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
         scene.getStylesheets().add(ClassLoader.getSystemResource("css/textarea.css").toExternalForm());
+        scene.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
         primaryStage.setScene(scene);
     }
 
@@ -270,6 +268,7 @@ public class MainMenuController implements FileSelectedHandler {
                         //TODO: Tell user that directory must be a corpus
                         //to create a new corpus use the corpus selector
                         //make corpus selector flash
+                        Main.createInfoDialog("Information", "To create a new corpus please use the file selector button.", Alert.AlertType.INFORMATION);
                     }
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
                     audioFiles.add(f);

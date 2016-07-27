@@ -1,11 +1,25 @@
 .orange {
-    -fx-fill: #ff7c00;
-}
+     -fx-fill: #ff7c00;
+ }
 
-.white {
-    -fx-fill: #e4e1f0;
-}
+ .white {
+     -fx-fill: #e4e1f0;
+ }
 
-.grey {
-    -fx-fill: #5c5a67;
-}
+ .grey {
+     -fx-fill: #5c5a67;
+ }
+
+ .caret {
+     -fx-stroke: #e4e1f0;
+ }
+
+ #textArea {
+     -fx-background-color: #2b2934;
+     -fx-font-family:'Levenim MT';
+     -fx-font-size: 24;
+ }
+
+  .button {
+      -fx-background-color: transparent;
+  }
