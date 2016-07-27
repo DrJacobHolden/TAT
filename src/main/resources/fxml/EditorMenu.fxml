@@ -59,11 +59,11 @@
                   </StackPane>
                </children>
             </HBox>
-            <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;" text="a_1.wav" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;" text="a_1.wav" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
               </items>
                <font>
-                  <Font name="Levenim MT" size="28.0" />
+                  <Font name="Levenim MT" size="26.0" />
                </font>
             </MenuButton>
          </children>

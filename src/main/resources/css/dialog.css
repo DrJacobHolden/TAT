@@ -20,6 +20,6 @@
     -fx-text-fill: #e4e1f0;
  }
 
- .button {
+ .dialog-pane .button {
      -fx-background-color: #ff7c00;
   }

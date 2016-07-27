@@ -179,7 +179,7 @@ public class MainMenuController implements FileSelectedHandler {
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
         initialiseDragAndDrop();
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
     }
 
     /**
@@ -220,6 +220,7 @@ public class MainMenuController implements FileSelectedHandler {
 
         //Main must be set before setting main.filesystem
         setCorpusPath();
+        EditorMenuController.setupMenu(fileMenu);
     }
 
     public void initialiseDragAndDrop() {
@@ -321,7 +322,7 @@ public class MainMenuController implements FileSelectedHandler {
             return;
         }
         main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
     }
 
     private void addAnnotationFile(File f) {
