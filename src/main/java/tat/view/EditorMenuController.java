@@ -4,17 +4,16 @@ import audio_player.AudioPlayer;
 import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
+import file_system.element.AudioFile;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import tat.Main;
 import tat.Position;
-import tat.PositionListener;
 import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
@@ -24,7 +23,7 @@ import java.util.Set;
 /**
  * Created by Tate on 29/06/2016.
  */
-public class EditorMenuController implements FileSelectedHandler, PositionListener {
+public class EditorMenuController implements FileSelectedHandler {
 
     @FXML
     private IconButton splitButton;
@@ -82,7 +81,6 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private String activeRecording;
 
     private AudioPlayer player;
-    private Segment currentSegment;
     private Position position;
 
     public Recording getActiveRecording() {
@@ -140,6 +138,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         bindZoomButtons();
         bindPlayerButtons();
         bindSaveButton();
+        bindSplitAndJoinButtons();
     }
 
     /**
@@ -172,12 +171,11 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     @Override
     public void fileSelected(String file) {
         position = new Position();
-        position.addSelectedListener(this);
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
-        textArea.setPosition(position);
         textArea.setRecording(getActiveRecording());
+        textArea.setPosition(position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 
@@ -195,7 +193,7 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     }
 
     private void maybeChangeSegment(int offset) {
-        Segment newSegment = getActiveRecording().getSegment(currentSegment.getSegmentNumber() + offset);
+        Segment newSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber() + offset);
         if (newSegment != null) {
             position.setSelected(newSegment, 0, this);
         }
@@ -214,6 +212,8 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
     private void bindSaveButton() {
         saveButton.setOnAction(event -> {
             try {
+                //Allow files to be overridden
+                player.closeOpenFiles();
                 getActiveRecording().save();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -221,8 +221,37 @@ public class EditorMenuController implements FileSelectedHandler, PositionListen
         });
     }
 
-    @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
-        this.currentSegment = segment;
+    private void bindSplitAndJoinButtons() {
+        splitButton.setOnAction(event -> {
+            int frame = position.getFrame();
+            if (frame > AudioFile.MIN_SPLIT_FRAMES) {
+                try {
+                    Segment segment2 = getActiveRecording().split(position.getSegment(), frame, textArea.getCursorPosInCurrentSegment());
+                    waveformDisplay.onSplit(position.getSegment(), segment2, frame);
+                    //Reset textarea with updated recording
+                    textArea.setRecording(getActiveRecording());
+                    //Select the second split segment
+                    maybeChangeSegment(+1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        joinButton.setOnAction(event -> {
+            Segment nextSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber()+1);
+            if (nextSegment == null) {
+                return;
+            }
+            try {
+                getActiveRecording().join(position.getSegment(), nextSegment);
+                waveformDisplay.onJoin(position.getSegment(), nextSegment);
+                //Reset textarea with updated recording
+                textArea.setRecording(getActiveRecording());
+                //Reselect the current segment
+                maybeChangeSegment(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

@@ -12,11 +12,25 @@ public class Position {
 
     private Set<PositionListener> positionListeners = new HashSet<>();
 
+    private Segment segment;
+    private int frame;
+
     public void addSelectedListener(PositionListener l) {
         positionListeners.add(l);
     }
 
-    public void setSelected(Segment segment, double frame, Object initiator) {
+    public Segment getSegment() {
+        return segment;
+    }
+
+    public int getFrame() {
+        return frame;
+    }
+
+    public void setSelected(Segment segment, int frame, Object initiator) {
+        this.segment = segment;
+        this.frame = frame;
+        System.out.println("Selected " + frame);
         positionListeners.stream().forEach(l -> l.positionChanged(segment, frame, initiator));
     }
 }

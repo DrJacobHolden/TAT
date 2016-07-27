@@ -1,6 +1,5 @@
 package audio_player;
 
-import file_system.Recording;
 import file_system.Segment;
 import javafx.application.Platform;
 import tat.Position;
@@ -19,9 +18,7 @@ public class AudioPlayer implements PositionListener {
     private Position position;
     private Segment segment;
 
-    public Clip clip;
-
-    public Mixer mixer;
+    private Clip clip;
     private Timer positionListenerTimer;
 
     private final long AUDIO_POSITION_UPDATE_INTERVAL = 20;
@@ -31,8 +28,16 @@ public class AudioPlayer implements PositionListener {
      */
     public AudioPlayer(Position position) {
         this.position = position;
+        DataLine.Info dataInfo = new DataLine.Info(Clip.class, null);
+        Mixer mixer = AudioSystem.getMixer(AudioSystem.getMixerInfo()[0]);
+        try {
+            clip = (Clip) mixer.getLine(dataInfo);
+            setUpListenerEvents();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
+
         position.addSelectedListener(this);
-        mixer = AudioSystem.getMixer(AudioSystem.getMixerInfo()[0]);
     }
 
     private void setUpListenerEvents() {
@@ -57,6 +62,15 @@ public class AudioPlayer implements PositionListener {
     }
 
     public void play() {
+        //This is the case after saving
+        if (!clip.isOpen()) {
+            try {
+                clip.open(segment.getAudioFile().getStream());
+                clip.setFramePosition(position.getFrame());
+            } catch (LineUnavailableException | IOException e) {
+                e.printStackTrace();
+            }
+        }
         clip.start();
     }
 
@@ -82,16 +96,12 @@ public class AudioPlayer implements PositionListener {
         return clip.isRunning();
     }
 
-    public long getCurrentFrame() {
+    private int getCurrentFrame() {
         return clip.getFramePosition();
     }
 
-    public long getEndFrame() {
-        return clip.getFrameLength();
-    }
-
     @Override
-    public void positionChanged(Segment segment, double frame, Object initiator) {
+    public void positionChanged(Segment segment, int frame, Object initiator) {
         if (initiator != this) {
             boolean isPlaying = isPlaying();
             try {
@@ -101,7 +111,7 @@ public class AudioPlayer implements PositionListener {
                     }
                     loadSegment(segment);
                 }
-                clip.setFramePosition((int) frame);
+                clip.setFramePosition(frame);
 
                 if (isPlaying) {
                     play();
@@ -113,12 +123,15 @@ public class AudioPlayer implements PositionListener {
     }
 
     private void loadSegment(Segment segment) throws IOException, LineUnavailableException {
+        closeOpenFiles();
         this.segment = segment;
+        clip.close();
+        clip.open(segment.getAudioFile().getStream());
+    }
 
-        DataLine.Info dataInfo = new DataLine.Info(Clip.class, null);
-        clip = (Clip) mixer.getLine(dataInfo);
-        AudioInputStream audioStream = segment.getAudioFile().getStream();
-        clip.open(audioStream);
-        setUpListenerEvents();
+    public void closeOpenFiles() throws IOException {
+        if (clip != null) {
+            clip.close();
+        }
     }
 }
