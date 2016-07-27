@@ -65,7 +65,7 @@ public class AudioPlayer implements PositionListener {
         //This is the case after saving
         if (!clip.isOpen()) {
             try {
-                clip.open(segment.getAudioFile().getStream());
+                clip.open(segment.getAudioFile().getAudioStream());
                 clip.setFramePosition(position.getFrame());
             } catch (LineUnavailableException | IOException e) {
                 e.printStackTrace();
@@ -126,7 +126,7 @@ public class AudioPlayer implements PositionListener {
         closeOpenFiles();
         this.segment = segment;
         clip.close();
-        clip.open(segment.getAudioFile().getStream());
+        clip.open(segment.getAudioFile().getAudioStream());
     }
 
     public void closeOpenFiles() throws IOException {

@@ -1,7 +1,13 @@
 package ui.waveform;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.spi.AudioFileReader;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Created by kalda on 24/07/2016.

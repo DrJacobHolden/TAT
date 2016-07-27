@@ -214,20 +214,25 @@ public class FileSystem {
         }
         segment.setBaseName(baseName);
 
-        segment.loadExternalAudioFile(audioFile);
+        try {
+            segment.loadExternalAudioFile(audioFile);
 
-        if (annotationFile != null) {
-            segment.loadExternalAnnotationFile(annotationFile);
+            if (annotationFile != null) {
+                segment.loadExternalAnnotationFile(annotationFile);
+            }
+
+            if (alignmentFile != null) {
+                segment.loadExternalAlignmentFile(alignmentFile);
+            }
+
+            Recording recording = new Recording(baseName);
+            recording.addSegment(segment);
+            recordings.put(baseName, recording);
+            return recording;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
-
-        if (alignmentFile != null) {
-            segment.loadExternalAlignmentFile(alignmentFile);
-        }
-
-        Recording recording = new Recording(baseName);
-        recording.addSegment(segment);
-        recordings.put(baseName, recording);
-        return recording;
     }
 
     public void importExternalAnnotation(Segment segment, File annotationFile) {

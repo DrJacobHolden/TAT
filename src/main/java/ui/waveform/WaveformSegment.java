@@ -9,7 +9,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import tat.view.Colours;
 
-import javax.imageio.ImageReader;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -51,7 +50,7 @@ public class WaveformSegment extends StackPane {
     }
 
     private Image generateImage(Segment segment) {
-        AudioInputStream audioInputStream = segment.getAudioFile().getStream();
+        AudioInputStream audioInputStream = segment.getAudioFile().getAudioStream();
         noFrames = (int) audioInputStream.getFrameLength();
         try {
             WaveformGenerator waveformGenerator = new WaveformGenerator(audioInputStream);
