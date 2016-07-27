@@ -116,16 +116,16 @@ public class Segment {
         if (audioFile == null) {
             try {
                 audioFile = new AudioFile(this, getPath(AudioFile.class));
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
                 return null;
             }
         }
         return audioFile;
     }
 
-    protected void loadExternalAudioFile(File file) {
-        //When saved will use generated file name
-        this.audioFile = new AudioFile(this, file);
+    protected void loadExternalAudioFile(File file) throws IOException {
+        this.audioFile = new AudioFile(this, file.toPath());
     }
 
     public Segment(FileSystem fileSystem) {
@@ -187,7 +187,7 @@ public class Segment {
         Segment segment2 = new Segment(fileSystem, segmentNumber+1, speakerId, baseName);
         segment2.setRecording(recording);
 
-        AudioFile audio2 = getAudioFile().split(segment2, frame);
+        AudioFile audio2 = getAudioFile().split(segment2, (int) frame);
         AnnotationFile annotation2 = getAnnotationFile().split(segment2, stringPos);
 
         segment2.audioFile = audio2;

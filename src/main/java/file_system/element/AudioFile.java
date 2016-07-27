@@ -1,8 +1,8 @@
 package file_system.element;
 
 import file_system.Segment;
+import org.apache.commons.io.EndianUtils;
 
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -17,92 +17,93 @@ public class AudioFile extends BaseFileSystemElement {
     public static final String[] FILE_EXTENSIONS = new String[]{".wav"};
     public static final int MIN_SPLIT_FRAMES = 50;
 
+    int WAV_HEADER_LENGTH = 44;
+
     private Segment segment;
 
-    private File file;
+    private byte[] storedFile;
 
-    public AudioFile(Segment segment, File audioFile) {
-        this.segment = segment;
-        this.file = audioFile;
+    private InputStream getDataStream() {
+        return new ByteArrayInputStream(storedFile);
     }
 
-    public AudioFile(Segment segment, Path path) throws FileNotFoundException {
-        this.segment = segment;
-        //Try to load file with file extensions
-        file = getFileForPath(path);
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public int getNoFrames() {
-        AudioInputStream as = getStream();
-        int no = (int) as.getFrameLength();
+    public AudioInputStream getAudioStream() {
         try {
-            as.close();
-        } catch (IOException e) {
-            //We're really in trouble
-            e.printStackTrace();
-        }
-        return no;
-    }
-
-    public AudioInputStream getStream() {
-        try {
-            return AudioSystem.getAudioInputStream(file);
+            return AudioSystem.getAudioInputStream(getDataStream());
         } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    @Override
-    public void save() throws IOException {
-        File newFile = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
-        //Ensure directory exists
-        newFile.toPath().getParent().toFile().mkdirs();
-
-        System.out.println("Copying " + file.toString() + " to " + newFile.toString());
-        Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    public AudioFile(Segment segment, Path path) throws IOException {
+        initialise(segment, Files.readAllBytes(getFileForPath(path).toPath()));
     }
 
-    public AudioFile split(Segment newSegment, long frame) throws IOException {
-        File file1 = File.createTempFile("split1", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
-        file1.deleteOnExit();
-        File file2 = File.createTempFile("split2", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
-        file2.deleteOnExit();
+    private AudioFile(Segment segment, byte[] data) {
+        initialise(segment, data);
+    }
 
-        AudioInputStream audioStream = getStream();
-        AudioInputStream audioStream1 = new AudioInputStream(audioStream, audioStream.getFormat(), frame);
-        AudioInputStream audioStream2 = new AudioInputStream(audioStream, audioStream.getFormat(), audioStream.getFrameLength()-frame);
+    private void initialise(Segment segment, byte[] data) {
+        this.segment = segment;
+        this.storedFile = data;
+    }
 
-        AudioSystem.write(audioStream1, AudioFileFormat.Type.WAVE, file1);
-        AudioSystem.write(audioStream2, AudioFileFormat.Type.WAVE, file2);
+    public int getNoFrames() {
+        System.out.println(segment.getSegmentNumber());
+        AudioInputStream as = getAudioStream();
+        int no = (int) as.getFrameLength();
+        try {
+            as.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return no;
+    }
 
-        audioStream.close();
-        audioStream1.close();
-        audioStream2.close();
+    @Override
+    public void save() throws IOException {
+        File file = Paths.get(segment.getPath(this).toString() + FILE_EXTENSIONS[0]).toFile();
+        //Ensure directory exists
+        file.toPath().getParent().toFile().mkdirs();
 
-        file = file1;
+        //Overwrite existing file, if exists
+        file.delete();
+        Files.copy(getDataStream(), file.toPath());
+    }
 
-        return new AudioFile(newSegment, file2.toPath());
+    public AudioFile split(Segment newSegment, int frame) throws IOException {
+        AudioInputStream audioStream = getAudioStream();
+        int frameSize = audioStream.getFormat().getFrameSize();
+
+        byte[] out1 = new byte[WAV_HEADER_LENGTH + frame*frameSize];
+        //Copy relevant part of file
+        System.arraycopy(storedFile, 0, out1, 0, out1.length);
+        //Write length
+        EndianUtils.writeSwappedInteger(out1, WAV_HEADER_LENGTH -4, out1.length-WAV_HEADER_LENGTH);
+
+        byte[] out2 = new byte[WAV_HEADER_LENGTH + storedFile.length-out1.length];
+        //Copy part of header
+        System.arraycopy(storedFile, 0, out2, 0, WAV_HEADER_LENGTH -4);
+        //Write length
+        EndianUtils.writeSwappedInteger(out2, WAV_HEADER_LENGTH -4, out2.length-WAV_HEADER_LENGTH);
+        System.arraycopy(storedFile, out1.length, out2, WAV_HEADER_LENGTH, storedFile.length-out1.length);
+
+        storedFile = out1;
+        return new AudioFile(newSegment, out2);
     }
 
     public void join(AudioFile audioFile2) throws IOException {
-        File joinedFile = File.createTempFile("join", Long.toString(System.nanoTime()) + FILE_EXTENSIONS[0]);
-        joinedFile.deleteOnExit();
+        byte[] file2 = audioFile2.storedFile;
+        byte[] joined = new byte[storedFile.length+file2.length-WAV_HEADER_LENGTH];
+        //Copy all of first file
+        System.arraycopy(storedFile, 0, joined, 0, storedFile.length);
+        //Append all but header of second file
+        System.arraycopy(file2, WAV_HEADER_LENGTH, joined, storedFile.length, file2.length-WAV_HEADER_LENGTH);
+        //Write length
+        EndianUtils.writeSwappedInteger(joined, WAV_HEADER_LENGTH -4, joined.length-WAV_HEADER_LENGTH);
 
-        AudioInputStream audio1 = getStream();
-        AudioInputStream audio2 = audioFile2.getStream();
-        AudioInputStream audioJoined = new AudioInputStream(new SequenceInputStream(audio1, audio2), audio1.getFormat(), audio1.getFrameLength() + audio2.getFrameLength());
-
-        AudioSystem.write(audioJoined, AudioFileFormat.Type.WAVE, joinedFile);
-        audioJoined.close();
-        audio1.close();
-        audio2.close();
-
-        file = joinedFile;
+        storedFile = joined;
     }
 
     @Override
