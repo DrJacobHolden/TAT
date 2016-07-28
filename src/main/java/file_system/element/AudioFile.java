@@ -2,6 +2,7 @@ package file_system.element;
 
 import file_system.Segment;
 import org.apache.commons.io.EndianUtils;
+import ui.waveform.AudioConvertor;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -14,7 +15,7 @@ import java.nio.file.*;
  */
 public class AudioFile extends BaseFileSystemElement {
 
-    public static final String[] FILE_EXTENSIONS = new String[]{".wav"};
+    public static final String[] FILE_EXTENSIONS = new String[]{".wav", ".mp3"};
     public static final int MIN_SPLIT_FRAMES = 50;
 
     int WAV_HEADER_LENGTH = 44;
@@ -36,8 +37,8 @@ public class AudioFile extends BaseFileSystemElement {
         }
     }
 
-    public AudioFile(Segment segment, Path path) throws IOException {
-        initialise(segment, Files.readAllBytes(getFileForPath(path).toPath()));
+    public AudioFile(Segment segment, Path path) throws IOException, UnsupportedAudioFileException {
+        initialise(segment, AudioConvertor.toByteArray(getFileForPath(path)));
     }
 
     private AudioFile(Segment segment, byte[] data) {

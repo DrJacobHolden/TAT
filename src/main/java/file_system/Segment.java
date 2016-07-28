@@ -10,6 +10,7 @@ import file_system.element.FileSystemElement;
 import sun.audio.AudioStream;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -116,7 +117,7 @@ public class Segment {
         if (audioFile == null) {
             try {
                 audioFile = new AudioFile(this, getPath(AudioFile.class));
-            } catch (IOException e) {
+            } catch (IOException | UnsupportedAudioFileException e) {
                 e.printStackTrace();
                 return null;
             }
@@ -124,7 +125,7 @@ public class Segment {
         return audioFile;
     }
 
-    protected void loadExternalAudioFile(File file) throws IOException {
+    protected void loadExternalAudioFile(File file) throws IOException, UnsupportedAudioFileException {
         this.audioFile = new AudioFile(this, file.toPath());
     }
 

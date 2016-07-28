@@ -12,6 +12,7 @@ import file_system.path_token.tokens.SpeakerIdPathToken;
 import javafx.collections.transformation.SortedList;
 import sun.rmi.runtime.Log;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -229,7 +230,7 @@ public class FileSystem {
             recording.addSegment(segment);
             recordings.put(baseName, recording);
             return recording;
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedAudioFileException e) {
             e.printStackTrace();
             return null;
         }
