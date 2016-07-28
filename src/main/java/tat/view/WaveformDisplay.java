@@ -83,29 +83,10 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         }
         zoomFactor = newValue;
 
-        //This works better than nothing
-        //TODO: Make work better still
-
-        System.out.println("internal width " + getInternalWidth());
-        System.out.println("image width " + getImageWidth());
-        System.out.println("new val " + newValue);
-
         double newScale = newValue * getInternalWidth()/getImageWidth();
-
-        double oldHVal = getHvalue();
-        double innerWidth = hBox.getWidth() * newScale;
-        Bounds viewport = getViewportBounds();
-
-       double viewpointMid = -1*viewport.getMinX() + getWidth();
-
-        double perc = viewpointMid/innerWidth;
-        System.out.println(viewport.getMinX());
-        System.out.println(innerWidth);
-
         scale.setX(newScale);
         updateCursorWidth();
-
-        setHvalue(oldHVal);
+        setHvalue(cursor.getX()/getImageWidth());
     }
 
     private double getInternalWidth() {
