@@ -20,6 +20,6 @@ public class NamePathToken implements PathToken {
     }
 
     public String getRegex() {
-        return "[A-Za-z1-9_]+";
+        return "[A-Za-z1-9_()\\- ]+";
     }
 }
