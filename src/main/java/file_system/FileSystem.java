@@ -10,7 +10,9 @@ import file_system.path_token.tokens.NamePathToken;
 import file_system.path_token.tokens.SegmentPathToken;
 import file_system.path_token.tokens.SpeakerIdPathToken;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.control.Alert;
 import sun.rmi.runtime.Log;
+import tat.Main;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -211,7 +213,8 @@ public class FileSystem {
         //Strip file extension and path
         String baseName = audioFile.getPath().substring(audioFile.getPath().lastIndexOf(File.separator)+1, audioFile.getPath().lastIndexOf('.'));
         if (recordings.get(baseName) != null) {
-            //TODO: Throw error
+            Main.createInfoDialog("Warning: Duplicate Recording", "A recording with the name " + baseName +
+                    " already exists. Please rename the recording you wish to import and try again.", Alert.AlertType.INFORMATION);
         }
         segment.setBaseName(baseName);
 

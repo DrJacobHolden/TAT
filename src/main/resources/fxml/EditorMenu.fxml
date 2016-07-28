@@ -2,19 +2,16 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.TextFlow?>
 
 <?import tat.view.IconButton?>
 <?import tat.view.WaveformDisplay?>
 <?import tat.view.AnnotationDisplay?>
-<?import javafx.scene.control.ScrollPane?>
 <VBox id="mainFrame" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.view.EditorMenuController">
    <children>
       <AnchorPane id="soundFileArea" minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0" VBox.vgrow="NEVER">
@@ -26,17 +23,17 @@
                <children>
                   <VBox alignment="CENTER" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="202.5" minWidth="62.5" prefHeight="405.0" prefWidth="125.0" style="-fx-background-color: #1c1b22;" HBox.hgrow="NEVER">
                      <children>
-                        <IconButton fx:id="splitButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                        <IconButton fx:id="splitButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
                            <VBox.margin>
                               <Insets bottom="12.5" />
                            </VBox.margin>
                         </IconButton>
-                        <IconButton fx:id="joinButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                        <IconButton fx:id="joinButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
                            <VBox.margin>
                               <Insets bottom="12.5" />
                            </VBox.margin>
                         </IconButton>
-                        <IconButton fx:id="alignButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                        <IconButton fx:id="alignButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
@@ -54,19 +51,19 @@
                         <WaveformDisplay fx:id="waveformDisplay" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" StackPane.alignment="BOTTOM_RIGHT" />
                         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="31.25" minWidth="62.5" prefHeight="62.5" prefWidth="125.0" StackPane.alignment="TOP_RIGHT">
                            <children>
-                              <IconButton fx:id="zoomInButton" style="-fx-background-color: transparent;" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
-                              <IconButton fx:id="zoomOutButton" style="-fx-background-color: transparent;" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
+                              <IconButton fx:id="zoomInButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
+                              <IconButton fx:id="zoomOutButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
                            </children>
                         </HBox>
                      </children>
                   </StackPane>
                </children>
             </HBox>
-            <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;" text="a_1.wav" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;" text="a_1.wav" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
               </items>
                <font>
-                  <Font name="Levenim MT" size="28.0" />
+                  <Font name="Levenim MT" size="26.0" />
                </font>
             </MenuButton>
          </children>
@@ -87,35 +84,35 @@
                      <children>
                         <IconButton fx:id="openFileSelectorButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0">
                         </IconButton>
-                        <IconButton fx:id="saveButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
+                        <IconButton fx:id="saveButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
                         <Pane HBox.hgrow="ALWAYS" />
-                        <IconButton fx:id="prevSegmentButton" style="-fx-background-color: transparent;" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY">
+                        <IconButton fx:id="prevSegmentButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY">
                            <HBox.margin>
                               <Insets right="12.5" />
                            </HBox.margin>
                         </IconButton>
-                        <IconButton fx:id="playButton" style="-fx-background-color: transparent;" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                        <IconButton fx:id="playButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
                            <HBox.margin>
                               <Insets right="12.5" />
                            </HBox.margin>
                         </IconButton>
-                        <IconButton fx:id="pauseButton" style="-fx-background-color: transparent;" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                        <IconButton fx:id="pauseButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
                            <HBox.margin>
                               <Insets right="12.5" />
                            </HBox.margin>
                         </IconButton>
-                        <IconButton fx:id="stopButton" style="-fx-background-color: transparent;" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                        <IconButton fx:id="stopButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
                            <HBox.margin>
                               <Insets right="12.5" />
                            </HBox.margin>
                         </IconButton>
-                        <IconButton fx:id="nextSegmentButton" style="-fx-background-color: transparent;" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                        <IconButton fx:id="nextSegmentButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </IconButton>
                         <Pane HBox.hgrow="ALWAYS" />
-                        <IconButton fx:id="settingsButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
+                        <IconButton fx:id="settingsButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
                      </children>
                      <VBox.margin>
                         <Insets />
@@ -123,7 +120,7 @@
                   </HBox>
                </children>
             </VBox>
-            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS" style="-fx-background-color: #2b2934;-fx-font-family:'Levenim MT';-fx-font-size: 24;">
+            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>

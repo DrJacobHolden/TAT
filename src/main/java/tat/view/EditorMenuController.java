@@ -150,18 +150,39 @@ public class EditorMenuController implements FileSelectedHandler {
         this.main = main;
         this.primaryStage = ps;
         this.activeRecording = activeRecording;
-        populateFileMenu(this, main.fileSystem, fileMenu);
+        setupMenu(fileMenu);
+        populateFileMenu(this, main.fileSystem, fileMenu, activeRecording);
         fileSelected(activeRecording);
     }
 
-    public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu) {
+    public static void setupMenu(MenuButton menu) {
+        menu.showingProperty().addListener((a) -> {
+            if(menu.isShowing()) {
+                menu.setTextFill(Colours.ORANGE);
+                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #ff7c00; " +
+                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
+            } else {
+                menu.setTextFill(Colours.WHITE);
+                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; " +
+                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
+            }
+        });
+    }
+
+    public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
         ObservableList<MenuItem> menuItems = fileMenu.getItems();
         menuItems.clear();
         Set<String> recordings = fileSystem.recordings.keySet();
         for(String name : recordings) {
-            MenuItem mu = new MenuItem(name);
+            SizingMenuItem mu;
+            if(activeRecording != null && activeRecording.equals(name)) {
+                mu = new SizingMenuItem(fileMenu, name, true);
+            } else {
+                mu = new SizingMenuItem(fileMenu, name, false);
+            }
+
             menuItems.add(mu);
-            mu.setOnAction(event -> handler.fileSelected(mu.getText()));
+            mu.setOnAction(event -> handler.fileSelected(name));
         }
         if(recordings.size() > 0) {
             fileMenu.setText(recordings.size() + " File(s)");

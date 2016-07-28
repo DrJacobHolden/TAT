@@ -1,26 +1,39 @@
 .orange {
-    -fx-fill: #ff7c00;
-}
+     -fx-fill: #ff7c00;
+ }
 
-.white {
-    -fx-fill: #e4e1f0;
-}
+ .white {
+     -fx-fill: #e4e1f0;
+ }
 
-.grey {
-    -fx-fill: #5c5a67;
-}
+ .grey {
+     -fx-fill: #5c5a67;
+ }
 
-.caret {
-    -fx-stroke: #e4e1f0;
-}
+ .caret {
+     -fx-stroke: #e4e1f0;
+ }
 
-#textArea {
+  .button {
+      -fx-background-color: transparent;
+  }
+
+  .menu-item .label {
+      -fx-font-size: 26.0;
+  }
+
+  .context-menu {
+      -fx-skin: "com.sun.javafx.scene.control.skin.ContextMenuSkin";
+      -fx-background-color: #1c1b22;
+      -fx-background-insets: 0, 1, 2;
+      -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+  /*    -fx-padding: 0.666667em 0.083333em 0.666667em 0.083333em;  8 1 8 1 */
+      -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+  }
+
+  #textArea {
     -fx-background-color: #2b2934;
     -fx-font-family:'Levenim MT';
     -fx-font-size: 24;
     -fx-caret-blink-rate: 0.5;
-}
-
-.button {
-    -fx-background-color: transparent;
-}
+  }

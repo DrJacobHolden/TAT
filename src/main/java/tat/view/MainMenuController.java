@@ -31,7 +31,11 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static tat.Main.p;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -122,9 +126,7 @@ public class MainMenuController implements FileSelectedHandler {
                 setCorpus(file);
             }
         } catch(IOException e) {
-            //TODO: Create error message
-            //ErrorHandler.getInstance().showError("Failed to load corpus.");
-            e.printStackTrace();
+            Main.createInfoDialog("Error", "Failed to load corpus.", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -155,8 +157,7 @@ public class MainMenuController implements FileSelectedHandler {
         try {
             main.rootLayout = loader.load();
         } catch(IOException e) {
-            //TODO: Handle error PLEASE REINSTALL
-            e.printStackTrace();
+            Main.createInfoDialog("Error", "Program error, please reinstall.", Alert.AlertType.INFORMATION);
         }
 
         EditorMenuController controller = loader.getController();
@@ -165,6 +166,7 @@ public class MainMenuController implements FileSelectedHandler {
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
         scene.getStylesheets().add(ClassLoader.getSystemResource("css/textarea.css").toExternalForm());
+        scene.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
         primaryStage.setScene(scene);
     }
 
@@ -177,7 +179,7 @@ public class MainMenuController implements FileSelectedHandler {
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
         initialiseDragAndDrop();
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
     }
 
     /**
@@ -218,6 +220,7 @@ public class MainMenuController implements FileSelectedHandler {
 
         //Main must be set before setting main.filesystem
         setCorpusPath();
+        EditorMenuController.setupMenu(fileMenu);
     }
 
     public void initialiseDragAndDrop() {
@@ -267,9 +270,8 @@ public class MainMenuController implements FileSelectedHandler {
                             e.printStackTrace();
                         }
                     } else {
-                        //TODO: Tell user that directory must be a corpus
-                        //to create a new corpus use the corpus selector
-                        //make corpus selector flash
+                        //Make corpus selector flash
+                        Main.createInfoDialog("Information", "To create a new corpus please use the file selector button.", Alert.AlertType.INFORMATION);
                     }
                 } else if (isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
                     audioFiles.add(f);
@@ -296,11 +298,15 @@ public class MainMenuController implements FileSelectedHandler {
                 if(r != null) {
                     int segmentId = 0;
                     if (r.getSegments().size() != 1) {
-                        //TODO: Ask user which segment to assign the alignment to
+                        int id = createSegmentSelectorDialog("Alignment", "name", r.getSegments().size());
+                        if(id == 0) //Cancel/Window close
+                            return;
+                        segmentId = id;
                     }
                     main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
                 } else {
-                    //TODO: Inform user that alignments require a matching audio file to be imported
+                    Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
+                            Alert.AlertType.INFORMATION);
                 }
             }
         });
@@ -311,11 +317,12 @@ public class MainMenuController implements FileSelectedHandler {
         String name = getBasename(f);
         Recording r = main.fileSystem.recordings.get(name);
         if(r != null) {
-            //TODO: Error about duplicate file
+            Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
+                    "this file before reimporting.", Alert.AlertType.INFORMATION);
             return;
         }
         main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu);
+        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
     }
 
     private void addAnnotationFile(File f) {
@@ -324,11 +331,15 @@ public class MainMenuController implements FileSelectedHandler {
         if(r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
-                //TODO: Ask user which segment to assign the annotation to
+                int id = createSegmentSelectorDialog("Annotation", "name", r.getSegments().size());
+                if(id == 0) //Cancel/Window close
+                    return;
+                segmentId = id;
             }
             main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
         } else {
-            //TODO: Inform user that annotations require a matching audio file to be imported
+            Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
+                    Alert.AlertType.INFORMATION);
         }
     }
 
@@ -370,6 +381,27 @@ public class MainMenuController implements FileSelectedHandler {
 
     private boolean isValidExtension(File file, String[] extensions) {
         return Arrays.stream(extensions).anyMatch(e -> file.toString().endsWith(e));
+    }
+
+    public static int createSegmentSelectorDialog(String type, String filename, int count) {
+        ChoiceDialog<Integer> alert = new ChoiceDialog(1, IntStream.range(1, count+1).boxed().
+                collect(Collectors.toList()));
+        alert.setTitle("Assign " + type);
+        alert.setHeaderText(filename + " matched recording " + filename + " which segment\n" +
+                " would you like to assign" +
+                " this " + type.toLowerCase() + " to?");
+        alert.setContentText("Segment: ");
+        alert.setGraphic(null);
+
+        alert.initOwner(p);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
+
+        Optional<Integer> result = alert.showAndWait();
+        if(result.isPresent())
+            return result.get();
+        return 0;
     }
 }
 
