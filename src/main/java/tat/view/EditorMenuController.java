@@ -6,7 +6,9 @@ import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
 import file_system.element.AudioFile;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuButton;
@@ -14,6 +16,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import tat.LoadingDialog;
 import tat.Main;
 import tat.Position;
 import tat.view.icon.Icon;
@@ -21,6 +24,7 @@ import tat.view.icon.IconLoader;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -146,15 +150,23 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void bindAlignButton() {
         alignButton.setOnAction(event -> {
-            for (Segment segment : getActiveRecording()) {
-                try {
-                    segment.generateAlignment();
-                    Main.createInfoDialog("Alignment", "Successfully generated alignment", Alert.AlertType.INFORMATION);
-                } catch (AlignmentException | IOException e) {
-                    Main.createInfoDialog("Alignment", "Failed to generate alignment", Alert.AlertType.ERROR);
-                    e.printStackTrace();
+            LoadingDialog dialog = new LoadingDialog();
+            Task<Void> task = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    Platform.runLater(dialog::show);
+                    for (Segment segment : getActiveRecording()) {
+                        try {
+                            segment.generateAlignment();
+                        } catch (AlignmentException | IOException e) {
+                            Platform.runLater(() -> Main.createInfoDialog("Alignment", "Failed to generate alignment", Alert.AlertType.ERROR));
+                        }
+                    }
+                    Platform.runLater(dialog::hide);
+                    return null;
                 }
-            }
+            };
+            new Thread(task).start();
         });
     }
 
