@@ -1,5 +1,6 @@
 package tat.view;
 
+import alignment.AlignmentException;
 import audio_player.AudioPlayer;
 import file_system.FileSystem;
 import file_system.Recording;
@@ -139,6 +140,21 @@ public class EditorMenuController implements FileSelectedHandler {
         bindPlayerButtons();
         bindSaveButton();
         bindSplitAndJoinButtons();
+        bindAlignButton();
+    }
+
+    private void bindAlignButton() {
+        alignButton.setOnAction(event -> {
+            for (Segment segment : getActiveRecording()) {
+                try {
+                    segment.generateAlignment();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (AlignmentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**

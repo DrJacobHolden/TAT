@@ -1,6 +1,10 @@
 package file_system;
 
+import alignment.AlignmentException;
+import alignment.formats.AlignmentFormat;
 import alignment.formats.TextGrid;
+import alignment.maus.MausResponse;
+import alignment.maus.WebMaus;
 import file_system.attribute.CustomAttribute;
 import file_system.attribute.CustomAttributeInstance;
 import file_system.element.AlignmentFile;
@@ -11,6 +15,7 @@ import sun.audio.AudioStream;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.xml.soap.Text;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -204,5 +209,12 @@ public class Segment {
         if (segment2.annotationFile != null) {
             annotationFile.join(segment2.annotationFile);
         }
+    }
+
+    public void generateAlignment() throws IOException, AlignmentException {
+        WebMaus maus = new WebMaus();
+        maus.setOutFormat(TextGrid.class);
+        AlignmentFormat response = (TextGrid) maus.generateAlignment(getAnnotationFile().getString(), getAudioFile().getAudioStream());
+        this.alignmentFile = new AlignmentFile(this, response);
     }
 }
