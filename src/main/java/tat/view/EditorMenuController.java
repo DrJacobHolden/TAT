@@ -8,6 +8,7 @@ import file_system.Segment;
 import file_system.element.AudioFile;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
@@ -148,9 +149,9 @@ public class EditorMenuController implements FileSelectedHandler {
             for (Segment segment : getActiveRecording()) {
                 try {
                     segment.generateAlignment();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (AlignmentException e) {
+                    Main.createInfoDialog("Alignment", "Successfully generated alignment", Alert.AlertType.INFORMATION);
+                } catch (AlignmentException | IOException e) {
+                    Main.createInfoDialog("Alignment", "Failed to generate alignment", Alert.AlertType.ERROR);
                     e.printStackTrace();
                 }
             }

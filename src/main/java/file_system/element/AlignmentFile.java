@@ -39,6 +39,7 @@ public class AlignmentFile extends BaseFileSystemElement {
     public void save() throws IOException {
         if (alignment != null) {
             Path saveFile = Paths.get(segment.getPath(this).toString() + alignment.getFileExtension());
+            saveFile.toFile().delete();
             Files.copy(alignment.getStream(), saveFile);
         }
     }
