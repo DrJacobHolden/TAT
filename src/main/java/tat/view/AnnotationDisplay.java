@@ -5,6 +5,7 @@ import file_system.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.control.IndexRange;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
@@ -62,11 +63,13 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
                 checkSelectEntireAnnotation();
 
-                //Check if you have switched segment
-                if (getSelection().getLength() == 0) {
-                    position.setSelected(getSegmentForSelection(getSelection()), 0, this);
-                } else {
-                    validateSelection();
+                if(getSegmentForSelection(getSelection()) != null) {
+                    //Check if you have switched segment
+                    if (getSelection().getLength() == 0) {
+                        position.setSelected(getSegmentForSelection(getSelection()), 0, this);
+                    } else {
+                        validateSelection();
+                    }
                 }
             }
         });
@@ -289,11 +292,11 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
             selection
 
             User Typed Valid Text within Range
-            User pushed backspace
+            User pushed backspace (/)
                 Valid: Inside range, not at start
                 Invalid: At start of range
                        sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
-            User pushed delete
+            User pushed delete (/)
                 Valid: Inside range, not at end
                 Invalid: At end of range
                         sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
@@ -334,13 +337,15 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
         protected TextState(TextState old, Annotation changedAnnotation, String text) {
             boolean start = false;
-            int diff = text.length() - changedAnnotation.text.length();
+            int diff = 0;
             Annotation updatedAnnotation;
             for (Annotation a : old.annotations) {
                 updatedAnnotation = a;
                 if (a == changedAnnotation) {
                     start = true;
                     updatedAnnotation = new Annotation(a, a.range.getStart(), text);
+                    //Incase text is empty string
+                    diff = updatedAnnotation.text.length() - changedAnnotation.text.length();
                 } else if (start) {
                     updatedAnnotation = new Annotation(a, a.range.getStart() + diff, a.text);
                 }
@@ -388,7 +393,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
             this.text = text;
             range = new IndexRange(start, start+text.length());
-            System.out.println("END of RANGE: " + range.getEnd());
         }
     }
 }
