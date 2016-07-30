@@ -153,7 +153,7 @@ public class Recording implements Iterable<Segment> {
 
         //Alignment is no longer valid
         maybeMarkAlignmentForDelete(segment1);
-        maybeMarkAlignmentForDelete(segment1);
+        maybeMarkAlignmentForDelete(segment2);
 
         segment1.join(segment2);
 
