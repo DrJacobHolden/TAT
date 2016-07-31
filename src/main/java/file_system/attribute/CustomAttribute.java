@@ -34,6 +34,10 @@ public class CustomAttribute implements PathToken {
         this.defaultValue = value;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String getToken() {
         return token;
