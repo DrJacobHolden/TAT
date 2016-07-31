@@ -33,7 +33,9 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
-    private Stack<TextState> states = new Stack();
+    private Stack<TextState> undoStates = new Stack<>();
+    private Stack<TextState> redoStates = new Stack<>();
+    private TextState currentState;
 
     private Segment activeSegment;
     private IndexRange previousSegRange;
@@ -84,14 +86,28 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         Nodes.addInputMap(this, InputMap.consume(keyPressed(DELETE), e -> deletedCharacter()));
 
         //Handle undo
-        Nodes.addInputMap(this, InputMap.consume(keyPressed(Z, SHORTCUT_DOWN)));
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Z, SHORTCUT_DOWN), e -> undo()));
         //Handle enter
-        Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN)));
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN), e -> redo()));
 
         //Disable enter, shift or no shift
         Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
         //Do not allow dragging text
         setOnSelectionDrop(a -> {});
+    }
+
+    public void undo() {
+        if (!undoStates.empty()) {
+            redoStates.push(currentState);
+            setState(undoStates.pop());
+        }
+    }
+
+    public void redo() {
+        if (!redoStates.empty()) {
+            undoStates.push(currentState);
+            setState(redoStates.pop());
+        }
     }
 
     @Override
@@ -125,7 +141,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         IndexRange localSelection = getLocalSelection();
 
         newText.replace(localSelection.getStart(), localSelection.getEnd(), text);
-        updateState(new TextState(states.peek(), getActiveAnnotation(), newText.toString()));
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
 
         selectRange(selection.getStart() + text.length(), selection.getStart() + text.length());
     }
@@ -156,7 +172,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         }
 
         newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
-        updateState(new TextState(states.peek(), getActiveAnnotation(), newText.toString()));
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
 
         if(single) {
             selectRange(selection.getStart() - 1, selection.getStart() - 1);
@@ -181,7 +197,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         }
 
         newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
-        updateState(new TextState(states.peek(), getActiveAnnotation(), newText.toString()));
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
 
         selectRange(selection.getStart(), selection.getStart());
     }
@@ -232,21 +248,25 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     public void setRecording(Recording recording) {
         this.recording = recording;
-        updateState(new TextState(recording));
+        setState(new TextState(recording));
         initialised = true;
     }
 
     private void updateState(TextState state) {
-        states.push(state);
+        undoStates.push(currentState);
+        redoStates.clear();
+        setState(state);
+    }
 
+    private void setState(TextState state) {
+        this.currentState = state;
         this.replaceText("");
         this.appendText(state.fullString);
 
-        setColours();//Still better than Skype - Potentially causes performance issues - Could be removed if someone
+        //Still better than Skype - Potentially causes performance issues - Could be removed if someone
         //discovered a potential off by one error or something weird that may or may not exist.
+        setColours();
     }
-
-
 
     private void setActiveSegment(Segment s) {
         activeSegment = s;
@@ -264,7 +284,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     public void setColours() {
-        for(Annotation a : states.peek().annotations) {
+        for(Annotation a : currentState.annotations) {
             if (a.segment == activeSegment) {
                 setStyleClass(a.range.getStart(), a.range.getEnd(), "orange");
             } else {
@@ -288,7 +308,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private Annotation getAnnotationForSelection(IndexRange selection) {
-        for(Annotation a: states.peek().annotations) {
+        for(Annotation a: currentState.annotations) {
             if(isWithinRange(selection, a.range))
                 return a;
         }
@@ -296,7 +316,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private Annotation getActiveAnnotation() {
-        for(Annotation a: states.peek().annotations) {
+        for(Annotation a: currentState.annotations) {
             if(a.segment == activeSegment) {
                 return a;
             }
@@ -310,7 +330,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private Segment getSegmentForSelection(IndexRange selection) {
-        for(Annotation a: states.peek().annotations) {
+        for(Annotation a: currentState.annotations) {
             if(isWithinRange(selection, a.range)) {
                 return a.segment;
             }
@@ -327,22 +347,22 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
             User Typed Valid Text within Range
             User pushed backspace (/)
-                Valid: Inside range, not at start
+                Valid: Inside range, not at start (/)
                 Invalid: At start of range
                        sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
             User pushed delete (/)
-                Valid: Inside range, not at end
+                Valid: Inside range, not at end (/)
                 Invalid: At end of range
                         sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
             Enter:
                 Consume (/)
             Cut:
-                Same as delete
+                Same as delete (/)
             Drag:
-                Consume
+                Consume (/)
             Selections:
                 ValidateSelections (/)
-                Deleted selected text:
+                Deleted selected text: (/)
             Insert:
                 Out of scope (/)
 
