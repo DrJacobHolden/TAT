@@ -4,6 +4,7 @@ import file_system.Recording;
 import file_system.Segment;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
@@ -109,6 +110,13 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         });
 
         setShowCaret(CaretVisibility.ON);
+    }
+
+    public void setContextMenu(ContextMenu c) {
+        //TODO: Make this work better. It does not go away yet.
+        setOnContextMenuRequested((a) -> {
+            c.show(this, a.getScreenX(), a.getScreenY());
+        });
     }
 
     public void setPosition(tat.Position position) {

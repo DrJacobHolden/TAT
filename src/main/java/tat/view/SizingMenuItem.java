@@ -5,6 +5,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.text.Font;
 
 /**
  * Provided by Peter Brouwer
@@ -16,6 +17,7 @@ public class SizingMenuItem extends MenuItem{
     public SizingMenuItem(final MenuButton menuButton, String string, boolean selected) {
         super();
         Label label=new Label("  " + string);
+        label.setFont(new Font("Levenim MT", 26.0));
         if(selected) {
             label.setTextFill(Colours.SECONDARY_GRAY);
         } else {
