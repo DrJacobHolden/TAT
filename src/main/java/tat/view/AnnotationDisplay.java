@@ -4,9 +4,7 @@ import file_system.Recording;
 import file_system.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.control.IndexRange;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
@@ -17,9 +15,7 @@ import java.util.*;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.SHIFT_ANY;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
-import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
-import static org.fxmisc.wellbehaved.event.EventPattern.keyReleased;
-import static org.fxmisc.wellbehaved.event.EventPattern.keyTyped;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
 
 
 /**
@@ -29,6 +25,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private Recording recording;
     private tat.Position position;
+
+    private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
     private Stack<TextState> states = new Stack();
 
@@ -41,22 +39,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         setPadding(new Insets(0,0,0,0));
         setWrapText(true);
 
-        Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e -> typedCharacter(e.getCharacter())));
-
-        Nodes.addInputMap(this,
-                InputMap.consume(keyPressed(Z, SHORTCUT_DOWN)));
-
-        Nodes.addInputMap(this,
-                InputMap.consume(keyPressed(Y, SHORTCUT_DOWN)));
-
-
-        Nodes.addInputMap(this, InputMap.consume(keyPressed(BACK_SPACE), e -> backspaceCharacter()));
-
-
-        Nodes.addInputMap(this, InputMap.consume(keyPressed(DELETE), e -> deletedCharacter()));
-
-        Nodes.addInputMap(this,
-                InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
+        setInputBindings();
 
         selectionProperty().addListener((observable) -> {
             if (initialised && getText().length() > 0) {
@@ -87,20 +70,64 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         setShowCaret(CaretVisibility.ON);
     }
 
-    private void typedCharacter(String character) {
+    private void setInputBindings() {
+        //Handle regular key typed
+        Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e -> typedCharacter(e.getCharacter())));
+        //Handle backspace
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(BACK_SPACE), e -> backspaceCharacter()));
+        //Handle delete
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(DELETE), e -> deletedCharacter()));
 
-        if(character.charAt(0) < 32 || character.charAt(0) > 126)
-            return;
+        //Handle undo
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Z, SHORTCUT_DOWN)));
+        //Handle enter
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN)));
 
+        //Disable enter, shift or no shift
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
+    }
+
+    @Override
+    public void paste() {
+        Object data = clipboard.getContent(DataFormat.PLAIN_TEXT);
+        if (data instanceof String) {
+            //Filter newline characters
+            String str = ((String) data).replaceAll("[\n\r]", "").trim();
+            insertTextAtCurrentPosition(str);
+        }
+    }
+
+    @Override
+    public void cut() {
+        copy();
+        backspaceCharacter();
+    }
+
+    @Override
+    public void copy() {
+        IndexRange selection = getSelection();
+        String content = getText().substring(selection.getStart(), selection.getEnd());
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(content);
+        clipboard.setContent(clipboardContent);
+    }
+
+    private void insertTextAtCurrentPosition(String text) {
         StringBuffer newText = new StringBuffer(getActiveAnnotation().text);
-
         IndexRange selection = getSelection();
         IndexRange localSelection = getLocalSelection();
 
-        newText.replace(localSelection.getStart(), localSelection.getEnd(), character);
+        newText.replace(localSelection.getStart(), localSelection.getEnd(), text);
         updateState(new TextState(states.peek(), getActiveAnnotation(), newText.toString()));
 
-        selectRange(selection.getStart() + 1, selection.getStart() + 1);
+        selectRange(selection.getStart() + text.length(), selection.getStart() + text.length());
+    }
+
+    private void typedCharacter(String character) {
+        //Do not register non printable characters
+        if(character.charAt(0) < 32 || character.charAt(0) > 126)
+            return;
+        insertTextAtCurrentPosition(character);
     }
 
     private void backspaceCharacter() {
