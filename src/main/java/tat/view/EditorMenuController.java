@@ -150,7 +150,7 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void bindAlignButton() {
         alignButton.setOnAction(event -> {
-            LoadingDialog dialog = new LoadingDialog();
+            LoadingDialog dialog = new LoadingDialog("Generating Alignment");
             Task<Void> task = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
