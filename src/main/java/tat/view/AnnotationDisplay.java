@@ -100,6 +100,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (!undoStates.empty()) {
             redoStates.push(currentState);
             setState(undoStates.pop());
+            selectRange(currentState.selection.getStart(), currentState.selection.getEnd());
         }
     }
 
@@ -107,7 +108,14 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (!redoStates.empty()) {
             undoStates.push(currentState);
             setState(redoStates.pop());
+            selectRange(currentState.selection.getStart(), currentState.selection.getEnd());
         }
+    }
+
+    @Override
+    public void selectRange(int anchor, int endPos) {
+        currentState.selection = new IndexRange(anchor, endPos);
+        super.selectRange(anchor, endPos);
     }
 
     @Override
@@ -253,6 +261,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private void updateState(TextState state) {
+        currentState.selection = getSelection();
         undoStates.push(currentState);
         redoStates.clear();
         setState(state);
@@ -376,8 +385,9 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private class TextState {
 
         public final List<Annotation> annotations = new ArrayList<>();
-
         public final String fullString;
+        //Need to update this
+        public IndexRange selection;
 
         protected TextState(Recording r) {
             int index = 0;
@@ -387,6 +397,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 annotations.add(a);
             }
             fullString = generateFullString();
+            selection = new IndexRange(0,0);
         }
 
         protected TextState(TextState old, Annotation changedAnnotation, String text) {
@@ -406,6 +417,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 annotations.add(updatedAnnotation);
             }
             fullString = generateFullString();
+            selection = new IndexRange(0,0);
         }
 
         private String generateFullString() {
