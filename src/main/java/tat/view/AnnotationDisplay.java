@@ -4,18 +4,23 @@ import file_system.Recording;
 import file_system.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.control.IndexRange;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
 import tat.PositionListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.SHIFT_ANY;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
-import static org.fxmisc.wellbehaved.event.EventPattern.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
 
 /**
@@ -85,6 +90,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
         //Disable enter, shift or no shift
         Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
+        //Do not allow dragging text
+        setOnSelectionDrop(a -> {});
     }
 
     @Override
