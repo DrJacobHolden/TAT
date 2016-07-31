@@ -11,7 +11,6 @@ import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
-import tat.Position;
 import tat.PositionListener;
 
 import java.util.ArrayList;
@@ -29,9 +28,7 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
  */
 public class AnnotationDisplay extends StyleClassedTextArea implements PositionListener {
 
-    private Recording recording;
     private tat.Position position;
-
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
     private Stack<TextState> undoStates = new Stack<>();
@@ -40,8 +37,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private IndexRange previousSegRange;
     private boolean initialised = false;
-
     private boolean updatingText = false;
+    private boolean firstSelect = true;
 
     public AnnotationDisplay() {
         super();
@@ -125,7 +122,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         Object data = clipboard.getContent(DataFormat.PLAIN_TEXT);
         if (data instanceof String) {
             //Filter newline characters
-            String str = ((String) data).replaceAll("[\n\r]", "").trim();
+            String str = ((String) data).replaceAll("[\n\r]", "");
             insertTextAtCurrentPosition(str);
         }
     }
@@ -254,13 +251,13 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     public void initialise(Recording recording, tat.Position position) {
         undoStates.empty();
         redoStates.empty();
-        this.recording = recording;
 
         this.position = position;
         position.addSelectedListener(this);
 
         setState(new TextState(recording));
         initialised = true;
+        firstSelect = true;
     }
 
     private void updateState(TextState state) {
@@ -285,7 +282,9 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
-        if(initiator != this && segment != getSegmentForSelection(getSelection())) {
+        //We should always update our position in the text if this is the first positionChanged we recieve
+        if((initiator != this && segment != getSegmentForSelection(getSelection())) || firstSelect) {
+            firstSelect = false;
             selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getStart());//Moves caret to start of selected annotation
         }
         setColours();
@@ -408,7 +407,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 if (a == changedAnnotation) {
                     start = true;
                     updatedAnnotation = new Annotation(a, a.range.getStart(), text);
-                    //Incase text is empty string
+                    //In case text is empty string
                     diff = updatedAnnotation.text.length() - changedAnnotation.text.length();
                 } else if (start) {
                     updatedAnnotation = new Annotation(a, a.range.getStart() + diff, a.text);
@@ -424,13 +423,12 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
             for(Annotation a : annotations) {
                 intermediateString = intermediateString + " " + a.text;
             }
-            return intermediateString.trim();
+            //Remove first space
+            return intermediateString.replaceAll("^ ", "");
         }
 
         private void updateRecording() {
-            for (Annotation a : annotations) {
-                a.updateSegment();
-            }
+            annotations.forEach(Annotation::updateSegment);
         }
     }
 
