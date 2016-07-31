@@ -23,6 +23,9 @@ import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -180,7 +183,7 @@ public class EditorMenuController implements FileSelectedHandler {
         this.primaryStage = ps;
         this.activeRecording = activeRecording;
         setupMenu(fileMenu);
-        populateFileMenu(this, main.fileSystem, fileMenu, activeRecording);
+        populateFileMenu(main.fileSystem, fileMenu, activeRecording);
         fileSelected(activeRecording);
     }
 
@@ -198,11 +201,28 @@ public class EditorMenuController implements FileSelectedHandler {
         });
     }
 
-    public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
+    private static FileSelectedHandler fileHandler = null;
+    public static void setFileSelectedHandler(FileSelectedHandler handler) {
+        fileHandler = handler;
+    }
+
+    /**
+     * Method supplied by Erickson @ stackoverflow
+     * Source: http://stackoverflow.com/questions/740299/how-do-i-sort-a-set-to-a-list-in-java
+     */
+    public static
+    <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+        List<T> list = new ArrayList<T>(c);
+        java.util.Collections.sort(list);
+        return list;
+    }
+
+    public static void populateFileMenu(FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
         ObservableList<MenuItem> menuItems = fileMenu.getItems();
         menuItems.clear();
         Set<String> recordings = fileSystem.recordings.keySet();
-        for(String name : recordings) {
+        List<String> recordingsSorted = asSortedList(recordings);
+        for(String name : recordingsSorted) {
             SizingMenuItem mu;
             if(activeRecording != null && activeRecording.equals(name)) {
                 mu = new SizingMenuItem(fileMenu, name, true);
@@ -211,7 +231,7 @@ public class EditorMenuController implements FileSelectedHandler {
             }
 
             menuItems.add(mu);
-            mu.setOnAction(event -> handler.fileSelected(name));
+            mu.setOnAction(event -> fileHandler.fileSelected(name));
         }
         if(recordings.size() > 0) {
             fileMenu.setText(recordings.size() + " File(s)");
