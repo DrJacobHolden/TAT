@@ -195,8 +195,7 @@ public class EditorMenuController implements FileSelectedHandler {
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
-        textArea.setRecording(getActiveRecording());
-        textArea.setPosition(position);
+        textArea.initialise(getActiveRecording(), position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
 
@@ -250,7 +249,7 @@ public class EditorMenuController implements FileSelectedHandler {
                     Segment segment2 = getActiveRecording().split(position.getSegment(), frame, textArea.getCursorPosInCurrentSegment());
                     waveformDisplay.onSplit(position.getSegment(), segment2, frame);
                     //Reset textarea with updated recording
-                    textArea.setRecording(getActiveRecording());
+                    textArea.initialise(getActiveRecording(), position);
                     //Select the second split segment
                     maybeChangeSegment(+1);
                 } catch (IOException e) {
@@ -267,7 +266,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 getActiveRecording().join(position.getSegment(), nextSegment);
                 waveformDisplay.onJoin(position.getSegment(), nextSegment);
                 //Reset textarea with updated recording
-                textArea.setRecording(getActiveRecording());
+                textArea.initialise(getActiveRecording(), position);
                 //Reselect the current segment
                 maybeChangeSegment(0);
             } catch (IOException e) {

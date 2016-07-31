@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
+import tat.Position;
 import tat.PositionListener;
 
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private Stack<TextState> redoStates = new Stack<>();
     private TextState currentState;
 
-    private Segment activeSegment;
     private IndexRange previousSegRange;
     private boolean initialised = false;
 
@@ -251,13 +251,14 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         }
     }
 
-    public void setPosition(tat.Position position) {
+    public void initialise(Recording recording, tat.Position position) {
+        undoStates.empty();
+        redoStates.empty();
+        this.recording = recording;
+
         this.position = position;
         position.addSelectedListener(this);
-    }
 
-    public void setRecording(Recording recording) {
-        this.recording = recording;
         setState(new TextState(recording));
         initialised = true;
     }
@@ -270,6 +271,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private void setState(TextState state) {
         this.currentState = state;
+        state.updateRecording();
 
         updatingText = true;
         this.replaceText("");
@@ -281,24 +283,17 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         setColours();
     }
 
-    private void setActiveSegment(Segment s) {
-        activeSegment = s;
-    }
-
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
-        if(segment != activeSegment) {
-            setActiveSegment(segment);
-            if(initiator != this) {
-                selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getStart());//Moves caret to start of selected annotation
-            }
-            setColours();
+        if(initiator != this && segment != getSegmentForSelection(getSelection())) {
+            selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getStart());//Moves caret to start of selected annotation
         }
+        setColours();
     }
 
     public void setColours() {
         for(Annotation a : currentState.annotations) {
-            if (a.segment == activeSegment) {
+            if (a.segment == position.getSegment()) {
                 setStyleClass(a.range.getStart(), a.range.getEnd(), "orange");
             } else {
                 if (a.segment.getSegmentNumber() % 2 == 0) {
@@ -330,7 +325,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private Annotation getActiveAnnotation() {
         for(Annotation a: currentState.annotations) {
-            if(a.segment == activeSegment) {
+            if(a.segment == position.getSegment()) {
                 return a;
             }
         }
@@ -431,6 +426,12 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
             }
             return intermediateString.trim();
         }
+
+        private void updateRecording() {
+            for (Annotation a : annotations) {
+                a.updateSegment();
+            }
+        }
     }
 
 
@@ -463,6 +464,10 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
             this.text = text;
             range = new IndexRange(start, start+text.length());
+        }
+
+        private void updateSegment() {
+            segment.getAnnotationFile().setString(text);
         }
     }
 }
