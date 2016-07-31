@@ -9,6 +9,7 @@ import alignment.formats.TextGrid;
 import javax.sound.sampled.AudioInputStream;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.security.AllPermission;
 
 /**
  * Created by kalda on 8/04/2016.
@@ -29,7 +30,7 @@ public class WebMaus implements AlignmentProvider {
     }
 
     @Override
-    public Object generateAlignment(String transcription, AudioInputStream audioStream) throws IOException, AlignmentException {
+    public AlignmentFormat generateAlignment(String transcription, AudioInputStream audioStream) throws IOException, AlignmentException {
         String url = "http://clarin.phonetik.uni-muenchen.de/BASWebServices/services/runMAUS";
         String charset = "UTF-8";
 
@@ -44,7 +45,12 @@ public class WebMaus implements AlignmentProvider {
         multipart.addAudioPart("SIGNAL", "audio.wav", audioStream);
 
         try {
-            return new MausResponse(multipart.finish());
+            MausResponse response = new MausResponse(multipart.finish());
+            if (response.getSuccess()) {
+                return response.getResult();
+            } else {
+                throw new AlignmentException();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new AlignmentException();

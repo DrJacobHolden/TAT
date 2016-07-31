@@ -1,7 +1,9 @@
 package file_system;
 
-import javax.sound.midi.SysexMessage;
-import javax.swing.plaf.synth.SynthTextAreaUI;
+import file_system.element.AlignmentFile;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,6 +88,10 @@ public class Recording implements Iterable<Segment> {
 
     public Segment split(Segment segment1, long frame, int stringPos) throws IOException {
         assertCorrectOrdering();
+
+        //Alignment is no longer valid
+        maybeMarkAlignmentForDelete(segment1);
+
         //Split the segment
         Segment segment2 = segment1.split(frame, stringPos);
 
@@ -120,6 +126,16 @@ public class Recording implements Iterable<Segment> {
         toDeleteOnSave.addAll(paths);
     }
 
+    private void maybeMarkAlignmentForDelete(Segment segment) {
+        AlignmentFile alignment = segment.getAlignmentFile();
+        try {
+            File file = alignment.getFileForPath(segment.getPath(alignment));
+            toDeleteOnSave.add(file.toPath());
+        } catch (FileNotFoundException e) {
+            //No worries, alignment doesn't exist
+        }
+    }
+
     private void deleteMarked() {
         while (toDeleteOnSave.size() > 0) {
             Path path = toDeleteOnSave.remove(toDeleteOnSave.size()-1);
@@ -134,6 +150,11 @@ public class Recording implements Iterable<Segment> {
 
     public Segment join(Segment segment1, Segment segment2) throws IOException {
         assertCorrectOrdering();
+
+        //Alignment is no longer valid
+        maybeMarkAlignmentForDelete(segment1);
+        maybeMarkAlignmentForDelete(segment2);
+
         segment1.join(segment2);
 
         //Move segments along to fill gaps. Will overwrite segment2
