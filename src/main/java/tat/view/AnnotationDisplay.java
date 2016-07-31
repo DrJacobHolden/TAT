@@ -41,6 +41,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private IndexRange previousSegRange;
     private boolean initialised = false;
 
+    private boolean updatingText = false;
+
     public AnnotationDisplay() {
         super();
         setPadding(new Insets(0,0,0,0));
@@ -49,13 +51,14 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         setInputBindings();
 
         selectionProperty().addListener((observable) -> {
-            if (initialised && getText().length() > 0) {
-
+            if (initialised && !updatingText && getText().length() > 0) {
                 checkSelectEntireAnnotation();
 
+                IndexRange currentSelection = getSelection();
+                Segment segmentForSelection = getSegmentForSelection(currentSelection);
                 //Check if you have switched segment
-                if (getSelection().getLength() == 0) {
-                    position.setSelected(getSegmentForSelection(getSelection()), 0, this);
+                if (currentSelection.getLength() == 0 && segmentForSelection != position.getSegment()) {
+                    position.setSelected(segmentForSelection, 0, this);
                 } else {
                     validateSelection();
                 }
@@ -230,7 +233,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //the entire annotation for a segment
         if (previousSegRange != null) {
             if (getSelection().getStart() == 0 && getSelection().getEnd() == getLength()) {
-                position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
+                //position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
                 selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
                 previousSegRange = null;
                 return;
@@ -267,8 +270,11 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private void setState(TextState state) {
         this.currentState = state;
+
+        updatingText = true;
         this.replaceText("");
         this.appendText(state.fullString);
+        updatingText = false;
 
         //Still better than Skype - Potentially causes performance issues - Could be removed if someone
         //discovered a potential off by one error or something weird that may or may not exist.
