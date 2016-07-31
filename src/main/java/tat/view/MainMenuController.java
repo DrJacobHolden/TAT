@@ -67,6 +67,7 @@ public class MainMenuController implements FileSelectedHandler {
     private Stage primaryStage;
     private boolean menuFlash = false;
     private boolean menuFlashing = false;
+    private EditorMenuController editor = null;
 
     //Used if annotation file is dragged in before audio
     private File annotationFile;
@@ -148,6 +149,12 @@ public class MainMenuController implements FileSelectedHandler {
     }
 
     public void fileSelected(String file) {
+        if(editor != null) {
+            if(!editor.createSaveDialog()) {
+                //User chose cancel or saving failed
+                return;
+            }
+        }
         moveToEditorScene(file);
     }
 
@@ -160,8 +167,8 @@ public class MainMenuController implements FileSelectedHandler {
             Main.createInfoDialog("Error", "Program error, please reinstall.", Alert.AlertType.INFORMATION);
         }
 
-        EditorMenuController controller = loader.getController();
-        controller.setup(main, primaryStage, file);
+        editor = loader.getController();
+        editor.setup(main, primaryStage, file);
 
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
@@ -179,7 +186,7 @@ public class MainMenuController implements FileSelectedHandler {
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
         initialiseDragAndDrop();
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
+        EditorMenuController.populateFileMenu(main.fileSystem, fileMenu, null);
     }
 
     /**
@@ -221,6 +228,7 @@ public class MainMenuController implements FileSelectedHandler {
         //Main must be set before setting main.filesystem
         setCorpusPath();
         EditorMenuController.setupMenu(fileMenu);
+        EditorMenuController.setFileSelectedHandler(this);
     }
 
     public void initialiseDragAndDrop() {
@@ -322,7 +330,7 @@ public class MainMenuController implements FileSelectedHandler {
             return;
         }
         main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
-        EditorMenuController.populateFileMenu(this, main.fileSystem, fileMenu, null);
+        EditorMenuController.populateFileMenu(main.fileSystem, fileMenu, null);
     }
 
     private void addAnnotationFile(File f) {

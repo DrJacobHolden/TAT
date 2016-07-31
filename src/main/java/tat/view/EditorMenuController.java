@@ -10,10 +10,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import tat.LoadingDialog;
@@ -23,8 +20,12 @@ import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static tat.Main.p;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -180,7 +181,7 @@ public class EditorMenuController implements FileSelectedHandler {
         this.primaryStage = ps;
         this.activeRecording = activeRecording;
         setupMenu(fileMenu);
-        populateFileMenu(this, main.fileSystem, fileMenu, activeRecording);
+        populateFileMenu(main.fileSystem, fileMenu, activeRecording);
         fileSelected(activeRecording);
     }
 
@@ -198,11 +199,28 @@ public class EditorMenuController implements FileSelectedHandler {
         });
     }
 
-    public static void populateFileMenu(FileSelectedHandler handler, FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
+    private static FileSelectedHandler fileHandler = null;
+    public static void setFileSelectedHandler(FileSelectedHandler handler) {
+        fileHandler = handler;
+    }
+
+    /**
+     * Method supplied by Erickson @ stackoverflow
+     * Source: http://stackoverflow.com/questions/740299/how-do-i-sort-a-set-to-a-list-in-java
+     */
+    public static
+    <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+        List<T> list = new ArrayList<T>(c);
+        java.util.Collections.sort(list);
+        return list;
+    }
+
+    public static void populateFileMenu(FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
         ObservableList<MenuItem> menuItems = fileMenu.getItems();
         menuItems.clear();
         Set<String> recordings = fileSystem.recordings.keySet();
-        for(String name : recordings) {
+        List<String> recordingsSorted = asSortedList(recordings);
+        for(String name : recordingsSorted) {
             SizingMenuItem mu;
             if(activeRecording != null && activeRecording.equals(name)) {
                 mu = new SizingMenuItem(fileMenu, name, true);
@@ -211,7 +229,7 @@ public class EditorMenuController implements FileSelectedHandler {
             }
 
             menuItems.add(mu);
-            mu.setOnAction(event -> handler.fileSelected(name));
+            mu.setOnAction(event -> fileHandler.fileSelected(name));
         }
         if(recordings.size() > 0) {
             fileMenu.setText(recordings.size() + " File(s)");
@@ -303,5 +321,44 @@ public class EditorMenuController implements FileSelectedHandler {
                 e.printStackTrace();
             }
         });
+    }
+
+    public boolean createSaveDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save Recording?");
+        alert.setHeaderText(null);
+        alert.setContentText("Would you like to save your recording? Unsaved changes will be lost.");
+        alert.setGraphic(null);
+
+        alert.initOwner(p);
+
+        ButtonType buttonYes = new ButtonType("Yes");
+        ButtonType buttonNo = new ButtonType("No");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonYes, buttonNo, buttonTypeCancel);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.get() == buttonNo) {
+            //Don't save
+            return true;
+        } else if(result.get() == buttonYes) {
+            //Save
+            //Allow files to be overridden
+            try {
+                player.closeOpenFiles();
+                getActiveRecording().save();
+            } catch (Exception e) {
+                Main.createInfoDialog("Error: Saving Files", "Files were unable to be saved due to an unknown error." +
+                        " Sorry.", Alert.AlertType.INFORMATION);
+                //Cancel file switch so that changes are not lost
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 }
