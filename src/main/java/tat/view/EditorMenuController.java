@@ -5,18 +5,28 @@ import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
 import file_system.element.AudioFile;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.fxmisc.wellbehaved.event.*;
+import org.fxmisc.wellbehaved.event.InputMap;
 import tat.Main;
 import tat.Position;
 import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Set;
 
@@ -202,6 +212,13 @@ public class EditorMenuController implements FileSelectedHandler {
         player = new AudioPlayer(position);
 
         position.setSelected(getActiveRecording().getSegment(1), 0, this);
+        bindKeyboardSelectTextarea();
+    }
+
+    private void bindKeyboardSelectTextarea() {
+        main.rootLayout.getChildrenUnmodifiable().stream()
+                .filter(a -> a != textArea)
+                .forEach(a -> Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> textArea.requestFocus())));
     }
 
     private void bindPlayerButtons() {
