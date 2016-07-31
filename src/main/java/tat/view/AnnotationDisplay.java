@@ -53,13 +53,11 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
                 checkSelectEntireAnnotation();
 
-                if(getSegmentForSelection(getSelection()) != null) {
-                    //Check if you have switched segment
-                    if (getSelection().getLength() == 0) {
-                        position.setSelected(getSegmentForSelection(getSelection()), 0, this);
-                    } else {
-                        validateSelection();
-                    }
+                //Check if you have switched segment
+                if (getSelection().getLength() == 0) {
+                    position.setSelected(getSegmentForSelection(getSelection()), 0, this);
+                } else {
+                    validateSelection();
                 }
             }
         });
@@ -87,7 +85,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
         //Handle undo
         Nodes.addInputMap(this, InputMap.consume(keyPressed(Z, SHORTCUT_DOWN), e -> undo()));
-        //Handle enter
+        //Handle redo
         Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN), e -> redo()));
 
         //Disable enter, shift or no shift
@@ -114,7 +112,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     @Override
     public void selectRange(int anchor, int endPos) {
-        currentState.selection = new IndexRange(anchor, endPos);
+        //Only set length of 0
+        currentState.selection = new IndexRange(anchor, anchor);
         super.selectRange(anchor, endPos);
     }
 
@@ -261,7 +260,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private void updateState(TextState state) {
-        currentState.selection = getSelection();
         undoStates.push(currentState);
         redoStates.clear();
         setState(state);
