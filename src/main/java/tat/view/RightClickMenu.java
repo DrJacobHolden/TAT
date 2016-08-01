@@ -47,10 +47,10 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
      *   - List of Speakers
      *     - Secondary_Gray == Current Speaker
      *   - Add Speaker (/)
-     * - Set "Custom Field Name"
+     * - Set "Custom Field Name" (/)
      *   - List of "Custom Field Name"
      *   - Add "Custom Field Name"
-     * - Add Custom Field
+     * - Add Custom Field (/)
      */
 
     private MenuItem enableOrDisable;
