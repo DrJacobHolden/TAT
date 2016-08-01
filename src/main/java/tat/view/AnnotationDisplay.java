@@ -83,11 +83,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         });
     }
 
-    public void setPosition(tat.Position position) {
-        this.position = position;
-        position.addSelectedListener(this);
-    }
-
     private void setInputBindings() {
         //Handle regular key typed
         Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e -> typedCharacter(e.getCharacter())));
