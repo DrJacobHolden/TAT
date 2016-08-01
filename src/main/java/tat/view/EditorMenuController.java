@@ -10,9 +10,14 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.fxmisc.wellbehaved.event.*;
+import org.fxmisc.wellbehaved.event.InputMap;
+import javafx.scene.control.*;
 import tat.LoadingDialog;
 import tat.Main;
 import tat.Position;
@@ -21,9 +26,6 @@ import tat.view.icon.IconLoader;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static tat.Main.p;
 
@@ -247,8 +249,7 @@ public class EditorMenuController implements FileSelectedHandler {
 
         fileMenu.setText(activeRecording);
         waveformDisplay.setRecording(getActiveRecording());
-        textArea.setRecording(getActiveRecording());
-        textArea.setPosition(position);
+        textArea.initialise(getActiveRecording(), position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
         setupRightClickMenu();
@@ -256,6 +257,13 @@ public class EditorMenuController implements FileSelectedHandler {
         player = new AudioPlayer(position);
 
         position.setSelected(getActiveRecording().getSegment(1), 0, this);
+        bindKeyboardSelectTextarea();
+    }
+
+    private void bindKeyboardSelectTextarea() {
+        main.rootLayout.getChildrenUnmodifiable().stream()
+                .filter(a -> a != textArea)
+                .forEach(a -> Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> textArea.requestFocus())));
     }
 
     private void bindPlayerButtons() {
@@ -303,7 +311,7 @@ public class EditorMenuController implements FileSelectedHandler {
                     Segment segment2 = getActiveRecording().split(position.getSegment(), frame, textArea.getCursorPosInCurrentSegment());
                     waveformDisplay.onSplit(position.getSegment(), segment2, frame);
                     //Reset textarea with updated recording
-                    textArea.setRecording(getActiveRecording());
+                    textArea.initialise(getActiveRecording(), position);
                     //Select the second split segment
                     maybeChangeSegment(+1);
                 } catch (IOException e) {
@@ -320,7 +328,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 getActiveRecording().join(position.getSegment(), nextSegment);
                 waveformDisplay.onJoin(position.getSegment(), nextSegment);
                 //Reset textarea with updated recording
-                textArea.setRecording(getActiveRecording());
+                textArea.initialise(getActiveRecording(), position);
                 //Reselect the current segment
                 maybeChangeSegment(0);
             } catch (IOException e) {

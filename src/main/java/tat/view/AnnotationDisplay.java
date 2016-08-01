@@ -2,27 +2,26 @@ package tat.view;
 
 import file_system.Recording;
 import file_system.Segment;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import org.eclipse.swt.graphics.TextStyle;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.StyledTextArea;
-import tat.Position;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
 import tat.PositionListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Stack;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Text;
-import static java.awt.SystemColor.text;
-import static javax.swing.UIManager.get;
+import static javafx.scene.input.KeyCode.*;
+import static javafx.scene.input.KeyCombination.SHIFT_ANY;
+import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
 
 /**
@@ -30,71 +29,36 @@ import static javax.swing.UIManager.get;
  */
 public class AnnotationDisplay extends StyleClassedTextArea implements PositionListener {
 
-    private Recording recording;
     private tat.Position position;
+    private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
-    private Segment activeSegment;
-    private IndexRange activeRange = new IndexRange(0,0);
+    private Stack<TextState> undoStates = new Stack<>();
+    private Stack<TextState> redoStates = new Stack<>();
+    private TextState currentState;
 
     private IndexRange previousSegRange;
-
-    private List<IndexRange> annotations = new ArrayList<>();
-    private String fullString = "";
-
-    private boolean textUpdated = false;
     private boolean initialised = false;
-    private final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
+    private boolean updatingText = false;
+    private boolean firstSelect = true;
 
     public AnnotationDisplay() {
         super();
         setPadding(new Insets(0,0,0,0));
+        setWrapText(true);
 
-        textProperty().addListener((observable, oldValue, newValue) -> {
-            if (initialised) {
-                int diff = newValue.length() - oldValue.length();
-
-                //Check if they have deleted a character before start
-                if (diff == -1) {
-                    if (getCaretPosition() == activeRange.getEnd()) {
-                        textUpdated = true;
-                        this.insertText(getCaretPosition(), " ");
-                        return;
-                    }
-                }
-                if (textUpdated) {
-                    textUpdated = false;
-                    return;
-                }
-                updateIndexRanges(activeRange.getStart(), diff);
-            }
-        });
+        setInputBindings();
 
         selectionProperty().addListener((observable) -> {
-            if (initialised) {
-                if (previousSegRange != null) {
-                    if (getSelection().getStart() == 0 && getSelection().getEnd() == fullString.length()) {
-                        selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
-                        previousSegRange = null;
-                        return;
-                    }
-                    previousSegRange = null;
-                }
-                if (getSelection().getLength() == 0) {
-                    if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
-                        previousSegRange = annotations.get(activeSegment.getSegmentNumber() - 1);
-                    }
-                }
-                if (getSelection().getStart() < activeRange.getStart() || getSelection().getEnd() > activeRange.getEnd()) {
-                    checkActiveSegment();
-                }
-                if (getSelection().getLength() == 0) {
-                    return;
-                }
-                if (getSelection().getEnd() > activeRange.getEnd()) {
-                    selectRange(getSelection().getStart(), activeRange.getEnd());
-                }
-                if (getSelection().getStart() < activeRange.getStart()) {
-                    selectRange(activeRange.getStart(), getSelection().getEnd());
+            if (initialised && !updatingText && getText().length() > 0) {
+                checkSelectEntireAnnotation();
+
+                IndexRange currentSelection = getSelection();
+                Segment segmentForSelection = getSegmentForSelection(currentSelection);
+                //Check if you have switched segment
+                if (currentSelection.getLength() == 0 && segmentForSelection != position.getSegment()) {
+                    position.setSelected(segmentForSelection, 0, this);
+                } else {
+                    validateSelection();
                 }
             }
         });
@@ -124,106 +88,363 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         position.addSelectedListener(this);
     }
 
-    private void checkActiveSegment() {
-        for(IndexRange i : annotations) {
-            if (getSelection().getStart() >= i.getStart() && getSelection().getEnd() <= i.getEnd()) {
-                position.setSelected(recording.getSegment(annotations.indexOf(i)+1), 0, this);
-            }
+    private void setInputBindings() {
+        //Handle regular key typed
+        Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e -> typedCharacter(e.getCharacter())));
+        //Handle backspace
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(BACK_SPACE), e -> backspaceCharacter()));
+        //Handle delete
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(DELETE), e -> deletedCharacter()));
+
+        //Handle undo
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Z, SHORTCUT_DOWN), e -> undo()));
+        //Handle redo
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN), e -> redo()));
+
+        //Disable enter, shift or no shift
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
+        //Do not allow dragging text
+        setOnSelectionDrop(a -> {});
+    }
+
+    public void undo() {
+        if (!undoStates.empty()) {
+            redoStates.push(currentState);
+            setState(undoStates.pop());
+            selectRange(currentState.selection.getStart(), currentState.selection.getEnd());
         }
     }
 
-    public void setRecording(Recording recording) {
-        reset();
-        this.recording = recording;
-        buildAnnotations();
-        initialised = true;
+    public void redo() {
+        if (!redoStates.empty()) {
+            undoStates.push(currentState);
+            setState(redoStates.pop());
+            selectRange(currentState.selection.getStart(), currentState.selection.getEnd());
+        }
     }
 
-    private void buildAnnotations() {
-        if(recording == null) {
-            //TODO: Throw error
+    @Override
+    public void selectRange(int anchor, int endPos) {
+        //Only set length of 0
+        currentState.selection = new IndexRange(anchor, anchor);
+        super.selectRange(anchor, endPos);
+    }
+
+    @Override
+    public void paste() {
+        Object data = clipboard.getContent(DataFormat.PLAIN_TEXT);
+        if (data instanceof String) {
+            //Filter newline characters
+            String str = ((String) data).replaceAll("[\n\r]", "");
+            insertTextAtCurrentPosition(str);
+        }
+    }
+
+    @Override
+    public void cut() {
+        copy();
+        backspaceCharacter();
+    }
+
+    @Override
+    public void copy() {
+        IndexRange selection = getSelection();
+        String content = getText().substring(selection.getStart(), selection.getEnd());
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(content);
+        clipboard.setContent(clipboardContent);
+    }
+
+    private void insertTextAtCurrentPosition(String text) {
+        StringBuffer newText = new StringBuffer(getActiveAnnotation().text);
+        IndexRange selection = getSelection();
+        IndexRange localSelection = getLocalSelection();
+
+        newText.replace(localSelection.getStart(), localSelection.getEnd(), text);
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
+
+        selectRange(selection.getStart() + text.length(), selection.getStart() + text.length());
+    }
+
+    private void typedCharacter(String character) {
+        //Do not register non printable characters
+        if(character.charAt(0) < 32 || character.charAt(0) > 126)
+            return;
+        insertTextAtCurrentPosition(character);
+    }
+
+    private void backspaceCharacter() {
+
+        if(getSelection().getLength() == 0 &&
+                (getSelection().getStart() == getActiveAnnotation().range.getStart())) {
             return;
         }
-        int lastIndex = 0;
-        for(int i = 1; i <= recording.getSegments().size(); i++) {
-            Segment s = recording.getSegments().get(i);
-            String annotationString;
-            if(s == null || s.getAnnotationFile().getString().trim().equals("")) {
-                annotationString = DEFAULT_TEXT;
-            } else {
-                annotationString = s.getAnnotationFile().getString().trim();
-            }
-            IndexRange range;
-            if(i == 1) {
-                fullString = annotationString;
-                range = new IndexRange(lastIndex, lastIndex + annotationString.length());
-            } else {
-                fullString = fullString + " " + annotationString;
-                range = new IndexRange(lastIndex, lastIndex + annotationString.length());
-            }
-            lastIndex = lastIndex + annotationString.length()+1;
-            annotations.add(range);
-        }
-        this.appendText(fullString);
-        this.setWrapText(true);
-    }
 
-    private void updateIndexRanges(int start, int diff) {
-        boolean updating = false;
-        for (int j = 0; j < annotations.size(); j++) {
-            IndexRange i = annotations.get(j);
-            if(i.getStart() == start) {
-                updating = true;
-                annotations.set(annotations.indexOf(i), new IndexRange(i.getStart(), i.getEnd()+diff));
-                activeSegment.getAnnotationFile().setString(getText(annotations.get(j).getStart(),
-                        annotations.get(j).getEnd()));
-            } else if(updating) {
-                annotations.set(annotations.indexOf(i), new IndexRange(i.getStart()+diff, i.getEnd()+diff));
-            }
+        StringBuffer newText = new StringBuffer(getActiveAnnotation().text);
+
+        IndexRange selection = getSelection();
+        IndexRange localSelection = getLocalSelection();
+
+        boolean single = localSelection.getLength() == 0;
+
+        if(single) {
+            localSelection = new IndexRange(localSelection.getStart()-1, localSelection.getEnd());
+        }
+
+        newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
+
+        if(single) {
+            selectRange(selection.getStart() - 1, selection.getStart() - 1);
+        } else {
+            selectRange(selection.getStart(), selection.getStart());
         }
     }
 
-    private void setActiveSegment(Segment s) {
-        activeSegment = s;
-        activeRange = annotations.get(activeSegment.getSegmentNumber()-1);
+    private void deletedCharacter() {
+        if(getSelection().getLength() == 0 &&
+                (getSelection().getEnd() == getActiveAnnotation().range.getEnd())) {
+            return;
+        }
+
+        StringBuffer newText = new StringBuffer(getActiveAnnotation().text);
+
+        IndexRange selection = getSelection();
+        IndexRange localSelection = getLocalSelection();
+
+        if(localSelection.getLength() == 0) {
+            localSelection = new IndexRange(localSelection.getStart(), localSelection.getEnd()+1);
+        }
+
+        newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
+        updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
+
+        selectRange(selection.getStart(), selection.getStart());
+    }
+
+    private void validateSelection() {
+        IndexRange newRange = new IndexRange(getSelection());
+
+        //Modify invalid selections to be valid
+        if (getSelection().getEnd() > getActiveAnnotation().range.getEnd()) {
+            newRange = new IndexRange(newRange.getStart(), getActiveAnnotation().range.getEnd());
+        }
+        if (getSelection().getStart() < getActiveAnnotation().range.getStart()) {
+            newRange = new IndexRange(getActiveAnnotation().range.getStart(), newRange.getEnd());
+        }
+        if(!newRange.equals(getSelection())) {
+            selectRange(newRange.getStart(), newRange.getEnd());
+        }
+    }
+
+    private void checkSelectEntireAnnotation() {
+        //Check if you have selected entire string after selecting start position
+        //this case only occurs when double clicking within a range, attempting to select
+        //the entire annotation for a segment
+        if (previousSegRange != null) {
+            if (getSelection().getStart() == 0 && getSelection().getEnd() == getLength()) {
+                //position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
+                selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
+                previousSegRange = null;
+                return;
+            }
+            previousSegRange = null;
+        }
+
+        //Just clicked a single place. This must be after previous check, otherwise this condition is
+        //met when the previous check should be met.
+        if (getSelection().getLength() == 0) {
+            if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
+                //Set condition for selecting entire annotation
+                previousSegRange = getActiveAnnotation().range;
+            }
+        }
+    }
+
+    public void initialise(Recording recording, tat.Position position) {
+        undoStates.empty();
+        redoStates.empty();
+
+        this.position = position;
+        position.addSelectedListener(this);
+
+        setState(new TextState(recording));
+        initialised = true;
+        firstSelect = true;
+    }
+
+    private void updateState(TextState state) {
+        undoStates.push(currentState);
+        redoStates.clear();
+        setState(state);
+    }
+
+    private void setState(TextState state) {
+        this.currentState = state;
+        state.updateRecording();
+
+        updatingText = true;
+        this.replaceText("");
+        this.appendText(state.fullString);
+        updatingText = false;
+
+        //Still better than Skype - Potentially causes performance issues - Could be removed if someone
+        //discovered a potential off by one error or something weird that may or may not exist.
+        setColours();
     }
 
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
-        if(segment != activeSegment) {
-            setActiveSegment(segment);
-            selectRange(activeRange.getStart(), activeRange.getStart());
-            setColours();
+        //We should always update our position in the text if this is the first positionChanged we recieve
+        if((initiator != this && segment != getSegmentForSelection(getSelection())) || firstSelect) {
+            firstSelect = false;
+            selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getStart());//Moves caret to start of selected annotation
         }
+        setColours();
     }
 
     public void setColours() {
-        for(IndexRange i : annotations) {
-            if (annotations.indexOf(i) == activeSegment.getSegmentNumber() - 1) {
-                setStyleClass(i.getStart(), i.getEnd(), "orange");
+        for(Annotation a : currentState.annotations) {
+            if (a.segment == position.getSegment()) {
+                setStyleClass(a.range.getStart(), a.range.getEnd(), "orange");
             } else {
-                if ((annotations.indexOf(i)+1) % 2 == 0) {
-                    setStyleClass(i.getStart(), i.getEnd(), "grey");
+                if (a.segment.getSegmentNumber() % 2 == 0) {
+                    setStyleClass(a.range.getStart(), a.range.getEnd(), "grey");
                 } else {
-                    setStyleClass(i.getStart(), i.getEnd(), "white");
+                    setStyleClass(a.range.getStart(), a.range.getEnd(), "white");
                 }
             }
         }
     }
 
-    private void reset() {
-        initialised = false;
-        recording = null;
-        activeSegment = null;
-        activeRange = new IndexRange(0,0);
-        previousSegRange = null;
-        annotations.clear();
-        fullString = "";
-        textUpdated = false;
-        replaceText("");
+    public int getCursorPosInCurrentSegment() {
+        return getSelection().getStart() - getAnnotationForSelection(getSelection()).range.getStart();
     }
 
-    public int getCursorPosInCurrentSegment() {
-        return getSelection().getStart() - activeRange.getStart();
+    private IndexRange getLocalSelection() {
+        int activeRangeStart = getActiveAnnotation().range.getStart();
+        IndexRange selection = getSelection();
+        return new IndexRange(selection.getStart() - activeRangeStart, selection.getEnd() - activeRangeStart);
+    }
+
+    private Annotation getAnnotationForSelection(IndexRange selection) {
+        for(Annotation a: currentState.annotations) {
+            if(isWithinRange(selection, a.range))
+                return a;
+        }
+        return null;
+    }
+
+    private Annotation getActiveAnnotation() {
+        for(Annotation a: currentState.annotations) {
+            if(a.segment == position.getSegment()) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    private boolean isWithinRange(IndexRange innerRange, IndexRange outerRange) {
+        return innerRange.getStart() >= outerRange.getStart() &&
+                innerRange.getEnd() <= outerRange.getEnd();
+    }
+
+    private Segment getSegmentForSelection(IndexRange selection) {
+        for(Annotation a: currentState.annotations) {
+            if(isWithinRange(selection, a.range)) {
+                return a.segment;
+            }
+        }
+        return null;
+    }
+
+    private class TextState {
+
+        public final List<Annotation> annotations = new ArrayList<>();
+        public final String fullString;
+        //Need to update this
+        public IndexRange selection;
+
+        protected TextState(Recording r) {
+            int index = 0;
+            for (Segment s : r) {
+                Annotation a = new Annotation(s, index);
+                index = a.range.getEnd() + 1;//FOR THE SPACE
+                annotations.add(a);
+            }
+            fullString = generateFullString();
+            selection = new IndexRange(0,0);
+        }
+
+        protected TextState(TextState old, Annotation changedAnnotation, String text) {
+            boolean start = false;
+            int diff = 0;
+            Annotation updatedAnnotation;
+            for (Annotation a : old.annotations) {
+                updatedAnnotation = a;
+                if (a == changedAnnotation) {
+                    start = true;
+                    updatedAnnotation = new Annotation(a, a.range.getStart(), text);
+                    //In case text is empty string
+                    diff = updatedAnnotation.text.length() - changedAnnotation.text.length();
+                } else if (start) {
+                    updatedAnnotation = new Annotation(a, a.range.getStart() + diff, a.text);
+                }
+                annotations.add(updatedAnnotation);
+            }
+            fullString = generateFullString();
+            selection = new IndexRange(0,0);
+        }
+
+        private String generateFullString() {
+            String intermediateString = "";
+            for(Annotation a : annotations) {
+                intermediateString = intermediateString + " " + a.text;
+            }
+            //Remove first space
+            return intermediateString.replaceAll("^ ", "");
+        }
+
+        private void updateRecording() {
+            annotations.forEach(Annotation::updateSegment);
+        }
+    }
+
+
+    private class Annotation {
+
+        private final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
+
+        public final IndexRange range;
+        public final Segment segment;
+        public final boolean isEmpty;
+        public final String text;
+
+        protected Annotation(Segment s, int start) {
+            this(start, s, s.getAnnotationFile().getString().trim());
+        }
+
+        protected Annotation(Annotation a, int start, String annotation) {
+            this(start, a.segment, annotation);
+        }
+
+        private Annotation(int start, Segment segment, String text) {
+            this.segment = segment;
+
+            if (text.equals("")) {
+                text = DEFAULT_TEXT;
+                isEmpty = true;
+            } else {
+                isEmpty = false;
+            }
+
+            this.text = text;
+            range = new IndexRange(start, start+text.length());
+        }
+
+        private void updateSegment() {
+            segment.getAnnotationFile().setString(text);
+        }
     }
 }
+
