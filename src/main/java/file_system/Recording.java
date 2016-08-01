@@ -80,10 +80,11 @@ public class Recording implements Iterable<Segment> {
     }
 
     public void save() throws IOException {
+        //Delete files first, so that they can be saved
+        deleteMarked();
         for (Segment segment : this) {
             segment.save();
         }
-        deleteMarked();
     }
 
     public Segment split(Segment segment1, long frame, int stringPos) throws IOException {
@@ -122,7 +123,7 @@ public class Recording implements Iterable<Segment> {
     }
 
     //Needs to be called whenever a file has an attribute change, or on a join
-    private void markFilesForDelete(List<Path> paths) {
+    protected void markFilesForDelete(List<Path> paths) {
         toDeleteOnSave.addAll(paths);
     }
 

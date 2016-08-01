@@ -76,11 +76,19 @@ public class Segment {
     }
 
     public void setSegmentNumber(int segmentNumber) {
+        attributeChanged();
         this.segmentNumber = segmentNumber;
     }
 
     public void setSpeakerId(int speakerId) {
+        attributeChanged();
         this.speakerId = speakerId;
+    }
+
+    private void attributeChanged() {
+        if (recording != null) {
+            recording.markFilesForDelete(getPossiblePaths());
+        }
     }
 
     public void setBaseName(String baseName) {
