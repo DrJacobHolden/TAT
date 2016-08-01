@@ -3,6 +3,7 @@ package tat.view;
 import file_system.Recording;
 import file_system.Segment;
 import javafx.geometry.Insets;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -73,6 +74,13 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         });
 
         setShowCaret(CaretVisibility.ON);
+    }
+
+    public void setContextMenu(ContextMenu c) {
+        //TODO: Make this work better. It does not go away yet.
+        setOnContextMenuRequested((a) -> {
+            c.show(this, a.getScreenX(), a.getScreenY());
+        });
     }
 
     private void setInputBindings() {

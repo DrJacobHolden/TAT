@@ -18,8 +18,12 @@
       -fx-background-color: transparent;
   }
 
-  .menu-item .label {
-      -fx-font-size: 26.0;
+  .menu {
+      -fx-mark-color: #e4e1f0;
+  }
+
+  .menu-item:focused {
+    -fx-background-color: #ff7c00;
   }
 
   .context-menu {

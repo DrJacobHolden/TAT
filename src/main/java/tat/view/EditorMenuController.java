@@ -187,6 +187,11 @@ public class EditorMenuController implements FileSelectedHandler {
         fileSelected(activeRecording);
     }
 
+    private void setupRightClickMenu() {
+        textArea.setContextMenu(new RightClickMenu(getActiveRecording(), this, position));
+        waveformDisplay.setContextMenu(new RightClickMenu(getActiveRecording(), this, position));
+    }
+
     public static void setupMenu(MenuButton menu) {
         menu.showingProperty().addListener((a) -> {
             if(menu.isShowing()) {
@@ -247,6 +252,7 @@ public class EditorMenuController implements FileSelectedHandler {
         textArea.initialise(getActiveRecording(), position);
         waveformDisplay.drawWaveform();
         waveformDisplay.setPosition(position);
+        setupRightClickMenu();
 
         player = new AudioPlayer(position);
 

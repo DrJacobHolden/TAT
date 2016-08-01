@@ -23,4 +23,8 @@ public class CustomAttributeInstance {
         return value;
     }
 
+    public String getName() {
+        return customAttribute.getName();
+    }
+
 }
