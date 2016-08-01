@@ -85,7 +85,7 @@ public class AnnotationFile extends BaseFileSystemElement {
     }
 
     public void join(AnnotationFile annotationFile2) {
-        annotation = annotation + annotationFile2.annotation;
+        annotation = annotation + " " + annotationFile2.annotation;
     }
 
     @Override
