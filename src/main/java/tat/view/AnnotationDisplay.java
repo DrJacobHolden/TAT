@@ -345,41 +345,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         return null;
     }
 
-    //CASES:
-        /*
-        TextState:
-            currentText - fullString
-            indexRange[]
-            selection
-
-            User Typed Valid Text within Range
-            User pushed backspace (/)
-                Valid: Inside range, not at start (/)
-                Invalid: At start of range
-                       sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
-            User pushed delete (/)
-                Valid: Inside range, not at end (/)
-                Invalid: At end of range
-                        sets prevUndoAction to top of undo stack or whatever unless prevUndoAction is !null
-            Enter:
-                Consume (/)
-            Cut:
-                Same as delete (/)
-            Drag:
-                Consume (/)
-            Selections:
-                ValidateSelections (/)
-                Deleted selected text: (/)
-            Insert:
-                Out of scope (/)
-
-
-             Ctrl + Z:
-                Consume (/), undo redo and implement own
-             Ctrl + Y:
-                Consume (/), implement own redo and undo
-
-         */
     private class TextState {
 
         public final List<Annotation> annotations = new ArrayList<>();
