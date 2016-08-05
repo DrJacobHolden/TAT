@@ -41,3 +41,55 @@
     -fx-font-size: 24;
     -fx-caret-blink-rate: 0.5;
   }
+
+  /** Scrollbars */
+
+  .scrollBarOverride .scroll-bar:horizontal,
+  .scrollBarOverride .scroll-bar:vertical {
+      -fx-background-color:#2b2934;
+  }
+
+  .scrollBarOverride .scroll-bar:horizontal .increment-button,
+  .scrollBarOverride .scroll-bar:horizontal .decrement-button {
+      -fx-background-color:transparent;
+      -fx-background-radius: 0em;
+      -fx-padding: 10 0 10 0;
+  }
+
+  .scrollBarOverride .increment-arrow,
+    .scrollBarOverride .decrement-arrow {
+        -fx-shape: " ";
+        -fx-padding: 0;
+    }
+
+  /* The main scrollbar **track** CSS class  */
+  .scrollBarOverride .scroll-bar:horizontal .track ,
+  .scrollBarOverride .scroll-bar:vertical .track{
+     -fx-background-color: transparent;
+     -fx-border-color:transparent;
+  	 -fx-background-radius: 0em;
+  	 -fx-border-radius: 2em;
+  }
+
+  /* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+  .scrollBarOverride .scroll-bar:horizontal .thumb,
+  .scrollBarOverride .scroll-bar:vertical .thumb {
+      -fx-background-color:#e4e1f0;
+  	-fx-background-insets: 2, 0, 0;
+  	-fx-background-radius: 0em;
+
+  }
+
+  .scrollBarOverride .scroll-bar:horizontal:hover .track ,
+  .scrollBarOverride .scroll-bar:horizontal:pressed .track ,
+  .scrollBarOverride .scroll-bar:vertical:hover .track,
+  .scrollBarOverride .scroll-bar:vertical:pressed .track{
+     -fx-background-color: #34323d;
+  	 -fx-opacity: 0.2;
+  	 -fx-background-radius: 0em;
+  }
+
+  .scrollBarOverride .scroll-bar .thumb:hover,
+  .scrollBarOverride .scroll-bar .thumb:pressed{
+      -fx-background-color: #ff7c00;
+  }

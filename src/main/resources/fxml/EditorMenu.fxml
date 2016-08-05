@@ -48,7 +48,7 @@
                         <Insets left="16.0" />
                      </HBox.margin>
                      <children>
-                        <WaveformDisplay fx:id="waveformDisplay" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" StackPane.alignment="BOTTOM_RIGHT" />
+                        <WaveformDisplay fx:id="waveformDisplay" styleClass="scrollBarOverride" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" StackPane.alignment="BOTTOM_RIGHT" />
                         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="31.25" minWidth="62.5" prefHeight="62.5" prefWidth="125.0" StackPane.alignment="TOP_RIGHT">
                            <children>
                               <IconButton fx:id="zoomInButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
