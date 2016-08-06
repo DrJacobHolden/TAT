@@ -3,7 +3,10 @@ package tat.view;
 import file_system.Recording;
 import file_system.Segment;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -94,9 +97,21 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     private double getInternalHeight() {
-        //Scroll bar is 13 pixels tall
-        //TODO: Obtain dynamically
-        return getHeight()-getInsets().getBottom()-getInsets().getTop()-13;
+        //The width is the height we are interested in on the scrollbar
+        double scrollbarHeight = 0;
+        if (getHorizontalScrollbar() != null) {
+            scrollbarHeight = getHorizontalScrollbar().getWidth();
+        }
+        return getHeight()-getInsets().getBottom()-getInsets().getTop()-scrollbarHeight;
+    }
+
+    private ScrollBar getHorizontalScrollbar() {
+        for (Node node : this.lookupAll(".scroll-bar")) {
+            if (node instanceof ScrollBar && ((ScrollBar) node).getOrientation() == Orientation.HORIZONTAL) {
+                return (ScrollBar) node;
+            }
+        }
+        return null;
     }
 
     private void resizeHeight() {
