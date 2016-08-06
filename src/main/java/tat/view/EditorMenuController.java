@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.fxmisc.wellbehaved.event.*;
@@ -257,13 +258,36 @@ public class EditorMenuController implements FileSelectedHandler {
         player = new AudioPlayer(position);
 
         position.setSelected(getActiveRecording().getSegment(1), 0, this);
-        bindKeyboardSelectTextarea();
+        bindKeyEvents();
     }
 
-    private void bindKeyboardSelectTextarea() {
-        main.rootLayout.getChildrenUnmodifiable().stream()
-                .filter(a -> a != textArea)
-                .forEach(a -> Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> textArea.requestFocus())));
+    private void bindKeyEvents() {
+        main.rootLayout.getChildrenUnmodifiable().stream().forEach(a ->
+            Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> {
+                if (e.getCode().equals(KeyCode.P) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    if (!player.isPlaying()) {
+                        playButton.fire();
+                    } else {
+                        pauseButton.fire();
+                    }
+                    e.consume();
+                } else if (e.getCode().equals(KeyCode.I) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    prevSegmentButton.fire();
+                    e.consume();
+                } else if (e.getCode().equals(KeyCode.O) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    nextSegmentButton.fire();
+                    e.consume();
+                } else if (e.getCode().equals(KeyCode.H) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    splitButton.fire();
+                    e.consume();
+                } else if (e.getCode().equals(KeyCode.J) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    joinButton.fire();
+                    e.consume();
+                } else if (a != textArea) {
+                    //Text area should be focused. Do no consume.
+                    textArea.requestFocus();
+                }
+            })));
     }
 
     private void bindPlayerButtons() {
