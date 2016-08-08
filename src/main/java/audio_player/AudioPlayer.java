@@ -21,6 +21,9 @@ public class AudioPlayer implements PositionListener {
     private Clip clip;
     private Timer positionListenerTimer;
 
+    private int stopPosition = 0;
+    private boolean paused = false;
+
     private final long AUDIO_POSITION_UPDATE_INTERVAL = 20;
 
     /**
@@ -55,6 +58,9 @@ public class AudioPlayer implements PositionListener {
             }
             //Stop giving regular updates of position if stopped
             else if (event.getType() == LineEvent.Type.STOP) {
+                if (!paused) {
+                    clip.setFramePosition(stopPosition);
+                }
                 notifyPositionChanged();
                 positionListenerTimer.cancel();
             }
@@ -62,6 +68,7 @@ public class AudioPlayer implements PositionListener {
     }
 
     public void play() {
+        paused = false;
         //This is the case after saving
         if (!clip.isOpen()) {
             try {
@@ -71,6 +78,7 @@ public class AudioPlayer implements PositionListener {
                 e.printStackTrace();
             }
         }
+        clip.setFramePosition(stopPosition);
         clip.start();
     }
 
@@ -79,13 +87,16 @@ public class AudioPlayer implements PositionListener {
     }
 
     public void pause() {
+        stopPosition = clip.getFramePosition();
+        paused = true;
         clip.stop();
         notifyPositionChanged();
     }
 
     public void stop() {
+        paused = false;
         clip.stop();
-        clip.setFramePosition(0);
+        clip.setFramePosition(stopPosition);
         notifyPositionChanged();
     }
 
@@ -111,6 +122,7 @@ public class AudioPlayer implements PositionListener {
                     }
                     loadSegment(segment);
                 }
+                stopPosition = frame;
                 clip.setFramePosition(frame);
 
                 if (isPlaying) {
@@ -123,6 +135,7 @@ public class AudioPlayer implements PositionListener {
     }
 
     private void loadSegment(Segment segment) throws IOException, LineUnavailableException {
+        stopPosition = 0;
         closeOpenFiles();
         this.segment = segment;
         clip.close();
