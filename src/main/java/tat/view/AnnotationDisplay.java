@@ -65,9 +65,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 }
 
                 //Select whole segment if segment contains default text
-                if (getActiveAnnotation().isEmpty()){ //&& !getActiveAnnotation().range.equals(newRange)) {
+                if (getActiveAnnotation().isEmpty()){
                     selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getEnd());
-                    return;
                 }
             }
         });
