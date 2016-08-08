@@ -299,6 +299,10 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     private void maybeChangeSegment(int offset) {
+        //Jump to start of current if not at the beginning
+        if (offset < 0 && position.getFrame() != 0) {
+            offset++;
+        }
         Segment newSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber() + offset);
         if (newSegment != null) {
             position.setSelected(newSegment, 0, this);
