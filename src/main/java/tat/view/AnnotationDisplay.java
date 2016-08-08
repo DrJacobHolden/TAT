@@ -116,7 +116,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private void maybeMoveCursorToSegmentOffset(int offset) {
         Segment nextSegment = recording.getSegment(getActiveAnnotation().segment.getSegmentNumber()+offset);
         if (nextSegment != null) {
-            //Dirty hack to
             position.setSelected(nextSegment, 0, nextSegment);
         }
     }
