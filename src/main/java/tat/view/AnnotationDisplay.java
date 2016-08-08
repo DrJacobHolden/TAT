@@ -17,6 +17,7 @@ import tat.PositionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.BooleanSupplier;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.SHIFT_ANY;
@@ -40,6 +41,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     private boolean initialised = false;
     private boolean updatingText = false;
     private boolean firstSelect = true;
+    private Recording recording;
 
     public AnnotationDisplay() {
         super();
@@ -54,21 +56,17 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
                 IndexRange currentSelection = getSelection();
                 Segment segmentForSelection = getSegmentForSelection(currentSelection);
+
                 //Check if you have switched segment
                 if (currentSelection.getLength() == 0 && segmentForSelection != position.getSegment()) {
                     position.setSelected(segmentForSelection, 0, this);
                 } else {
                     validateSelection();
                 }
-            }
-        });
 
-        focusedProperty().addListener((observable, oldVal, newVal) -> {
-            if (initialised) {
-                if (newVal) {
-                    //TODO: Start blinking
-                } else {
-                    //TODO: Stop blinking
+                //Select whole segment if segment contains default text
+                if (getActiveAnnotation().isEmpty()){
+                    selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getEnd());
                 }
             }
         });
@@ -96,10 +94,30 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //Handle redo
         Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN), e -> redo()));
 
+        //Allow moving segments when entire segment is selected when pressing left or right
+        Nodes.addInputMap(this, InputMap.consumeWhen(keyPressed(LEFT), this::entireAnnotationSelected,
+                e -> maybeMoveCursorToSegmentOffset(-1)));
+        Nodes.addInputMap(this, InputMap.consumeWhen(keyPressed(RIGHT), this::entireAnnotationSelected,
+                e -> maybeMoveCursorToSegmentOffset(+1)));
+
         //Disable enter, shift or no shift
         Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
         //Do not allow dragging text
         setOnSelectionDrop(a -> {});
+    }
+
+    private boolean entireAnnotationSelected() {
+        return getActiveAnnotation().range.equals(getSelection());
+    }
+
+    /**
+     * Move the cursor to either the next segment, or previous, specified by offset
+     */
+    private void maybeMoveCursorToSegmentOffset(int offset) {
+        Segment nextSegment = recording.getSegment(getActiveAnnotation().segment.getSegmentNumber()+offset);
+        if (nextSegment != null) {
+            position.setSelected(nextSegment, 0, nextSegment);
+        }
     }
 
     public void undo() {
@@ -260,6 +278,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         undoStates.empty();
         redoStates.empty();
 
+        this.recording = recording;
         this.position = position;
         position.addSelectedListener(this);
 
@@ -412,7 +431,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
         public final IndexRange range;
         public final Segment segment;
-        public final boolean isEmpty;
         public final String text;
 
         protected Annotation(Segment s, int start) {
@@ -428,13 +446,15 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
             if (text.equals("")) {
                 text = DEFAULT_TEXT;
-                isEmpty = true;
             } else {
-                isEmpty = false;
             }
 
             this.text = text;
             range = new IndexRange(start, start+text.length());
+        }
+
+        private boolean isEmpty() {
+            return text.equals(DEFAULT_TEXT);
         }
 
         private void updateSegment() {
