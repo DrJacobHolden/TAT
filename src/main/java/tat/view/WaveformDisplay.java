@@ -97,21 +97,9 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     private double getInternalHeight() {
-        //The width is the height we are interested in on the scrollbar
-        double scrollbarHeight = 0;
-        if (getHorizontalScrollbar() != null) {
-            scrollbarHeight = getHorizontalScrollbar().getWidth();
-        }
+        //This is not set when we start, so it was easier to just hardcode it
+        double scrollbarHeight = 20;
         return getHeight()-getInsets().getBottom()-getInsets().getTop()-scrollbarHeight;
-    }
-
-    private ScrollBar getHorizontalScrollbar() {
-        for (Node node : this.lookupAll(".scroll-bar")) {
-            if (node instanceof ScrollBar && ((ScrollBar) node).getOrientation() == Orientation.HORIZONTAL) {
-                return (ScrollBar) node;
-            }
-        }
-        return null;
     }
 
     private void resizeHeight() {
