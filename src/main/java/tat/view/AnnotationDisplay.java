@@ -30,6 +30,8 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
  */
 public class AnnotationDisplay extends StyleClassedTextArea implements PositionListener {
 
+    public static final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
+
     private tat.Position position;
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
@@ -426,9 +428,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
 
     private class Annotation {
-
-        private final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
-
         public final IndexRange range;
         public final Segment segment;
         public final String text;

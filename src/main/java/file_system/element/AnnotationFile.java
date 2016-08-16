@@ -1,6 +1,7 @@
 package file_system.element;
 
 import file_system.Segment;
+import tat.view.AnnotationDisplay;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,7 +86,13 @@ public class AnnotationFile extends BaseFileSystemElement {
     }
 
     public void join(AnnotationFile annotationFile2) {
-        annotation = annotation + " " + annotationFile2.annotation;
+        annotation = (isEmpty() ? "" : annotation) + " " +
+                (annotationFile2.isEmpty() ? "" : annotationFile2.annotation);
+    }
+
+    public boolean isEmpty() {
+        String stripped = getString().trim();
+        return (stripped.equals("") || stripped.equals(AnnotationDisplay.DEFAULT_TEXT));
     }
 
     @Override
