@@ -39,8 +39,7 @@ public class AnnotationFile extends BaseFileSystemElement {
     public AnnotationFile(Segment segment, File file) {
         this.segment = segment;
         try {
-            byte[] encoded = Files.readAllBytes(file.toPath());
-            this.annotation = new String(encoded, ENCODING);
+            loadFromFile(file);
         } catch (IOException e) {
             //Meh, we tried. Annotation can be empty string.
             LOGGER.info("Failed to load annotation file.");
@@ -51,12 +50,16 @@ public class AnnotationFile extends BaseFileSystemElement {
         this.segment = segment;
         try {
             File file = getFileForPath(path);
-            byte[] encoded = Files.readAllBytes(file.toPath());
-            this.annotation = new String(encoded, ENCODING);
+            loadFromFile(file);
         } catch (IOException e) {
             //Meh, we tried. Annotation can be empty string.
             LOGGER.info("Couldn't find file at "+path+" with extensions "+ Arrays.toString(getFileExtensions()));
         }
+    }
+
+    private void loadFromFile(File file) throws IOException {
+        byte[] encoded = Files.readAllBytes(file.toPath());
+        this.annotation = new String(encoded, ENCODING).trim();
     }
 
     @Override
@@ -79,7 +82,14 @@ public class AnnotationFile extends BaseFileSystemElement {
     }
 
     public void setString(String s) {
-        annotation = s;
+        s = s.trim();
+        if (s.equals(AnnotationDisplay.DEFAULT_TEXT)) {
+            s = "";
+        }
+        if (!s.equals(annotation)) {
+            segment.getRecording().invalidateSave();
+            annotation = s;
+        }
     }
 
     public AnnotationFile split(Segment newSegment, int strPos) {
@@ -91,13 +101,12 @@ public class AnnotationFile extends BaseFileSystemElement {
     }
 
     public void join(AnnotationFile annotationFile2) {
-        annotation = (isEmpty() ? "" : annotation) + " " +
-                (annotationFile2.isEmpty() ? "" : annotationFile2.annotation);
+        annotation = (annotation + " " + annotationFile2.annotation).trim();
     }
 
     public boolean isEmpty() {
         String stripped = getString().trim();
-        return (stripped.equals("") || stripped.equals(AnnotationDisplay.DEFAULT_TEXT));
+        return stripped.equals("");
     }
 
     @Override

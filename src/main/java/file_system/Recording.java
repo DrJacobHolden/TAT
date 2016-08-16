@@ -16,6 +16,16 @@ import java.util.*;
  */
 public class Recording implements Iterable<Segment> {
 
+    private boolean saveIsUpToDate = true;
+
+    public void invalidateSave() {
+        saveIsUpToDate = false;
+    }
+
+    public boolean saveIsUpToDate() {
+        return saveIsUpToDate;
+    }
+
     public Map<Integer, Segment> getSegments() {
         return segments;
     }
@@ -87,6 +97,7 @@ public class Recording implements Iterable<Segment> {
         for (Segment segment : this) {
             segment.save();
         }
+        saveIsUpToDate = true;
     }
 
     public Segment split(Segment segment1, long frame, int stringPos) throws IOException {
@@ -109,6 +120,7 @@ public class Recording implements Iterable<Segment> {
         segments.put(segment2.getSegmentNumber(), segment2);
         size++;
         assertCorrectOrdering();
+        invalidateSave();
         return segment2;
     }
 
@@ -177,6 +189,7 @@ public class Recording implements Iterable<Segment> {
         }
         size--;
         assertCorrectOrdering();
+        invalidateSave();
         return segment1;
     }
 

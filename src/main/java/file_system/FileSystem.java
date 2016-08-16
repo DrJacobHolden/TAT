@@ -230,6 +230,7 @@ public class FileSystem implements Iterable<Recording> {
             }
 
             Recording recording = new Recording(baseName);
+            recording.invalidateSave();
             recording.addSegment(segment);
             recordings.put(baseName, recording);
             return recording;

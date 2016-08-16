@@ -364,6 +364,9 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     public boolean createSaveDialog() {
+        if (getActiveRecording().saveIsUpToDate()) {
+            return true;
+        }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Save Recording?");
         alert.setHeaderText(null);
