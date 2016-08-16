@@ -61,7 +61,6 @@ public class AudioPlayer implements PositionListener {
                 if (!paused) {
                     clip.setFramePosition(stopPosition);
                 }
-                notifyPositionChanged();
                 positionListenerTimer.cancel();
             }
         });
