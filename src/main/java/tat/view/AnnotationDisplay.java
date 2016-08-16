@@ -96,11 +96,15 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //Handle redo
         Nodes.addInputMap(this, InputMap.consume(keyPressed(Y, SHORTCUT_DOWN), e -> redo()));
 
+        //Handle tab
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(TAB), e -> maybeMoveCursorToSegmentOffset(+1, true)));
+
+
         //Allow moving segments when entire segment is selected when pressing left or right
         Nodes.addInputMap(this, InputMap.consumeWhen(keyPressed(LEFT), this::entireAnnotationSelected,
-                e -> maybeMoveCursorToSegmentOffset(-1)));
+                e -> maybeMoveCursorToSegmentOffset(-1, false)));
         Nodes.addInputMap(this, InputMap.consumeWhen(keyPressed(RIGHT), this::entireAnnotationSelected,
-                e -> maybeMoveCursorToSegmentOffset(+1)));
+                e -> maybeMoveCursorToSegmentOffset(+1, false)));
 
         //Disable enter, shift or no shift
         Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
@@ -115,8 +119,13 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     /**
      * Move the cursor to either the next segment, or previous, specified by offset
      */
-    private void maybeMoveCursorToSegmentOffset(int offset) {
-        Segment nextSegment = recording.getSegment(getActiveAnnotation().segment.getSegmentNumber()+offset);
+    private void maybeMoveCursorToSegmentOffset(int offset, boolean loopAround) {
+        int segmentNum = getActiveAnnotation().segment.getSegmentNumber()+offset;
+        if (loopAround) {
+            segmentNum = ((segmentNum-1) % currentState.annotations.size()) + 1;
+        }
+        
+        Segment nextSegment = recording.getSegment(segmentNum);
         if (nextSegment != null) {
             position.setSelected(nextSegment, 0, nextSegment);
         }
