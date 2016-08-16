@@ -367,36 +367,22 @@ public class EditorMenuController implements FileSelectedHandler {
         if (getActiveRecording().saveIsUpToDate()) {
             return true;
         }
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Save Recording?");
-        alert.setHeaderText(null);
-        alert.setContentText("Would you like to save your recording? Unsaved changes will be lost.");
-        alert.setGraphic(null);
 
-        alert.initOwner(p);
+        DialogBox dialog = new DialogBox("Save Recording?", "Would you like to save your recording? Unsaved changes will be lost.",
+                new DialogBox.DialogOption[]{DialogBox.DialogOption.YES, DialogBox.DialogOption.NO, DialogBox.DialogOption.CANCEL});
 
-        ButtonType buttonYes = new ButtonType("Yes");
-        ButtonType buttonNo = new ButtonType("No");
-        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(buttonYes, buttonNo, buttonTypeCancel);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.get() == buttonNo) {
+        DialogBox.DialogOption result = dialog.showAndGetResult();
+        if(result == DialogBox.DialogOption.NO) {
             //Don't save
             return true;
-        } else if(result.get() == buttonYes) {
+        } else if(result == DialogBox.DialogOption.YES) {
             //Save
             //Allow files to be overridden
             try {
                 player.closeOpenFiles();
                 getActiveRecording().save();
             } catch (Exception e) {
-                Main.createInfoDialog("Error: Saving Files", "Files were unable to be saved due to an unknown error." +
-                        " Sorry.", Alert.AlertType.INFORMATION);
+                new DialogBox("Error: Saving Files", "Files were unable to be saved due to an unknown error. Sorry.").showAndGetResult();
                 //Cancel file switch so that changes are not lost
                 return false;
             }
