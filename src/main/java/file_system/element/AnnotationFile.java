@@ -62,11 +62,16 @@ public class AnnotationFile extends BaseFileSystemElement {
     @Override
     public void save() throws FileNotFoundException {
         File saveFile = Paths.get(segment.getPath(this).toString() + (FILE_EXTENSIONS[0])).toFile();
-        //Ensure directory exists
-        saveFile.toPath().getParent().toFile().mkdirs();
-        PrintWriter out = new PrintWriter(saveFile);
-        out.println(isEmpty() ? "" : annotation);
-        out.close();
+        if (!isEmpty()) {
+            //Ensure directory exists
+            saveFile.toPath().getParent().toFile().mkdirs();
+            PrintWriter out = new PrintWriter(saveFile);
+            out.println(annotation);
+            out.close();
+        } else {
+            //Delete empty annotation if it exists
+            saveFile.delete();
+        }
     }
 
     public String getString() {
