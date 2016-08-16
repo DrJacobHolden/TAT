@@ -65,7 +65,7 @@ public class AnnotationFile extends BaseFileSystemElement {
         //Ensure directory exists
         saveFile.toPath().getParent().toFile().mkdirs();
         PrintWriter out = new PrintWriter(saveFile);
-        out.println(annotation);
+        out.println(isEmpty() ? "" : annotation);
         out.close();
     }
 
