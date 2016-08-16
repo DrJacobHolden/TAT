@@ -4,7 +4,6 @@ import file_system.Recording;
 import file_system.Segment;
 import file_system.attribute.CustomAttribute;
 import file_system.attribute.CustomAttributeInstance;
-import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -14,11 +13,7 @@ import tat.Position;
 import tat.PositionListener;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static java.awt.Color.orange;
-import static java.awt.SystemColor.menu;
 import static tat.Main.p;
 
 /**
@@ -53,7 +48,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
      * - Add Custom Field (/)
      */
 
-    private MenuItem enableOrDisable;
+    private MenuItem removeSegment;
     private MenuItem rename;
 
     private Menu speakerMenu;
@@ -68,8 +63,8 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         p.addSelectedListener(this);
 
-        enableOrDisable = createMenuItem("Disable", false, () -> {
-
+        removeSegment = createMenuItem("Remove", false, () -> {
+            e.removeSegment(activeSegment);
         });
         rename = createMenuItem("Rename", false, () -> {
 
@@ -79,7 +74,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         speakerMenu = createSpeakerMenu();
 
-        this.getItems().addAll(enableOrDisable, rename, sep, speakerMenu);
+        this.getItems().addAll(removeSegment, rename, sep, speakerMenu);
 
         this.setOnShowing((a) -> {
             refreshCustomAttributes();

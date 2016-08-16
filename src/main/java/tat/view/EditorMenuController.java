@@ -404,4 +404,30 @@ public class EditorMenuController implements FileSelectedHandler {
         }
         return false;
     }
+
+    public void removeSegment(Segment toRemove) {
+        if (getActiveRecording().size() > 1) {
+            DialogBox dialog = new DialogBox("Delete Segment?", "Are you sure you wish to delete the selected segment?",
+                    new DialogBox.DialogOption[]{DialogBox.DialogOption.YES, DialogBox.DialogOption.NO});
+            if (dialog.showAndGetResult() == DialogBox.DialogOption.YES) {
+
+                boolean wasLastSegment = toRemove.getSegmentNumber() == getActiveRecording().size();
+
+                getActiveRecording().removeSegment(toRemove);
+                textArea.initialise(getActiveRecording(), position);
+
+                waveformDisplay.onRemove(toRemove);
+                textArea.initialise(getActiveRecording(), position);
+
+                if (wasLastSegment) {
+                    //One fewer active recording
+                    maybeChangeSegment(-2);
+                } else {
+                    maybeChangeSegment(0);
+                }
+            }
+        } else {
+            new DialogBox("Error: Cannot remove", "A recording must contain at least one segment").showAndGetResult();
+        }
+    }
 }
