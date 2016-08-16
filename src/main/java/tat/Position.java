@@ -28,10 +28,12 @@ public class Position {
     }
 
     public void setSelected(Segment segment, int frame, Object initiator) {
-        this.segment = segment;
-        this.frame = frame;
-        System.out.println("Selected " + frame);
-        positionListeners.stream().forEach(l -> l.positionChanged(segment, frame, initiator));
+        if (segment != this.segment || frame != this.frame) {
+            this.segment = segment;
+            this.frame = frame;
+            System.out.println("Selected segment: " + segment.getSegmentNumber() + " frame: " + frame + " from " + initiator);
+            positionListeners.stream().forEach(l -> l.positionChanged(segment, frame, initiator));
+        }
     }
 }
 
