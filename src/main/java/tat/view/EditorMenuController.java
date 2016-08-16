@@ -235,8 +235,10 @@ public class EditorMenuController implements FileSelectedHandler {
             menuItems.add(mu);
             mu.setOnAction(event -> fileHandler.fileSelected(recording.getBaseName()));
         }
-        if(size > 0) {
+        if (size > 0) {
             fileMenu.setText("" + size + " File(s)");
+        } else {
+            fileMenu.setText("No files");
         }
     }
 

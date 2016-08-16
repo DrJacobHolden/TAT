@@ -20,7 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.eclipse.swt.graphics.TextStyle;
 import tat.GlobalConfiguration;
 import tat.Main;
 import tat.TimerHandler;
@@ -205,7 +204,7 @@ public class MainMenuController implements FileSelectedHandler {
         loadFunctionality();
     }
 
-    private void setCorpusPath() {
+    private void loadLastUsedCorpus() {
         Path path = GlobalConfiguration.getInstance().getCorpusPath();
         if (path != null) {
             try {
@@ -226,7 +225,7 @@ public class MainMenuController implements FileSelectedHandler {
         this.primaryStage = primaryStage;
 
         //Main must be set before setting main.filesystem
-        setCorpusPath();
+        loadLastUsedCorpus();
         EditorMenuController.setupMenu(fileMenu);
         EditorMenuController.setFileSelectedHandler(this);
     }
