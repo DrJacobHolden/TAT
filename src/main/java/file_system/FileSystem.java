@@ -32,7 +32,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
  *
  * PATHS MUST BE IN UNIX FORMAT. / INSTEAD OF \
  */
-public class FileSystem {
+public class FileSystem implements Iterable<Recording> {
 
     private static Logger LOGGER = Logger.getLogger(FileSystem.class.getName());
     private static final String CONFIG_FILE = "config.xml";
@@ -251,6 +251,10 @@ public class FileSystem {
         }
     }
 
+    @Override
+    public Iterator<Recording> iterator() {
+        return recordings.values().iterator();
+    }
 }
 
 class TokenMatch implements Comparable<TokenMatch> {

@@ -66,7 +66,7 @@ public class Recording implements Iterable<Segment> {
     }
 
     public static Map<String, Recording> groupSegments(List<Segment> segments) {
-        Map<String, Recording> recordingMap = new HashMap<>();
+        TreeMap<String, Recording> recordingMap = new TreeMap<>();
 
         for (Segment segment : segments) {
             String baseName = segment.getBaseName();

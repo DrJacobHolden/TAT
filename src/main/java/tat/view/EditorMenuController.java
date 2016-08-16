@@ -226,24 +226,17 @@ public class EditorMenuController implements FileSelectedHandler {
     public static void populateFileMenu(FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
         ObservableList<MenuItem> menuItems = fileMenu.getItems();
         menuItems.clear();
-        Set<String> recordings = fileSystem.recordings.keySet();
-        List<String> recordingsSorted = asSortedList(recordings);
-        for(String name : recordingsSorted) {
-            SizingMenuItem mu;
-            boolean isActive = activeRecording != null && activeRecording.equals(name);
-
-            Recording recording = fileSystem.recordings.get(name);
-            String displayName = name;
-            if (recording.hasNoAnnotation()) {
-                displayName = "* " + displayName;
-            }
-            mu = new SizingMenuItem(fileMenu, displayName, isActive);
+        int size = 0;
+        for(Recording recording : fileSystem) {
+            size++;
+            String displayName = (recording.hasNoAnnotation() ? "* " : "") + recording.getBaseName();
+            SizingMenuItem mu = new SizingMenuItem(fileMenu, displayName, recording.getBaseName().equals(activeRecording));
 
             menuItems.add(mu);
-            mu.setOnAction(event -> fileHandler.fileSelected(name));
+            mu.setOnAction(event -> fileHandler.fileSelected(recording.getBaseName()));
         }
-        if(recordings.size() > 0) {
-            fileMenu.setText(recordings.size() + " File(s)");
+        if(size > 0) {
+            fileMenu.setText("" + size + " File(s)");
         }
     }
 
