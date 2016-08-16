@@ -230,11 +230,14 @@ public class EditorMenuController implements FileSelectedHandler {
         List<String> recordingsSorted = asSortedList(recordings);
         for(String name : recordingsSorted) {
             SizingMenuItem mu;
-            if(activeRecording != null && activeRecording.equals(name)) {
-                mu = new SizingMenuItem(fileMenu, name, true);
-            } else {
-                mu = new SizingMenuItem(fileMenu, name, false);
+            boolean isActive = activeRecording != null && activeRecording.equals(name);
+
+            Recording recording = fileSystem.recordings.get(name);
+            String displayName = name;
+            if (recording.hasNoAnnotation()) {
+                displayName = "* " + displayName;
             }
+            mu = new SizingMenuItem(fileMenu, displayName, isActive);
 
             menuItems.add(mu);
             mu.setOnAction(event -> fileHandler.fileSelected(name));

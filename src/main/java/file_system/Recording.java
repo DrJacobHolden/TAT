@@ -1,6 +1,8 @@
 package file_system;
 
 import file_system.element.AlignmentFile;
+import file_system.element.AnnotationFile;
+import ui.text_box.Annotation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -193,5 +195,13 @@ public class Recording implements Iterable<Segment> {
                 return getSegment(index-1);
             }
         };
+    }
+
+    public boolean hasNoAnnotation() {
+        boolean hasAnnotation = false;
+        for (Segment seg : this) {
+            hasAnnotation = hasAnnotation || !seg.getAnnotationFile().isEmpty();
+        }
+        return !hasAnnotation;
     }
 }
