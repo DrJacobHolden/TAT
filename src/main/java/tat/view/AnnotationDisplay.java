@@ -66,8 +66,9 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                     validateSelection();
                 }
 
-                //Select whole segment if segment contains default text
-                if (getActiveAnnotation().isEmpty()){
+                //Select whole segment if segment contains default text AND we are not in part of a triple click
+                // (or else the first segment will be selected).
+                if (getActiveAnnotation().isEmpty() && previousSegRange == null){
                     selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getEnd());
                 }
             }
@@ -267,7 +268,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //the entire annotation for a segment
         if (previousSegRange != null) {
             if (getSelection().getStart() == 0 && getSelection().getEnd() == getLength()) {
-                //position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
+                position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
+                System.out.println("Selecting range: " + getActiveAnnotation().range.getStart() + " " + getActiveAnnotation().range.getEnd());
                 selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
                 previousSegRange = null;
                 return;
@@ -280,6 +282,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (getSelection().getLength() == 0) {
             if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
                 //Set condition for selecting entire annotation
+                System.out.println(getActiveAnnotation().range.getStart() + " " + getActiveAnnotation().range.getEnd());
                 previousSegRange = getActiveAnnotation().range;
             }
         }
@@ -323,7 +326,9 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //We should always update our position in the text if this is the first positionChanged we recieve
         if((initiator != this && segment != getSegmentForSelection(getSelection())) || firstSelect) {
             firstSelect = false;
-            selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getStart());//Moves caret to start of selected annotation
+
+            Annotation active = getActiveAnnotation();
+            selectRange(active.range.getStart(), active.isEmpty() ? active.range.getEnd() : active.range.getStart());
         }
         setColours();
     }
