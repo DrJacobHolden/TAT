@@ -203,6 +203,13 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         resetColours();
     }
 
+    public void onRemove(Segment removed) {
+        WaveformSegment waveformSegment = imageViews.get(removed.getSegmentNumber()-1);
+        removeWaveform(waveformSegment);
+        resetColours();
+        setZoomFactor(1);
+    }
+
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
         WaveformSegment iv = imageViewForSegment(segment);
