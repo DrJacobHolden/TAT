@@ -135,15 +135,8 @@ public class AudioPlayer implements PositionListener {
 
     private void loadSegment(Segment segment) throws IOException, LineUnavailableException {
         stopPosition = 0;
-        closeOpenFiles();
         this.segment = segment;
         clip.close();
         clip.open(segment.getAudioFile().getAudioStream());
-    }
-
-    public void closeOpenFiles() throws IOException {
-        if (clip != null) {
-            clip.close();
-        }
     }
 }

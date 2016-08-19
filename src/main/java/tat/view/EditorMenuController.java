@@ -320,8 +320,6 @@ public class EditorMenuController implements FileSelectedHandler {
     private void bindSaveButton() {
         saveButton.setOnAction(event -> {
             try {
-                //Allow files to be overridden
-                player.closeOpenFiles();
                 getActiveRecording().save();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -379,7 +377,6 @@ public class EditorMenuController implements FileSelectedHandler {
             //Save
             //Allow files to be overridden
             try {
-                player.closeOpenFiles();
                 getActiveRecording().save();
             } catch (Exception e) {
                 new DialogBox("Error: Saving Files", "Files were unable to be saved due to an unknown error. Sorry.").showAndGetResult();
