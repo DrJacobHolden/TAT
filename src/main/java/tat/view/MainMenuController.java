@@ -104,7 +104,7 @@ public class MainMenuController implements FileSelectedHandler {
             addAnnotationFile(file);
     }
 
-    private FileChooser getFileChooser(String type, String[] extensions) {
+    public FileChooser getFileChooser(String type, String[] extensions) {
         final FileChooser chooser = new FileChooser();
 
         extensions = Arrays.stream(extensions).map(ext -> "*" + ext).toArray(String[]::new);
@@ -167,7 +167,7 @@ public class MainMenuController implements FileSelectedHandler {
         }
 
         editor = loader.getController();
-        editor.setup(main, primaryStage, file);
+        editor.setup(main, primaryStage, file, this);
 
         // Show the scene containing the root layout.
         Scene scene = new Scene(main.rootLayout);
@@ -300,27 +300,13 @@ public class MainMenuController implements FileSelectedHandler {
                 addAnnotationFile(f);
             }
             for (File f: alignmentFiles.values()) {
-                String name = getBasename(f);
-                Recording r = main.fileSystem.recordings.get(name);
-                if(r != null) {
-                    int segmentId = 0;
-                    if (r.getSegments().size() != 1) {
-                        int id = createSegmentSelectorDialog("Alignment", "name", r.getSegments().size());
-                        if(id == 0) //Cancel/Window close
-                            return;
-                        segmentId = id;
-                    }
-                    main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
-                } else {
-                    Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
-                            Alert.AlertType.INFORMATION);
-                }
+                addAlignmentFile(f);
             }
         });
 
     }
 
-    private void addAudioFile(File f, File annotationFile, File alignmentFile) {
+    public void addAudioFile(File f, File annotationFile, File alignmentFile) {
         String name = getBasename(f);
         Recording r = main.fileSystem.recordings.get(name);
         if(r != null) {
@@ -332,13 +318,13 @@ public class MainMenuController implements FileSelectedHandler {
         EditorMenuController.populateFileMenu(main.fileSystem, fileMenu, null);
     }
 
-    private void addAnnotationFile(File f) {
+    public void addAnnotationFile(File f) {
         String name = getBasename(f);
         Recording r = main.fileSystem.recordings.get(name);
         if(r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
-                int id = createSegmentSelectorDialog("Annotation", "name", r.getSegments().size());
+                int id = createSegmentSelectorDialog("Annotation", name, r.getSegments().size());
                 if(id == 0) //Cancel/Window close
                     return;
                 segmentId = id;
@@ -346,6 +332,24 @@ public class MainMenuController implements FileSelectedHandler {
             main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
         } else {
             Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
+                    Alert.AlertType.INFORMATION);
+        }
+    }
+
+    public void addAlignmentFile(File f) {
+        String name = getBasename(f);
+        Recording r = main.fileSystem.recordings.get(name);
+        if(r != null) {
+            int segmentId = 0;
+            if (r.getSegments().size() != 1) {
+                int id = createSegmentSelectorDialog("Alignment", name, r.getSegments().size());
+                if(id == 0) //Cancel/Window close
+                    return;
+                segmentId = id;
+            }
+            main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
+        } else {
+            Main.createInfoDialog("Information", "Alignment files cannot be imported without a matching audio file.",
                     Alert.AlertType.INFORMATION);
         }
     }
@@ -382,11 +386,11 @@ public class MainMenuController implements FileSelectedHandler {
         }
     }
 
-    private String getBasename(File f) {
+    public static String getBasename(File f) {
         return f.getName().substring(0, f.getName().lastIndexOf('.'));
     }
 
-    private boolean isValidExtension(File file, String[] extensions) {
+    public boolean isValidExtension(File file, String[] extensions) {
         return Arrays.stream(extensions).anyMatch(e -> file.toString().endsWith(e));
     }
 
