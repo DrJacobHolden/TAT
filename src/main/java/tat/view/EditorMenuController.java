@@ -5,16 +5,21 @@ import audio_player.AudioPlayer;
 import file_system.FileSystem;
 import file_system.Recording;
 import file_system.Segment;
+import file_system.element.AlignmentFile;
+import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.fxmisc.wellbehaved.event.*;
 import org.fxmisc.wellbehaved.event.InputMap;
@@ -25,10 +30,12 @@ import tat.Position;
 import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
-import static tat.Main.p;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Created by Tate on 29/06/2016.
@@ -55,6 +62,9 @@ public class EditorMenuController implements FileSelectedHandler {
 
     @FXML
     private IconButton openFileSelectorButton;
+
+    @FXML
+    private IconButton openCorpusButton;
 
     @FXML
     private IconButton saveButton;
@@ -86,9 +96,13 @@ public class EditorMenuController implements FileSelectedHandler {
     @FXML
     private WaveformDisplay waveformDisplay;
 
+    @FXML
+    private VBox window;
+
     private Main main;
     private Stage primaryStage;
     private String activeRecording;
+    private MainMenuController mainMenu;
 
     private AudioPlayer player;
     private Position position;
@@ -105,6 +119,7 @@ public class EditorMenuController implements FileSelectedHandler {
         zoomInButton.setIcons(new Icon(IconLoader.getInstance().zoomInIcon), new Icon(IconLoader.getInstance().zoomInIconPressed));
         zoomOutButton.setIcons(new Icon(IconLoader.getInstance().zoomOutIcon), new Icon(IconLoader.getInstance().zoomOutIconPressed));
         openFileSelectorButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
+        openCorpusButton.setIcons(new Icon(IconLoader.getInstance().openCorpusIcon), new Icon(IconLoader.getInstance().openCorpusIconPressed));
         saveButton.setIcons(new Icon(IconLoader.getInstance().saveIcon), new Icon(IconLoader.getInstance().saveIconPressed));
         prevSegmentButton.setIcons(new Icon(IconLoader.getInstance().prevIcon), new Icon(IconLoader.getInstance().prevIconPressed));
         playButton.setIcons(new Icon(IconLoader.getInstance().playIcon), new Icon(IconLoader.getInstance().playIconPressed));
@@ -122,8 +137,9 @@ public class EditorMenuController implements FileSelectedHandler {
                 "system. When complete the results will be displayed."));
         zoomInButton.setTooltip(new Tooltip("Zoom in.\n"));
         zoomOutButton.setTooltip(new Tooltip("Zoom out.\n"));
-        openFileSelectorButton.setTooltip(new Tooltip("Open a new file.\n"));
-        saveButton.setTooltip(new Tooltip("Save the corpus in the current state.\n"));
+        openFileSelectorButton.setTooltip(new Tooltip("Add a new recording to the corpus.\n"));
+        openCorpusButton.setTooltip(new Tooltip("Open the corpus directory in the file explorer.\n"));
+        saveButton.setTooltip(new Tooltip("Save the recording in the current state.\n"));
         prevSegmentButton.setTooltip(new Tooltip("Previous segment.\n"));
         playButton.setTooltip(new Tooltip("Begin playback.\n"));
         pauseButton.setTooltip(new Tooltip("Pause at current point.\n"));
@@ -145,11 +161,26 @@ public class EditorMenuController implements FileSelectedHandler {
     private void initialize() {
         loadIcons();
         loadTooltips();
+        initialiseDragAndDrop();
         bindZoomButtons();
         bindPlayerButtons();
         bindSaveButton();
+        bindOpenCorpusButton();
         bindSplitAndJoinButtons();
         bindAlignButton();
+        bindOpenFileSelectorButton();
+    }
+
+    private void bindOpenFileSelectorButton() {
+        openFileSelectorButton.setOnAction(event -> {
+            FileChooser annotationChooser = mainMenu.getFileChooser("Add New Recording", AudioFile.FILE_EXTENSIONS);
+            File file = annotationChooser.showOpenDialog(primaryStage);
+            if(file != null) {
+                if (mainMenu.isValidExtension(file, AudioFile.FILE_EXTENSIONS)) {
+                    mainMenu.addAudioFile(file, null, null);
+                }
+            }
+        });
     }
 
     private void bindAlignButton() {
@@ -179,10 +210,11 @@ public class EditorMenuController implements FileSelectedHandler {
      *
      * @param main
      */
-    public void setup(Main main, Stage ps, String activeRecording) {
+    public void setup(Main main, Stage ps, String activeRecording, MainMenuController mainMenuController) {
         this.main = main;
         this.primaryStage = ps;
         this.activeRecording = activeRecording;
+        this.mainMenu = mainMenuController;
         setupMenu(fileMenu);
         populateFileMenu(main.fileSystem, fileMenu, activeRecording);
         fileSelected(activeRecording);
@@ -327,6 +359,18 @@ public class EditorMenuController implements FileSelectedHandler {
         });
     }
 
+    private void bindOpenCorpusButton() {
+        openCorpusButton.setOnAction(event -> {
+            try {
+                File file = new File(main.fileSystem.getRootDir().toUri());
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private void bindSplitAndJoinButtons() {
         splitButton.setOnAction(event -> {
             int frame = position.getFrame();
@@ -412,5 +456,69 @@ public class EditorMenuController implements FileSelectedHandler {
         } else {
             new DialogBox("Error: Cannot remove", "A recording must contain at least one segment").showAndGetResult();
         }
+    }
+
+    public void initialiseDragAndDrop() {
+        window.setOnDragOver(new EventHandler<DragEvent>()  {
+            public String[] acceptedTypes = Stream.concat(
+                    Arrays.stream(AudioFile.FILE_EXTENSIONS),
+                    Stream.concat(Arrays.stream(AnnotationFile.FILE_EXTENSIONS),
+                            Arrays.stream(AlignmentFile.FILE_EXTENSIONS)))
+                    .toArray(String[]::new);
+
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean invalidFileFound = false;
+                if (db.hasFiles()) {
+                    for(File file : db.getFiles()) {
+                        String absolutePath = file.getAbsolutePath();
+                        if (!file.isDirectory() && !invalidFileFound) {
+                            invalidFileFound = !mainMenu.isValidExtension(file, acceptedTypes);
+                        } else {
+                            //Don't accept directories
+                            invalidFileFound = true;
+                        }
+                    }
+                    if (!invalidFileFound)
+                        event.acceptTransferModes(TransferMode.ANY);
+                }
+                event.consume();
+            }
+        });
+
+        window.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            List<File> audioFiles = new ArrayList<File>();
+            Map<String, File> annotationFiles = new HashMap<String, File>();
+            Map<String, File> alignmentFiles = new HashMap<String, File>();
+
+            for(File f : db.getFiles()) {
+                if (mainMenu.isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
+                    audioFiles.add(f);
+                } else if (mainMenu.isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
+                    annotationFiles.put(MainMenuController.getBasename(f), f);
+                } else if (mainMenu.isValidExtension(f, AlignmentFile.FILE_EXTENSIONS)) {
+                    alignmentFiles.put(MainMenuController.getBasename(f), f);
+                }
+            }
+
+            //Loop through audioFiles
+            for(File f : audioFiles) {
+                String name = MainMenuController.getBasename(f);
+                mainMenu.addAudioFile(f, annotationFiles.remove(name), alignmentFiles.remove(name));
+            }
+
+            //Handle remaining files
+            for (File f: annotationFiles.values()) {
+                mainMenu.addAnnotationFile(f);
+            }
+            for (File f: alignmentFiles.values()) {
+                mainMenu.addAlignmentFile(f);
+            }
+            textArea.initialise(getActiveRecording(), position);
+            populateFileMenu(main.fileSystem, fileMenu, activeRecording);
+        });
+
     }
 }
