@@ -59,7 +59,8 @@ public class AudioPlayer implements PositionListener {
             //Stop giving regular updates of position if stopped
             else if (event.getType() == LineEvent.Type.STOP) {
                 if (!paused) {
-                    clip.setFramePosition(stopPosition);
+                    positionChanged(segment, stopPosition, null);
+                    Platform.runLater(() -> notifyPositionChanged());
                 }
                 positionListenerTimer.cancel();
             }
