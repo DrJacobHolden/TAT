@@ -517,6 +517,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 mainMenu.addAlignmentFile(f);
             }
             textArea.initialise(getActiveRecording(), position);
+            populateFileMenu(main.fileSystem, fileMenu, activeRecording);
         });
 
     }
