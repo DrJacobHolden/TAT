@@ -325,7 +325,7 @@ public class MainMenuController implements FileSelectedHandler {
         Recording r = main.fileSystem.recordings.get(name);
         if(r != null) {
             Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
-                    "this file before reimporting.", Alert.AlertType.INFORMATION);
+                    " this file before reimporting.", Alert.AlertType.INFORMATION);
             return;
         }
         main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
