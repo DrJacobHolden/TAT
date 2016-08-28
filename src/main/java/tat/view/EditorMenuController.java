@@ -33,14 +33,9 @@ import tat.view.icon.IconLoader;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static java.awt.Color.red;
-import static java.awt.SystemColor.window;
-import static tat.Main.p;
 
 /**
  * Created by Tate on 29/06/2016.
