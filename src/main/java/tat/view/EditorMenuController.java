@@ -25,9 +25,13 @@ import tat.Position;
 import tat.view.icon.Icon;
 import tat.view.icon.IconLoader;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
+import static java.awt.Color.red;
 import static tat.Main.p;
 
 /**
@@ -55,6 +59,9 @@ public class EditorMenuController implements FileSelectedHandler {
 
     @FXML
     private IconButton openFileSelectorButton;
+
+    @FXML
+    private IconButton openCorpusButton;
 
     @FXML
     private IconButton saveButton;
@@ -105,6 +112,7 @@ public class EditorMenuController implements FileSelectedHandler {
         zoomInButton.setIcons(new Icon(IconLoader.getInstance().zoomInIcon), new Icon(IconLoader.getInstance().zoomInIconPressed));
         zoomOutButton.setIcons(new Icon(IconLoader.getInstance().zoomOutIcon), new Icon(IconLoader.getInstance().zoomOutIconPressed));
         openFileSelectorButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
+        openCorpusButton.setIcons(new Icon(IconLoader.getInstance().openCorpusIcon), new Icon(IconLoader.getInstance().openCorpusIconPressed));
         saveButton.setIcons(new Icon(IconLoader.getInstance().saveIcon), new Icon(IconLoader.getInstance().saveIconPressed));
         prevSegmentButton.setIcons(new Icon(IconLoader.getInstance().prevIcon), new Icon(IconLoader.getInstance().prevIconPressed));
         playButton.setIcons(new Icon(IconLoader.getInstance().playIcon), new Icon(IconLoader.getInstance().playIconPressed));
@@ -123,6 +131,7 @@ public class EditorMenuController implements FileSelectedHandler {
         zoomInButton.setTooltip(new Tooltip("Zoom in.\n"));
         zoomOutButton.setTooltip(new Tooltip("Zoom out.\n"));
         openFileSelectorButton.setTooltip(new Tooltip("Open a new file.\n"));
+        openCorpusButton.setTooltip(new Tooltip("Open the corpus directory in the file explorer.\n"));
         saveButton.setTooltip(new Tooltip("Save the corpus in the current state.\n"));
         prevSegmentButton.setTooltip(new Tooltip("Previous segment.\n"));
         playButton.setTooltip(new Tooltip("Begin playback.\n"));
@@ -148,6 +157,7 @@ public class EditorMenuController implements FileSelectedHandler {
         bindZoomButtons();
         bindPlayerButtons();
         bindSaveButton();
+        bindOpenCorpusButton();
         bindSplitAndJoinButtons();
         bindAlignButton();
     }
@@ -322,6 +332,18 @@ public class EditorMenuController implements FileSelectedHandler {
             try {
                 getActiveRecording().save();
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void bindOpenCorpusButton() {
+        openCorpusButton.setOnAction(event -> {
+            try {
+                File file = new File(main.fileSystem.getRootDir().toUri());
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
+            } catch(IOException e) {
                 e.printStackTrace();
             }
         });

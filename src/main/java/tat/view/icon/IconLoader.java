@@ -23,11 +23,14 @@ public class IconLoader {
     public Image alignIcon = new Image(getClass().getResourceAsStream("/icons/Align_Released.png"));
     public Image alignIconPressed = new Image(getClass().getResourceAsStream("/icons/Align_Pressed.png"));
 
-    public Image mainFileIcon = new Image(getClass().getResourceAsStream("/icons/Browse_Released.png"));
-    public Image mainFileIconPressed = new Image(getClass().getResourceAsStream("/icons/Browse_Pressed.png"));
+    public Image mainFileIcon = new Image(getClass().getResourceAsStream("/icons/Save_Released.png"));
+    public Image mainFileIconPressed = new Image(getClass().getResourceAsStream("/icons/Save_Pressed.png"));
 
     public Image joinIcon = new Image(getClass().getResourceAsStream("/icons/Join_Released.png"));
     public Image joinIconPressed = new Image(getClass().getResourceAsStream("/icons/Join_Pressed.png"));
+
+    public Image openCorpusIcon = new Image(getClass().getResourceAsStream("/icons/Browse_Released.png"));
+    public Image openCorpusIconPressed = new Image(getClass().getResourceAsStream("/icons/Browse_Pressed.png"));
 
     public Image prevIcon = new Image(getClass().getResourceAsStream("/icons/Left_Released.png"));
     public Image prevIconPressed = new Image(getClass().getResourceAsStream("/icons/Left_Pressed.png"));
@@ -41,8 +44,8 @@ public class IconLoader {
     public Image nextIcon = new Image(getClass().getResourceAsStream("/icons/Right_Released.png"));
     public Image nextIconPressed = new Image(getClass().getResourceAsStream("/icons/Right_Pressed.png"));
 
-    public Image saveIcon = new Image(getClass().getResourceAsStream("/icons/Save_Released.png"));
-    public Image saveIconPressed = new Image(getClass().getResourceAsStream("/icons/Save_Pressed.png"));
+    public Image saveIcon = new Image(getClass().getResourceAsStream("/icons/Save_Floppy_Released.png"));
+    public Image saveIconPressed = new Image(getClass().getResourceAsStream("/icons/Save_Floppy_Pressed.png"));
 
     public Image settingsIcon = new Image(getClass().getResourceAsStream("/icons/Settings_Released.png"));
     public Image settingsIconPressed = new Image(getClass().getResourceAsStream("/icons/Settings_Pressed.png"));

@@ -256,6 +256,10 @@ public class FileSystem implements Iterable<Recording> {
     public Iterator<Recording> iterator() {
         return recordings.values().iterator();
     }
+
+    public Path getRootDir() {
+        return rootDir;
+    }
 }
 
 class TokenMatch implements Comparable<TokenMatch> {
