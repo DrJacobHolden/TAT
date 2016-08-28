@@ -132,7 +132,7 @@ public class EditorMenuController implements FileSelectedHandler {
         zoomOutButton.setTooltip(new Tooltip("Zoom out.\n"));
         openFileSelectorButton.setTooltip(new Tooltip("Open a new file.\n"));
         openCorpusButton.setTooltip(new Tooltip("Open the corpus directory in the file explorer.\n"));
-        saveButton.setTooltip(new Tooltip("Save the corpus in the current state.\n"));
+        saveButton.setTooltip(new Tooltip("Save the recording in the current state.\n"));
         prevSegmentButton.setTooltip(new Tooltip("Previous segment.\n"));
         playButton.setTooltip(new Tooltip("Begin playback.\n"));
         pauseButton.setTooltip(new Tooltip("Pause at current point.\n"));
