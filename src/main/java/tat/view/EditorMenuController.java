@@ -13,6 +13,8 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
@@ -20,6 +22,8 @@ import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.fxmisc.wellbehaved.event.*;
 import org.fxmisc.wellbehaved.event.InputMap;
@@ -265,6 +269,13 @@ public class EditorMenuController implements FileSelectedHandler {
             SizingMenuItem mu = new SizingMenuItem(fileMenu, displayName, recording.getBaseName().equals(activeRecording));
 
             menuItems.add(mu);
+
+            //Resize menu to prefer fitting smallest menu item
+            double currentPrefWidth = fileMenu.getPrefWidth();
+            //Width of string + hardcoded padding estimate
+            double strPrefWidth = getWidthOfString(displayName, fileMenu.getFont()) + 30;
+            fileMenu.setPrefWidth(Math.max(currentPrefWidth, strPrefWidth));
+
             mu.setOnAction(event -> fileHandler.fileSelected(recording.getBaseName()));
         }
         if (size > 0) {
@@ -272,6 +283,14 @@ public class EditorMenuController implements FileSelectedHandler {
         } else {
             fileMenu.setText("No files");
         }
+    }
+
+    private static double getWidthOfString(String str, Font font){
+        //Potentially slow, doesn't seem to be a problem though
+        Text text = new Text(str);
+        text.setFont(font);
+        new Scene(new Group(text));
+        return text.getLayoutBounds().getWidth();
     }
 
     @Override
