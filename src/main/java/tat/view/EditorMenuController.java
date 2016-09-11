@@ -135,8 +135,8 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void loadTooltips() {
         System.out.println("Tooltips Loaded");
-        splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the selected point.\n"));
-        joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the selected point.\n"));
+        splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the selected point. (Ctrl + Shift + S)\n"));
+        joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the selected point. (Ctrl + Shift + J)\n"));
         alignButton.setTooltip(new Tooltip("Sends the audio and transcription to the alignment\n" +
                 "system. When complete the results will be displayed."));
         zoomInButton.setTooltip(new Tooltip("Zoom in.\n"));
@@ -144,11 +144,11 @@ public class EditorMenuController implements FileSelectedHandler {
         openFileSelectorButton.setTooltip(new Tooltip("Add a new recording to the corpus.\n"));
         openCorpusButton.setTooltip(new Tooltip("Open the corpus directory in the file explorer.\n"));
         saveButton.setTooltip(new Tooltip("Save the recording in the current state.\n"));
-        prevSegmentButton.setTooltip(new Tooltip("Previous segment.\n"));
-        playButton.setTooltip(new Tooltip("Begin playback.\n"));
-        pauseButton.setTooltip(new Tooltip("Pause at current point.\n"));
-        stopButton.setTooltip(new Tooltip("Stop playback.\n"));
-        nextSegmentButton.setTooltip(new Tooltip("Next segment.\n"));
+        prevSegmentButton.setTooltip(new Tooltip("Previous segment.(Ctrl + Shift + <)\n"));
+        playButton.setTooltip(new Tooltip("Begin playback. (Ctrl + Space)\n"));
+        pauseButton.setTooltip(new Tooltip("Pause at current point. (Ctrl + Space)\n"));
+        stopButton.setTooltip(new Tooltip("Stop playback. (Ctrl + Shift + Space)\n"));
+        nextSegmentButton.setTooltip(new Tooltip("Next segment. (Ctrl + Shift + >)\n"));
         settingsButton.setTooltip(new Tooltip("Open the configuration menu.\n"));
     }
 
