@@ -313,23 +313,25 @@ public class EditorMenuController implements FileSelectedHandler {
     private void bindKeyEvents() {
         main.rootLayout.getChildrenUnmodifiable().stream().forEach(a ->
             Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> {
-                if (e.getCode().equals(KeyCode.P) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    if (!player.isPlaying()) {
+                if (e.getCode().equals(KeyCode.SPACE) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                    if(e.isShiftDown()) {
+                        stopButton.fire();
+                    } else if (!player.isPlaying()) {
                         playButton.fire();
                     } else {
                         pauseButton.fire();
                     }
                     e.consume();
-                } else if (e.getCode().equals(KeyCode.I) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                } else if (e.getCode().equals(KeyCode.COMMA) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
                     prevSegmentButton.fire();
                     e.consume();
-                } else if (e.getCode().equals(KeyCode.O) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                } else if (e.getCode().equals(KeyCode.PERIOD) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
                     nextSegmentButton.fire();
                     e.consume();
-                } else if (e.getCode().equals(KeyCode.H) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                } else if (e.getCode().equals(KeyCode.S) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
                     splitButton.fire();
                     e.consume();
-                } else if (e.getCode().equals(KeyCode.J) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                } else if (e.getCode().equals(KeyCode.J) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
                     joinButton.fire();
                     e.consume();
                 } else if (a != textArea) {
