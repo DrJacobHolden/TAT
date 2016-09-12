@@ -8,4 +8,4 @@ TAT comes with a pre-built JAR containing all dependencies, assuming Java is ins
 If you wish to modify the source and run, you may do so using Maven. Simply load the source code as a Maven project into Eclipse or IntelliJ and modify as to your desires.
 
 ## Licensing
-TAT is an open-source software provided as-is. Continued support is not guaranteed. It is distributed freely under the Apache license.
+TAT is an open-source software provided as-is. Continued support is not guaranteed. It is distributed freely under the Apache Version 2 license.
