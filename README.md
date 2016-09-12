@@ -10,7 +10,7 @@ If you wish to modify the source and run, you may do so using Maven. Simply load
 ## Licensing
 TAT is an open-source software provided as-is. Continued support is not guaranteed. It is distributed freely under the Apache Version 2 license.
 
-Copyright [2016] [Tate Robertson and Max Lay]
+Copyright 2016 Tate Robertson and Max Lay
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
