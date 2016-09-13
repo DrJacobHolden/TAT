@@ -167,7 +167,6 @@ public class MultipartUtility {
 
 
         int status = httpConn.getResponseCode();
-        System.out.println("WebMaus responded with " + status);
 
         if (status == 200) {
             return new InputStreamReader(httpConn.getInputStream());

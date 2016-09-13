@@ -56,7 +56,6 @@ public class AudioFile extends BaseFileSystemElement {
     }
 
     public int getNoFrames() {
-        System.out.println(segment.getSegmentNumber());
         AudioInputStream as = getAudioStream();
         int no = (int) as.getFrameLength();
         try {

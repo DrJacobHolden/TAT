@@ -173,7 +173,6 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     private void loadIcons() {
-        System.out.println("Icons loaded");
         splitButton.setIcons(new Icon(IconLoader.getInstance().splitIcon), new Icon(IconLoader.getInstance().splitIconPressed));
         joinButton.setIcons(new Icon(IconLoader.getInstance().joinIcon), new Icon(IconLoader.getInstance().joinIconPressed));
         alignButton.setIcons(new Icon(IconLoader.getInstance().alignIcon), new Icon(IconLoader.getInstance().alignIconPressed));
@@ -191,7 +190,6 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     private void loadTooltips() {
-        System.out.println("Tooltips Loaded");
         splitButton.setTooltip(new Tooltip("Splits the audio and annotation at the selected point. (Ctrl + Shift + S)\n"));
         joinButton.setTooltip(new Tooltip("Joins the audio and annotation at the selected point. (Ctrl + Shift + J)\n"));
         alignButton.setTooltip(new Tooltip("Sends the audio and transcription to the tat.alignment\n" +

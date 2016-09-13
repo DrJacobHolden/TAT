@@ -107,13 +107,11 @@ public class MainMenuController implements FileSelectedHandler {
     }
 
     private void loadIcons() {
-        System.out.println("Icons loaded");
         fileButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
         settingsButton.setIcons(new Icon(IconLoader.getInstance().settingsIcon), new Icon(IconLoader.getInstance().settingsIconPressed));
     }
 
     private void loadTooltips() {
-        System.out.println("Tooltips Loaded");
         fileButton.setTooltip(new Tooltip("Open the file/directory selector.\n"));
         settingsButton.setTooltip(new Tooltip("Configure Corpus-wide settings.\n"));
     }

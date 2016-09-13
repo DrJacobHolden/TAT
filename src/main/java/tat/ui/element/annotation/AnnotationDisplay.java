@@ -267,7 +267,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (previousSegRange != null) {
             if (getSelection().getStart() == 0 && getSelection().getEnd() == getLength()) {
                 position.setSelected(getSegmentForSelection(previousSegRange), 0, this);
-                System.out.println("Selecting range: " + getActiveAnnotation().range.getStart() + " " + getActiveAnnotation().range.getEnd());
                 selectRange(previousSegRange.getStart(), previousSegRange.getEnd());
                 previousSegRange = null;
                 return;
@@ -280,7 +279,6 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (getSelection().getLength() == 0) {
             if (getSelection().getStart() == 0 && getSelection().getEnd() == 0) {
                 //Set condition for selecting entire annotation
-                System.out.println(getActiveAnnotation().range.getStart() + " " + getActiveAnnotation().range.getEnd());
                 previousSegRange = getActiveAnnotation().range;
             }
         }

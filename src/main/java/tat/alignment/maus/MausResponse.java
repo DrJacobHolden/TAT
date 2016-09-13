@@ -53,7 +53,6 @@ public class MausResponse {
     }
 
     public AlignmentFormat getResult() throws IOException, ParseException {
-        System.out.println(getResultLink());
         URL url = new URL(getResultLink());
         URLConnection connection = url.openConnection();
         InputStream in = connection.getInputStream();

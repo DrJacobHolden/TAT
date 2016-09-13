@@ -19,6 +19,7 @@ public class Recording implements Iterable<Segment> {
     private Map<Integer, Segment> segments = new HashMap<>();
     private int size = 0;
     private List<Path> toDeleteOnSave = new ArrayList<>();
+
     public Recording(String baseName) {
         this.baseName = baseName;
     }
@@ -150,10 +151,8 @@ public class Recording implements Iterable<Segment> {
         while (toDeleteOnSave.size() > 0) {
             Path path = toDeleteOnSave.remove(toDeleteOnSave.size() - 1);
             try {
-                System.out.println("Deleting file " + path);
                 Files.delete(path);
             } catch (IOException e) {
-                System.out.println("Failed to delete file " + path);
             }
         }
     }

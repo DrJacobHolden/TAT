@@ -31,7 +31,6 @@ public class Position {
         if (segment != this.segment || frame != this.frame) {
             this.segment = segment;
             this.frame = frame;
-            System.out.println("Selected segment: " + segment.getSegmentNumber() + " frame: " + frame + " from " + initiator);
             positionListeners.stream().forEach(l -> l.positionChanged(segment, frame, initiator));
         }
     }
