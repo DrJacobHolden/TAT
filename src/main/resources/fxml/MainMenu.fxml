@@ -10,10 +10,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import tat.view.IconButton?>
+<?import tat.ui.element.IconButton?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<VBox id="mainFrame" fx:id="window" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.view.MainMenuController">
+<VBox id="mainFrame" fx:id="window" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.ui.view.MainMenuController">
    <children>
       <AnchorPane fx:id="soundFileArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;" VBox.vgrow="NEVER" disable="TRUE">
          <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;" text="No files" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
