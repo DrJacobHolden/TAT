@@ -1,40 +1,31 @@
 package file_system;
 
-import file_system.attribute.CustomAttribute;
-import file_system.element.AlignmentFile;
-import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
-import file_system.element.FileSystemElement;
 import file_system.path_token.PathToken;
 import file_system.path_token.tokens.NamePathToken;
 import file_system.path_token.tokens.SegmentPathToken;
 import file_system.path_token.tokens.SpeakerIdPathToken;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.control.Alert;
-import sun.rmi.runtime.Log;
 import tat.Main;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-
 /**
  * Created by Tate and Max on 21/05/2016.
  *
  * PATHS MUST BE IN UNIX FORMAT. / INSTEAD OF \
  */
-public class FileSystem implements Iterable<Recording> {
+public class Corpus implements Iterable<Recording> {
 
-    private static Logger LOGGER = Logger.getLogger(FileSystem.class.getName());
+    private static Logger LOGGER = Logger.getLogger(Corpus.class.getName());
     private static final String CONFIG_FILE = "config.xml";
     private static final PathToken[] defaultPathTokens = {
             new NamePathToken(),
@@ -186,7 +177,7 @@ public class FileSystem implements Iterable<Recording> {
      * @param rootDir The root directory of the corpus
      * @throws IOException
      */
-    public FileSystem(Path rootDir) throws IOException {
+    public Corpus(Path rootDir) throws IOException {
         this.rootDir = rootDir;
         config = Config.load(rootDir.resolve(CONFIG_FILE));
         importRecordings();
@@ -199,7 +190,7 @@ public class FileSystem implements Iterable<Recording> {
      * @param annotationStorageRule
      * @param alignmentStorageRule
      */
-    public FileSystem(Path rootDir, String audioStorageRule, String annotationStorageRule, String alignmentStorageRule) throws IOException {
+    public Corpus(Path rootDir, String audioStorageRule, String annotationStorageRule, String alignmentStorageRule) throws IOException {
         this.rootDir = rootDir;
         config = new Config(audioStorageRule, annotationStorageRule, alignmentStorageRule);
         config.save(rootDir.resolve(CONFIG_FILE));

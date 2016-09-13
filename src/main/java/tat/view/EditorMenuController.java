@@ -2,7 +2,7 @@ package tat.view;
 
 import alignment.AlignmentException;
 import audio_player.AudioPlayer;
-import file_system.FileSystem;
+import file_system.Corpus;
 import file_system.Recording;
 import file_system.Segment;
 import file_system.element.AlignmentFile;
@@ -112,7 +112,7 @@ public class EditorMenuController implements FileSelectedHandler {
     private Position position;
 
     public Recording getActiveRecording() {
-        return main.fileSystem.recordings.get(activeRecording);
+        return main.corpus.recordings.get(activeRecording);
     }
 
     private void loadIcons() {
@@ -220,7 +220,7 @@ public class EditorMenuController implements FileSelectedHandler {
         this.activeRecording = activeRecording;
         this.mainMenu = mainMenuController;
         setupMenu(fileMenu);
-        populateFileMenu(main.fileSystem, fileMenu, activeRecording);
+        populateFileMenu(main.corpus, fileMenu, activeRecording);
         fileSelected(activeRecording);
     }
 
@@ -259,11 +259,11 @@ public class EditorMenuController implements FileSelectedHandler {
         return list;
     }
 
-    public static void populateFileMenu(FileSystem fileSystem, MenuButton fileMenu, String activeRecording) {
+    public static void populateFileMenu(Corpus corpus, MenuButton fileMenu, String activeRecording) {
         ObservableList<MenuItem> menuItems = fileMenu.getItems();
         menuItems.clear();
         int size = 0;
-        for(Recording recording : fileSystem) {
+        for(Recording recording : corpus) {
             size++;
             String displayName = (recording.hasNoAnnotation() ? "* " : "") + recording.getBaseName();
             SizingMenuItem mu = new SizingMenuItem(fileMenu, displayName, recording.getBaseName().equals(activeRecording));
@@ -383,7 +383,7 @@ public class EditorMenuController implements FileSelectedHandler {
     private void bindOpenCorpusButton() {
         openCorpusButton.setOnAction(event -> {
             try {
-                File file = new File(main.fileSystem.getRootDir().toUri());
+                File file = new File(main.corpus.getRootDir().toUri());
                 Desktop desktop = Desktop.getDesktop();
                 desktop.open(file);
             } catch(IOException e) {
@@ -538,7 +538,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 mainMenu.addAlignmentFile(f);
             }
             textArea.initialise(getActiveRecording(), position);
-            populateFileMenu(main.fileSystem, fileMenu, activeRecording);
+            populateFileMenu(main.corpus, fileMenu, activeRecording);
         });
 
     }

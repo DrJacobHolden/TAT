@@ -3,24 +3,18 @@ package file_system;
 import alignment.AlignmentException;
 import alignment.formats.AlignmentFormat;
 import alignment.formats.TextGrid;
-import alignment.maus.MausResponse;
 import alignment.maus.WebMaus;
-import file_system.attribute.CustomAttribute;
 import file_system.attribute.CustomAttributeInstance;
 import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
 import file_system.element.AudioFile;
 import file_system.element.FileSystemElement;
-import sun.audio.AudioStream;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.xml.soap.Text;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,12 +27,12 @@ import java.util.List;
 public class Segment {
 
     //EEK. Lots of associations. BEWARE! Constant for safety.
-    private final FileSystem fileSystem;
+    private final Corpus corpus;
     private Recording recording;
     public List<CustomAttributeInstance> customAttributes = new ArrayList<>();
 
-    public FileSystem getFileSystem() {
-        return fileSystem;
+    public Corpus getCorpus() {
+        return corpus;
     }
 
     public Recording getRecording() {
@@ -142,12 +136,12 @@ public class Segment {
         this.audioFile = new AudioFile(this, file.toPath());
     }
 
-    public Segment(FileSystem fileSystem) {
-        this.fileSystem = fileSystem;
+    public Segment(Corpus corpus) {
+        this.corpus = corpus;
     }
 
-    public Segment(FileSystem fileSystem, int segmentNumber, int speakerId, String baseName) {
-        this.fileSystem = fileSystem;
+    public Segment(Corpus corpus, int segmentNumber, int speakerId, String baseName) {
+        this.corpus = corpus;
         this.segmentNumber = segmentNumber;
         this.speakerId = speakerId;
         this.baseName = baseName;
@@ -171,11 +165,11 @@ public class Segment {
 
     public Path getPath(Class<? extends FileSystemElement> cls) {
         if (AudioFile.class.isAssignableFrom(cls)) {
-            return fileSystem.pathFromString(this, fileSystem.getAudioStorageRule());
+            return corpus.pathFromString(this, corpus.getAudioStorageRule());
         } else if (AnnotationFile.class.isAssignableFrom(cls)) {
-            return fileSystem.pathFromString(this, fileSystem.getAnnotationStorageRule());
+            return corpus.pathFromString(this, corpus.getAnnotationStorageRule());
         } else if (AlignmentFile.class.isAssignableFrom(cls)) {
-            return fileSystem.pathFromString(this, fileSystem.getAlignmentStorageRule());
+            return corpus.pathFromString(this, corpus.getAlignmentStorageRule());
         }
         //TODO: Throw error
         return null;
@@ -198,7 +192,7 @@ public class Segment {
     }
 
     public Segment split(long frame, int stringPos) throws IOException {
-        Segment segment2 = new Segment(fileSystem, segmentNumber+1, speakerId, baseName);
+        Segment segment2 = new Segment(corpus, segmentNumber+1, speakerId, baseName);
         segment2.setRecording(recording);
 
         AudioFile audio2 = getAudioFile().split(segment2, (int) frame);

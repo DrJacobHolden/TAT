@@ -1,6 +1,6 @@
 package tat;
 
-import file_system.FileSystem;
+import file_system.Corpus;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -13,12 +13,10 @@ import tat.view.MainMenuController;
 import tat.view.icon.IconLoader;
 import java.io.IOException;
 
-import static java.awt.SystemColor.info;
-
 public class Main extends Application {
 
     public VBox rootLayout;
-    public FileSystem fileSystem;
+    public Corpus corpus;
     public static Stage p;
 
     @Override

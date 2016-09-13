@@ -1,7 +1,7 @@
 package tat.view;
 
 import file_system.Config;
-import file_system.FileSystem;
+import file_system.Corpus;
 import file_system.Recording;
 import file_system.element.AlignmentFile;
 import file_system.element.AnnotationFile;
@@ -140,8 +140,8 @@ public class MainMenuController implements FileSelectedHandler {
     //TODO: Generic or specific error messages?
     public void setCorpus(File file) throws IOException {
         Path path = Paths.get(file.getAbsolutePath());
-        if (!FileSystem.corpusExists(path)) {
-            main.fileSystem = new FileSystem(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
+        if (!Corpus.corpusExists(path)) {
+            main.corpus = new Corpus(path, Config.DEFAULT_AUDIO_STORAGE_RULE,
                     Config.DEFAULT_ANNOTATION_STORAGE_RULE, Config.DEFAULT_ALIGNMENT_STORAGE_RULE);
         }
         engageCorpus(path);
@@ -178,14 +178,14 @@ public class MainMenuController implements FileSelectedHandler {
 
     private void engageCorpus(Path path) throws IOException {
         GlobalConfiguration.getInstance().setCorpusPath(path);
-        main.fileSystem = new FileSystem(path);
+        main.corpus = new Corpus(path);
         corpus.setText("Corpus: " + path);
         settingsButton.setDisable(false);
         settingsButton.setFlashing(true);
         textArea.setDisable(false);
         soundFileArea.setDisable(false);
         initialiseDragAndDrop();
-        EditorMenuController.populateFileMenu(main.fileSystem, fileMenu, null);
+        EditorMenuController.populateFileMenu(main.corpus, fileMenu, null);
     }
 
     /**
@@ -269,7 +269,7 @@ public class MainMenuController implements FileSelectedHandler {
 
             for(File f : db.getFiles()) {
                 if (f.isDirectory()) {
-                    if(FileSystem.corpusExists(f.toPath())) {
+                    if(Corpus.corpusExists(f.toPath())) {
                         try {
                             setCorpus(f);
                         } catch (IOException e) {
@@ -308,19 +308,19 @@ public class MainMenuController implements FileSelectedHandler {
 
     public void addAudioFile(File f, File annotationFile, File alignmentFile) {
         String name = getBasename(f);
-        Recording r = main.fileSystem.recordings.get(name);
+        Recording r = main.corpus.recordings.get(name);
         if(r != null) {
             Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
                     " this file before reimporting.", Alert.AlertType.INFORMATION);
             return;
         }
-        main.fileSystem.importExternalRecording(f, annotationFile, alignmentFile);
-        EditorMenuController.populateFileMenu(main.fileSystem, fileMenu, null);
+        main.corpus.importExternalRecording(f, annotationFile, alignmentFile);
+        EditorMenuController.populateFileMenu(main.corpus, fileMenu, null);
     }
 
     public void addAnnotationFile(File f) {
         String name = getBasename(f);
-        Recording r = main.fileSystem.recordings.get(name);
+        Recording r = main.corpus.recordings.get(name);
         if(r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
@@ -329,7 +329,7 @@ public class MainMenuController implements FileSelectedHandler {
                     return;
                 segmentId = id;
             }
-            main.fileSystem.importExternalAnnotation(r.getSegment(segmentId), f);
+            main.corpus.importExternalAnnotation(r.getSegment(segmentId), f);
         } else {
             Main.createInfoDialog("Information", "Annotation files cannot be imported without a matching audio file.",
                     Alert.AlertType.INFORMATION);
@@ -338,7 +338,7 @@ public class MainMenuController implements FileSelectedHandler {
 
     public void addAlignmentFile(File f) {
         String name = getBasename(f);
-        Recording r = main.fileSystem.recordings.get(name);
+        Recording r = main.corpus.recordings.get(name);
         if(r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
@@ -347,7 +347,7 @@ public class MainMenuController implements FileSelectedHandler {
                     return;
                 segmentId = id;
             }
-            main.fileSystem.importExternalAlignment(r.getSegment(segmentId), f);
+            main.corpus.importExternalAlignment(r.getSegment(segmentId), f);
         } else {
             Main.createInfoDialog("Information", "Alignment files cannot be imported without a matching audio file.",
                     Alert.AlertType.INFORMATION);
