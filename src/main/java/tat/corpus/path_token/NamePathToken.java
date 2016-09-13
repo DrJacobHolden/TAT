@@ -1,7 +1,6 @@
 package tat.corpus.path_token;
 
 import tat.corpus.Segment;
-import tat.corpus.path_token.PathToken;
 
 /**
  * Created by kalda on 25/06/2016.

@@ -1,24 +1,44 @@
 package tat.ui;
 
-import tat.corpus.Corpus;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.*;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import tat.ui.TimerHandler;
-import tat.ui.view.MainMenuController;
+import tat.corpus.Corpus;
 import tat.ui.icon.IconLoader;
+import tat.ui.view.MainMenuController;
+
 import java.io.IOException;
 
 public class Main extends Application {
 
+    public static Stage p;
     public VBox rootLayout;
     public Corpus corpus;
-    public static Stage p;
+
+    public static Alert createInfoDialog(String title, String info, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(info);
+        alert.setGraphic(null);
+
+        alert.initOwner(p);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
+
+        alert.showAndWait();
+        return alert;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -51,26 +71,6 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Alert createInfoDialog(String title, String info, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(info);
-        alert.setGraphic(null);
-
-        alert.initOwner(p);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
-
-        alert.showAndWait();
-        return alert;
-    }
-    
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }

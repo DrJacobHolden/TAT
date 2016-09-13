@@ -1,5 +1,25 @@
 package tat.ui.view;
 
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
 import tat.alignment.AlignmentException;
 import tat.audio.AudioPlayer;
 import tat.corpus.Corpus;
@@ -8,33 +28,16 @@ import tat.corpus.Segment;
 import tat.corpus.file.AlignmentFile;
 import tat.corpus.file.AnnotationFile;
 import tat.corpus.file.AudioFile;
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.*;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import org.fxmisc.wellbehaved.event.*;
-import org.fxmisc.wellbehaved.event.InputMap;
-import javafx.scene.control.*;
-import tat.ui.element.dialog.DialogBox;
-import tat.ui.element.dialog.LoadingDialog;
+import tat.ui.Colours;
+import tat.ui.FileSelectedHandler;
 import tat.ui.Main;
 import tat.ui.Position;
-import tat.ui.*;
-import tat.ui.element.*;
+import tat.ui.element.IconButton;
+import tat.ui.element.RightClickMenu;
+import tat.ui.element.SizingMenuItem;
 import tat.ui.element.annotation.AnnotationDisplay;
+import tat.ui.element.dialog.DialogBox;
+import tat.ui.element.dialog.LoadingDialog;
 import tat.ui.element.waveform.WaveformDisplay;
 import tat.ui.icon.Icon;
 import tat.ui.icon.IconLoader;
@@ -51,70 +54,119 @@ import java.util.stream.Stream;
  */
 public class EditorMenuController implements FileSelectedHandler {
 
+    private static FileSelectedHandler fileHandler = null;
     @FXML
     private IconButton splitButton;
-
     @FXML
     private IconButton joinButton;
-
     @FXML
     private IconButton alignButton;
-
     @FXML
     private IconButton zoomInButton;
-
     @FXML
     private IconButton zoomOutButton;
-
     @FXML
     private Pane alignmentPane;
-
     @FXML
     private IconButton openFileSelectorButton;
-
     @FXML
     private IconButton openCorpusButton;
-
     @FXML
     private IconButton saveButton;
-
     @FXML
     private IconButton prevSegmentButton;
-
     @FXML
     private IconButton playButton;
-
     @FXML
     private IconButton pauseButton;
-
     @FXML
     private IconButton stopButton;
-
     @FXML
     private IconButton nextSegmentButton;
-
     @FXML
     private IconButton settingsButton;
-
     @FXML
     private AnnotationDisplay textArea;
-
     @FXML
     private MenuButton fileMenu;
-
     @FXML
     private WaveformDisplay waveformDisplay;
-
     @FXML
     private VBox window;
-
     private Main main;
     private Stage primaryStage;
     private String activeRecording;
     private MainMenuController mainMenu;
-
     private AudioPlayer player;
     private Position position;
+
+    /**
+     * The constructor is called before the initialize() method.
+     */
+    public EditorMenuController() {
+    }
+
+    public static void setupMenu(MenuButton menu) {
+        menu.showingProperty().addListener((a) -> {
+            if (menu.isShowing()) {
+                menu.setTextFill(Colours.ORANGE);
+                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #ff7c00; " +
+                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
+            } else {
+                menu.setTextFill(Colours.WHITE);
+                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; " +
+                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
+            }
+        });
+    }
+
+    public static void setFileSelectedHandler(FileSelectedHandler handler) {
+        fileHandler = handler;
+    }
+
+    /**
+     * Method supplied by Erickson @ stackoverflow
+     * Source: http://stackoverflow.com/questions/740299/how-do-i-sort-a-set-to-a-list-in-java
+     */
+    public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+        List<T> list = new ArrayList<T>(c);
+        java.util.Collections.sort(list);
+        return list;
+    }
+
+    public static void populateFileMenu(Corpus corpus, MenuButton fileMenu, String activeRecording) {
+        ObservableList<MenuItem> menuItems = fileMenu.getItems();
+        menuItems.clear();
+        int size = 0;
+        for (Recording recording : corpus) {
+            size++;
+            String displayName = (recording.hasNoAnnotation() ? "* " : "") + recording.getBaseName();
+            SizingMenuItem mu = new SizingMenuItem(fileMenu, displayName, recording.getBaseName().equals(activeRecording));
+
+            menuItems.add(mu);
+
+            //Resize menu to prefer fitting smallest menu item
+            double currentPrefWidth = fileMenu.getPrefWidth();
+            //Width of string + hardcoded padding estimate
+            double strPrefWidth = getWidthOfString(displayName, fileMenu.getFont()) + 30;
+            fileMenu.setPrefWidth(Math.max(currentPrefWidth, strPrefWidth));
+
+            mu.setOnAction(event -> fileHandler.fileSelected(recording.getBaseName()));
+        }
+        if (size > 0) {
+            fileMenu.setText("" + size + " File(s)");
+        } else {
+            fileMenu.setText("No files");
+        }
+    }
+
+    private static double getWidthOfString(String str, Font font) {
+        //Potentially slow, doesn't seem to be a problem though
+        Text text = new Text(str);
+        text.setFont(font);
+        new Scene(new Group(text));
+        return text.getLayoutBounds().getWidth();
+    }
 
     public Recording getActiveRecording() {
         return main.corpus.recordings.get(activeRecording);
@@ -158,11 +210,6 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     /**
-     * The constructor is called before the initialize() method.
-     */
-    public EditorMenuController() {}
-
-    /**
      * Initializes the controller class. This method is automatically called
      * after the fxml file has been loaded.
      */
@@ -184,7 +231,7 @@ public class EditorMenuController implements FileSelectedHandler {
         openFileSelectorButton.setOnAction(event -> {
             FileChooser annotationChooser = mainMenu.getFileChooser("Add New Recording", AudioFile.FILE_EXTENSIONS);
             File file = annotationChooser.showOpenDialog(primaryStage);
-            if(file != null) {
+            if (file != null) {
                 if (mainMenu.isValidExtension(file, AudioFile.FILE_EXTENSIONS)) {
                     mainMenu.addAudioFile(file, null, null);
                 }
@@ -234,70 +281,6 @@ public class EditorMenuController implements FileSelectedHandler {
         waveformDisplay.setContextMenu(new RightClickMenu(getActiveRecording(), this, position));
     }
 
-    public static void setupMenu(MenuButton menu) {
-        menu.showingProperty().addListener((a) -> {
-            if(menu.isShowing()) {
-                menu.setTextFill(Colours.ORANGE);
-                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #ff7c00; " +
-                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
-            } else {
-                menu.setTextFill(Colours.WHITE);
-                menu.setStyle("-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; " +
-                        "-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;");
-            }
-        });
-    }
-
-    private static FileSelectedHandler fileHandler = null;
-    public static void setFileSelectedHandler(FileSelectedHandler handler) {
-        fileHandler = handler;
-    }
-
-    /**
-     * Method supplied by Erickson @ stackoverflow
-     * Source: http://stackoverflow.com/questions/740299/how-do-i-sort-a-set-to-a-list-in-java
-     */
-    public static
-    <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
-        List<T> list = new ArrayList<T>(c);
-        java.util.Collections.sort(list);
-        return list;
-    }
-
-    public static void populateFileMenu(Corpus corpus, MenuButton fileMenu, String activeRecording) {
-        ObservableList<MenuItem> menuItems = fileMenu.getItems();
-        menuItems.clear();
-        int size = 0;
-        for(Recording recording : corpus) {
-            size++;
-            String displayName = (recording.hasNoAnnotation() ? "* " : "") + recording.getBaseName();
-            SizingMenuItem mu = new SizingMenuItem(fileMenu, displayName, recording.getBaseName().equals(activeRecording));
-
-            menuItems.add(mu);
-
-            //Resize menu to prefer fitting smallest menu item
-            double currentPrefWidth = fileMenu.getPrefWidth();
-            //Width of string + hardcoded padding estimate
-            double strPrefWidth = getWidthOfString(displayName, fileMenu.getFont()) + 30;
-            fileMenu.setPrefWidth(Math.max(currentPrefWidth, strPrefWidth));
-
-            mu.setOnAction(event -> fileHandler.fileSelected(recording.getBaseName()));
-        }
-        if (size > 0) {
-            fileMenu.setText("" + size + " File(s)");
-        } else {
-            fileMenu.setText("No files");
-        }
-    }
-
-    private static double getWidthOfString(String str, Font font){
-        //Potentially slow, doesn't seem to be a problem though
-        Text text = new Text(str);
-        text.setFont(font);
-        new Scene(new Group(text));
-        return text.getLayoutBounds().getWidth();
-    }
-
     @Override
     public void fileSelected(String file) {
         position = new Position();
@@ -317,33 +300,33 @@ public class EditorMenuController implements FileSelectedHandler {
 
     private void bindKeyEvents() {
         main.rootLayout.getChildrenUnmodifiable().stream().forEach(a ->
-            Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> {
-                if (e.getCode().equals(KeyCode.SPACE) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    if(e.isShiftDown()) {
-                        stopButton.fire();
-                    } else if (!player.isPlaying()) {
-                        playButton.fire();
-                    } else {
-                        pauseButton.fire();
+                Nodes.addInputMap(a, InputMap.consume((javafx.scene.input.KeyEvent.ANY), e -> {
+                    if (e.getCode().equals(KeyCode.SPACE) && e.isControlDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                        if (e.isShiftDown()) {
+                            stopButton.fire();
+                        } else if (!player.isPlaying()) {
+                            playButton.fire();
+                        } else {
+                            pauseButton.fire();
+                        }
+                        e.consume();
+                    } else if (e.getCode().equals(KeyCode.COMMA) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                        prevSegmentButton.fire();
+                        e.consume();
+                    } else if (e.getCode().equals(KeyCode.PERIOD) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                        nextSegmentButton.fire();
+                        e.consume();
+                    } else if (e.getCode().equals(KeyCode.S) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                        splitButton.fire();
+                        e.consume();
+                    } else if (e.getCode().equals(KeyCode.J) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+                        joinButton.fire();
+                        e.consume();
+                    } else if (a != textArea) {
+                        //Text area should be focused. Do no consume.
+                        textArea.requestFocus();
                     }
-                    e.consume();
-                } else if (e.getCode().equals(KeyCode.COMMA) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    prevSegmentButton.fire();
-                    e.consume();
-                } else if (e.getCode().equals(KeyCode.PERIOD) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    nextSegmentButton.fire();
-                    e.consume();
-                } else if (e.getCode().equals(KeyCode.S) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    splitButton.fire();
-                    e.consume();
-                } else if (e.getCode().equals(KeyCode.J) && e.isControlDown() && e.isShiftDown() && e.getEventType().equals(KeyEvent.KEY_PRESSED)) {
-                    joinButton.fire();
-                    e.consume();
-                } else if (a != textArea) {
-                    //Text area should be focused. Do no consume.
-                    textArea.requestFocus();
-                }
-            })));
+                })));
     }
 
     private void bindPlayerButtons() {
@@ -368,10 +351,10 @@ public class EditorMenuController implements FileSelectedHandler {
     private void bindZoomButtons() {
         double zoomFactor = 1.2;
         zoomInButton.setOnAction(event -> {
-            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()*zoomFactor);
+            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor() * zoomFactor);
         });
         zoomOutButton.setOnAction(event -> {
-            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor()/zoomFactor);
+            waveformDisplay.setZoomFactor(waveformDisplay.getZoomFactor() / zoomFactor);
         });
     }
 
@@ -391,7 +374,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 File file = new File(main.corpus.getRootDir().toUri());
                 Desktop desktop = Desktop.getDesktop();
                 desktop.open(file);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });
@@ -414,7 +397,7 @@ public class EditorMenuController implements FileSelectedHandler {
             }
         });
         joinButton.setOnAction(event -> {
-            Segment nextSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber()+1);
+            Segment nextSegment = getActiveRecording().getSegment(position.getSegment().getSegmentNumber() + 1);
             if (nextSegment == null) {
                 return;
             }
@@ -440,10 +423,10 @@ public class EditorMenuController implements FileSelectedHandler {
                 new DialogBox.DialogOption[]{DialogBox.DialogOption.YES, DialogBox.DialogOption.NO, DialogBox.DialogOption.CANCEL});
 
         DialogBox.DialogOption result = dialog.showAndGetResult();
-        if(result == DialogBox.DialogOption.NO) {
+        if (result == DialogBox.DialogOption.NO) {
             //Don't save
             return true;
-        } else if(result == DialogBox.DialogOption.YES) {
+        } else if (result == DialogBox.DialogOption.YES) {
             //Save
             //Allow files to be overridden
             try {
@@ -485,7 +468,7 @@ public class EditorMenuController implements FileSelectedHandler {
     }
 
     public void initialiseDragAndDrop() {
-        window.setOnDragOver(new EventHandler<DragEvent>()  {
+        window.setOnDragOver(new EventHandler<DragEvent>() {
             public String[] acceptedTypes = Stream.concat(
                     Arrays.stream(AudioFile.FILE_EXTENSIONS),
                     Stream.concat(Arrays.stream(AnnotationFile.FILE_EXTENSIONS),
@@ -497,7 +480,7 @@ public class EditorMenuController implements FileSelectedHandler {
                 Dragboard db = event.getDragboard();
                 boolean invalidFileFound = false;
                 if (db.hasFiles()) {
-                    for(File file : db.getFiles()) {
+                    for (File file : db.getFiles()) {
                         String absolutePath = file.getAbsolutePath();
                         if (!file.isDirectory() && !invalidFileFound) {
                             invalidFileFound = !mainMenu.isValidExtension(file, acceptedTypes);
@@ -519,7 +502,7 @@ public class EditorMenuController implements FileSelectedHandler {
             Map<String, File> annotationFiles = new HashMap<String, File>();
             Map<String, File> alignmentFiles = new HashMap<String, File>();
 
-            for(File f : db.getFiles()) {
+            for (File f : db.getFiles()) {
                 if (mainMenu.isValidExtension(f, AudioFile.FILE_EXTENSIONS)) {
                     audioFiles.add(f);
                 } else if (mainMenu.isValidExtension(f, AnnotationFile.FILE_EXTENSIONS)) {
@@ -530,16 +513,16 @@ public class EditorMenuController implements FileSelectedHandler {
             }
 
             //Loop through audioFiles
-            for(File f : audioFiles) {
+            for (File f : audioFiles) {
                 String name = MainMenuController.getBasename(f);
                 mainMenu.addAudioFile(f, annotationFiles.remove(name), alignmentFiles.remove(name));
             }
 
             //Handle remaining files
-            for (File f: annotationFiles.values()) {
+            for (File f : annotationFiles.values()) {
                 mainMenu.addAnnotationFile(f);
             }
-            for (File f: alignmentFiles.values()) {
+            for (File f : alignmentFiles.values()) {
                 mainMenu.addAlignmentFile(f);
             }
             textArea.initialise(getActiveRecording(), position);

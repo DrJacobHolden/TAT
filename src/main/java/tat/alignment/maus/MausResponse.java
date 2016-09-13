@@ -1,10 +1,10 @@
 package tat.alignment.maus;
 
-import tat.alignment.formats.AlignmentFormat;
-import tat.alignment.formats.TextGrid;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import tat.alignment.formats.AlignmentFormat;
+import tat.alignment.formats.TextGrid;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

@@ -15,6 +15,29 @@ import java.util.*;
 public class Recording implements Iterable<Segment> {
 
     private boolean saveIsUpToDate = true;
+    private String baseName;
+    private Map<Integer, Segment> segments = new HashMap<>();
+    private int size = 0;
+    private List<Path> toDeleteOnSave = new ArrayList<>();
+    public Recording(String baseName) {
+        this.baseName = baseName;
+    }
+
+    public static Map<String, Recording> groupSegments(List<Segment> segments) {
+        TreeMap<String, Recording> recordingMap = new TreeMap<>();
+
+        for (Segment segment : segments) {
+            String baseName = segment.getBaseName();
+            Recording recording = recordingMap.get(baseName);
+            //We haven't encountered any segments with this basename yet.
+            if (recording == null) {
+                recording = new Recording(baseName);
+                recordingMap.put(baseName, recording);
+            }
+            recording.addSegment(segment);
+        }
+        return recordingMap;
+    }
 
     public void invalidateSave() {
         saveIsUpToDate = false;
@@ -28,22 +51,12 @@ public class Recording implements Iterable<Segment> {
         return segments;
     }
 
-    private String baseName;
-    private Map<Integer, Segment> segments = new HashMap<>();
-    private int size = 0;
-
-    private List<Path> toDeleteOnSave = new ArrayList<>();
-
     public int size() {
         return size;
     }
 
     public String getBaseName() {
         return baseName;
-    }
-
-    public Recording(String baseName) {
-        this.baseName = baseName;
     }
 
     public void addSegment(Segment segment) {
@@ -65,28 +78,12 @@ public class Recording implements Iterable<Segment> {
     }
 
     public boolean missingSegments() {
-        for (int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             if (segments.get(i) == null) {
                 return true;
             }
         }
         return false;
-    }
-
-    public static Map<String, Recording> groupSegments(List<Segment> segments) {
-        TreeMap<String, Recording> recordingMap = new TreeMap<>();
-
-        for (Segment segment : segments) {
-            String baseName = segment.getBaseName();
-            Recording recording = recordingMap.get(baseName);
-            //We haven't encountered any segments with this basename yet.
-            if (recording == null) {
-                recording = new Recording(baseName);
-                recordingMap.put(baseName, recording);
-            }
-            recording.addSegment(segment);
-        }
-        return recordingMap;
     }
 
     public void save() throws IOException {
@@ -108,10 +105,10 @@ public class Recording implements Iterable<Segment> {
         Segment segment2 = segment1.split(frame, stringPos);
 
         //Move segments along to make room for new one
-        for (int i=size; i>segment1.getSegmentNumber(); i--) {
+        for (int i = size; i > segment1.getSegmentNumber(); i--) {
             Segment seg = segments.get(i);
-            seg.setSegmentNumber(i+1);
-            segments.put(i+1, seg);
+            seg.setSegmentNumber(i + 1);
+            segments.put(i + 1, seg);
         }
 
         //Put segment after first
@@ -123,13 +120,13 @@ public class Recording implements Iterable<Segment> {
     }
 
     private void assertCorrectOrdering() {
-        int i=1;
+        int i = 1;
         for (Segment segment : this) {
             if (segment == null) {
                 throw new IllegalStateException("Segment at position " + i + " is null");
             } else if (segment.getSegmentNumber() != i++) {
                 throw new IllegalStateException("Segment " + segment.toString() + " has number " + segment.getSegmentNumber()
-                + " when it is in position " + (i-1));
+                        + " when it is in position " + (i - 1));
             }
         }
     }
@@ -151,7 +148,7 @@ public class Recording implements Iterable<Segment> {
 
     private void deleteMarked() {
         while (toDeleteOnSave.size() > 0) {
-            Path path = toDeleteOnSave.remove(toDeleteOnSave.size()-1);
+            Path path = toDeleteOnSave.remove(toDeleteOnSave.size() - 1);
             try {
                 System.out.println("Deleting file " + path);
                 Files.delete(path);
@@ -175,9 +172,9 @@ public class Recording implements Iterable<Segment> {
 
     public void removeSegment(Segment toRemove) {
         //Move segments along to fill gaps. Will overwrite segment2
-        for (int i=toRemove.getSegmentNumber(); i<=size; i++) {
+        for (int i = toRemove.getSegmentNumber(); i <= size; i++) {
             Segment seg = segments.get(i);
-            if (i==size()) {
+            if (i == size()) {
                 //Last item won't be overridden, so mark for delete before changing segment number
                 markFilesForDelete(seg.getPossiblePaths());
                 //Last index should be removed
@@ -198,6 +195,7 @@ public class Recording implements Iterable<Segment> {
     public Iterator<Segment> iterator() {
         return new Iterator<Segment>() {
             int index = 1;
+
             @Override
             public boolean hasNext() {
                 return index <= size;
@@ -206,7 +204,7 @@ public class Recording implements Iterable<Segment> {
             @Override
             public Segment next() {
                 index++;
-                return getSegment(index-1);
+                return getSegment(index - 1);
             }
         };
     }

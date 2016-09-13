@@ -1,16 +1,16 @@
 package tat.ui.element.waveform;
 
-import tat.corpus.Recording;
-import tat.corpus.Segment;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import tat.corpus.Recording;
+import tat.corpus.Segment;
+import tat.ui.Colours;
 import tat.ui.Position;
 import tat.ui.PositionListener;
-import tat.ui.Colours;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -23,24 +23,14 @@ import java.util.List;
 public class WaveformDisplay extends ScrollPane implements PositionListener {
 
     public Recording recording;
-    private List<WaveformSegment> imageViews = new ArrayList<>();
+    protected Rectangle cursor = new Rectangle();
     Scale scale = new Scale();
-
+    Group group = new Group();
+    private List<WaveformSegment> imageViews = new ArrayList<>();
     private HBox hBox = new HBox();
     private Group cursorGroup = new Group();
-
-    Group group = new Group();
-
     private double zoomFactor = 1;
-
-    protected Rectangle cursor = new Rectangle();
-
     private Position position;
-
-    public void setPosition(Position position) {
-        this.position = position;
-        position.addSelectedListener(this);
-    }
 
     public WaveformDisplay() {
         super();
@@ -72,6 +62,11 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         cursor.setStrokeWidth(0);
     }
 
+    public void setPosition(Position position) {
+        this.position = position;
+        position.addSelectedListener(this);
+    }
+
     public double getZoomFactor() {
         return zoomFactor;
     }
@@ -82,24 +77,24 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
         }
         zoomFactor = newValue;
 
-        double newScale = newValue * getInternalWidth()/getImageWidth();
+        double newScale = newValue * getInternalWidth() / getImageWidth();
         scale.setX(newScale);
         updateCursorWidth();
-        setHvalue(cursor.getX()/getImageWidth());
+        setHvalue(cursor.getX() / getImageWidth());
     }
 
     private double getInternalWidth() {
-        return getWidth()-getInsets().getLeft()-getInsets().getRight();
+        return getWidth() - getInsets().getLeft() - getInsets().getRight();
     }
 
     private double getInternalHeight() {
         //This is not set when we start, so it was easier to just hardcode it
         double scrollbarHeight = 20;
-        return getHeight()-getInsets().getBottom()-getInsets().getTop()-scrollbarHeight;
+        return getHeight() - getInsets().getBottom() - getInsets().getTop() - scrollbarHeight;
     }
 
     private void resizeHeight() {
-        scale.setY(getInternalHeight()/getImageHeight());
+        scale.setY(getInternalHeight() / getImageHeight());
     }
 
     private double getImageWidth() {
@@ -137,7 +132,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     public void addWaveform(WaveformSegment iv) {
-        int index = iv.getSegment().getSegmentNumber()-1;
+        int index = iv.getSegment().getSegmentNumber() - 1;
         iv.setOnMouseClicked(e -> segmentClicked(iv, e));
         hBox.getChildren().add(index, iv);
         imageViews.add(index, iv);
@@ -159,12 +154,12 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     private void updateCursorWidth() {
-        cursor.setWidth(2/scale.getX());
+        cursor.setWidth(2 / scale.getX());
     }
 
     public void resetColours() {
-        for (int i=0; i<imageViews.size(); i++) {
-            if ((i+1)%2==0) {
+        for (int i = 0; i < imageViews.size(); i++) {
+            if ((i + 1) % 2 == 0) {
                 imageViews.get(i).setColourEven();
             } else {
                 imageViews.get(i).setColourOdd();
@@ -182,7 +177,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     public void onSplit(Segment segment1, Segment segment2, int splitFrame) {
-        WaveformSegment splitWaveformSegment = imageViews.get(segment1.getSegmentNumber()-1);
+        WaveformSegment splitWaveformSegment = imageViews.get(segment1.getSegmentNumber() - 1);
         WaveformSegment newWaveform = splitWaveformSegment.split(segment2, splitFrame);
         //Add after segment1
         addWaveform(newWaveform);
@@ -191,8 +186,8 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     public void onJoin(Segment segment1, Segment segment2) {
-        WaveformSegment waveform1 = imageViews.get(segment1.getSegmentNumber()-1);
-        WaveformSegment waveform2 = imageViews.get(segment2.getSegmentNumber()-1);
+        WaveformSegment waveform1 = imageViews.get(segment1.getSegmentNumber() - 1);
+        WaveformSegment waveform2 = imageViews.get(segment2.getSegmentNumber() - 1);
         waveform1.join(waveform2);
         removeWaveform(waveform2);
         //Select will be called after waveform is selected in EditorMenuController
@@ -200,7 +195,7 @@ public class WaveformDisplay extends ScrollPane implements PositionListener {
     }
 
     public void onRemove(Segment removed) {
-        WaveformSegment waveformSegment = imageViews.get(removed.getSegmentNumber()-1);
+        WaveformSegment waveformSegment = imageViews.get(removed.getSegmentNumber() - 1);
         removeWaveform(waveformSegment);
         resetColours();
         setZoomFactor(1);

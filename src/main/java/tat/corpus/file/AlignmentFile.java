@@ -15,10 +15,9 @@ import java.nio.file.Paths;
  */
 public class AlignmentFile extends BaseFileSystemElement {
 
+    public static final String[] FILE_EXTENSIONS = new String[]{TextGrid.FILE_EXTENSION};
     private Segment segment;
     private AlignmentFormat alignment;
-
-    public static final String[] FILE_EXTENSIONS = new String[]{TextGrid.FILE_EXTENSION};
 
     //Currently this is the only way to make a valid tat.alignment file
     public AlignmentFile(Segment segment, AlignmentFormat alignment) {

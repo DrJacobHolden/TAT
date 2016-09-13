@@ -57,8 +57,8 @@ public class IconButton extends Button {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                if(flashing) {
-                                    if(flash) {
+                                if (flashing) {
+                                    if (flash) {
                                         setGraphic(standard.resizeIcon(size, size));
                                         flash = false;
                                     } else {
@@ -76,7 +76,7 @@ public class IconButton extends Button {
         flashing = flash;
 
         //Ensure button does not remain orange when flashing disabled
-        if(!flash)
+        if (!flash)
             setGraphic(standard.resizeIcon(size, size));
     }
 
@@ -90,7 +90,7 @@ public class IconButton extends Button {
 
         @Override
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-            size = (double)newValue;
+            size = (double) newValue;
             iconButton.setGraphic(standard.resizeIcon(size, size));
         }
     }

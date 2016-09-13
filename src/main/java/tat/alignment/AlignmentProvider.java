@@ -10,7 +10,9 @@ import java.io.IOException;
  */
 public interface AlignmentProvider {
     public void setLanguage(Language language);
+
     public void setOutFormat(Class<? extends AlignmentFormat> alignmentFormat);
+
     //TODO: Change return type
     public Object generateAlignment(String transcription, AudioInputStream audioFile) throws IOException, AlignmentException;
 }

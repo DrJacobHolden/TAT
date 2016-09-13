@@ -1,10 +1,10 @@
 package tat.corpus.attribute;
 
-import tat.corpus.Segment;
-import tat.corpus.path_token.PathToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import tat.corpus.Segment;
+import tat.corpus.path_token.PathToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,39 @@ public class CustomAttribute implements PathToken {
     private final String name;
     private String defaultValue;
     private String token;
+
+    public CustomAttribute(String name, String defaultValue, String token) {
+        this.name = name;
+        this.defaultValue = defaultValue;
+        this.token = token;
+    }
+
+    public static CustomAttribute fromXMLElement(Element element) {
+        String name = element.getAttribute(NAME_ATTR_NAME);
+        String defaultValue = element.getAttribute(DEFAULT_VALUE_ATTR_NAME);
+        String token = element.getAttribute(DEFAULT_VALUE_ATTR_NAME);
+        return new CustomAttribute(name, defaultValue, token);
+    }
+
+    public static Element listToXMLElement(Document document, List<CustomAttribute> attributes) {
+        Element attributesElement = document.createElement(CUSTOM_ATTRIBUTES_TAG_NAME);
+        for (CustomAttribute attribute : attributes) {
+            attributesElement.appendChild(attribute.toXMLElement(document));
+        }
+        return attributesElement;
+    }
+
+    public static List<CustomAttribute> XMLElementsToList(Element element) {
+        List<CustomAttribute> customAttributes = new ArrayList<>();
+
+        NodeList elements = element.getElementsByTagName(CUSTOM_ATTRIBUTE_TAG_NAME);
+        for (int i = 0; i < elements.getLength(); i++) {
+            //Cast seems safe
+            CustomAttribute attr = CustomAttribute.fromXMLElement((Element) elements.item(i));
+            customAttributes.add(attr);
+        }
+        return customAttributes;
+    }
 
     public String getDefaultValue() {
         return defaultValue;
@@ -48,7 +81,7 @@ public class CustomAttribute implements PathToken {
                 .filter(attr -> attr.customAttribute == this)
                 .toArray(size -> new CustomAttributeInstance[size]);
         if (instances.length > 1) {
-            throw new  IllegalStateException("Segment contains more than one instance of attribute " + this.name);
+            throw new IllegalStateException("Segment contains more than one instance of attribute " + this.name);
         } else if (instances.length == 1) {
             return instances[0];
         } else {
@@ -77,12 +110,6 @@ public class CustomAttribute implements PathToken {
         return new CustomAttributeInstance(this);
     }
 
-    public CustomAttribute(String name, String defaultValue, String token) {
-        this.name = name;
-        this.defaultValue = defaultValue;
-        this.token = token;
-    }
-
     //XML stuff
     public Element toXMLElement(Document document) {
         Element element = document.createElement(CUSTOM_ATTRIBUTE_TAG_NAME);
@@ -90,32 +117,5 @@ public class CustomAttribute implements PathToken {
         element.setAttribute(DEFAULT_VALUE_ATTR_NAME, defaultValue);
         element.setAttribute(TOKEN_ATTR_NAME, defaultValue);
         return element;
-    }
-
-    public static CustomAttribute fromXMLElement(Element element) {
-        String name = element.getAttribute(NAME_ATTR_NAME);
-        String defaultValue = element.getAttribute(DEFAULT_VALUE_ATTR_NAME);
-        String token = element.getAttribute(DEFAULT_VALUE_ATTR_NAME);
-        return new CustomAttribute(name, defaultValue, token);
-    }
-
-    public static Element listToXMLElement(Document document, List<CustomAttribute> attributes) {
-        Element attributesElement = document.createElement(CUSTOM_ATTRIBUTES_TAG_NAME);
-        for (CustomAttribute attribute : attributes) {
-            attributesElement.appendChild(attribute.toXMLElement(document));
-        }
-        return attributesElement;
-    }
-
-    public static List<CustomAttribute> XMLElementsToList(Element element) {
-        List<CustomAttribute> customAttributes = new ArrayList<>();
-
-        NodeList elements = element.getElementsByTagName(CUSTOM_ATTRIBUTE_TAG_NAME);
-        for (int i=0; i<elements.getLength(); i++) {
-            //Cast seems safe
-            CustomAttribute attr = CustomAttribute.fromXMLElement((Element) elements.item(i));
-            customAttributes.add(attr);
-        }
-        return customAttributes;
     }
 }

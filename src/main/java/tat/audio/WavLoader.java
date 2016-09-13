@@ -1,7 +1,10 @@
 package tat.audio;
 
 import javax.sound.sampled.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 
 /**
@@ -25,8 +28,8 @@ public class WavLoader {
 
     public byte[] convertToMono16Little(AudioInputStream in) throws IOException {
         //Potentially slow
-        AudioFormat format = new AudioFormat(in.getFormat().getSampleRate(),16,1,true,false);
-        AudioInputStream out = AudioSystem.getAudioInputStream(format,in);
+        AudioFormat format = new AudioFormat(in.getFormat().getSampleRate(), 16, 1, true, false);
+        AudioInputStream out = AudioSystem.getAudioInputStream(format, in);
         ByteArrayOutputStream outByte = new ByteArrayOutputStream();
         AudioSystem.write(out, AudioFileFormat.Type.WAVE, outByte);
         return outByte.toByteArray();

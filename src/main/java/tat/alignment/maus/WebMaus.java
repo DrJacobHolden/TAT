@@ -7,7 +7,8 @@ import tat.alignment.formats.AlignmentFormat;
 import tat.alignment.formats.TextGrid;
 
 import javax.sound.sampled.AudioInputStream;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -56,8 +57,8 @@ public class WebMaus implements AlignmentProvider {
         }
     }
 
-    private String getMausAlignmentFormat(Class<? extends AlignmentFormat> format){
-        if (format == TextGrid.class){
+    private String getMausAlignmentFormat(Class<? extends AlignmentFormat> format) {
+        if (format == TextGrid.class) {
             return "TextGrid";
         }
         return "";

@@ -15,18 +15,16 @@ import java.util.regex.Pattern;
  */
 public class TextGrid implements AlignmentFormat {
 
-    private String content;
-    private List<Interval> words = new ArrayList<>();
-    private List<Interval> canonicalPhones = new ArrayList<>();
-    private List<Interval> phones = new ArrayList<>();
-
     public static final String FILE_EXTENSION = ".textgrid";
-
     private final Pattern XMIN_PATTERN = Pattern.compile("[\\s]*xmin[\\s]*=[\\s]*([0-9]+(.[0-9]+)?)");
     private final Pattern XMAX_PATTERN = Pattern.compile("[\\s]*xmax[\\s]*=[\\s]*([0-9]+(.[0-9]+)?)");
     private final Pattern TEXT_PATTERN = Pattern.compile("[\\s]*text[\\s]*=[\\s]*\"([^\"]*)\"");
     private final Pattern INTERVAL_SIZE = Pattern.compile("[\\s]*intervals:[\\s]*size[\\s]*=[\\s]*([0-9]+)");
     private final Pattern TIER_NAME = Pattern.compile("[\\s]*name[\\s]*=[\\s]*\"([^\"]*)\"");
+    private String content;
+    private List<Interval> words = new ArrayList<>();
+    private List<Interval> canonicalPhones = new ArrayList<>();
+    private List<Interval> phones = new ArrayList<>();
 
     public TextGrid(String content) {
         this.content = content;
@@ -41,7 +39,7 @@ public class TextGrid implements AlignmentFormat {
         String line = null;
 
         int lineNum = 0;
-        while((line = in.readLine()) != null) {
+        while ((line = in.readLine()) != null) {
             lineNum++;
             if (lineNum == 7) {
                 textGrid.buildItems(in);
@@ -92,7 +90,7 @@ public class TextGrid implements AlignmentFormat {
         intervalSizeMatcher.find();
         int intervalLength = Integer.parseInt(intervalSizeMatcher.group(1));
 
-        for (int i=0; i<intervalLength; i++) {
+        for (int i = 0; i < intervalLength; i++) {
             intervalList.add(buildInterval(in));
         }
     }

@@ -38,7 +38,7 @@ public class LoadingDialog {
         stage.setScene(scene);
     }
 
-    public void show()  {
+    public void show() {
         stage.show();
     }
 

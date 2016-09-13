@@ -1,7 +1,7 @@
 package tat.audio;
 
-import tat.corpus.Segment;
 import javafx.application.Platform;
+import tat.corpus.Segment;
 import tat.ui.Position;
 import tat.ui.PositionListener;
 
@@ -15,16 +15,13 @@ import java.util.TimerTask;
  */
 public class AudioPlayer implements PositionListener {
 
+    private final long AUDIO_POSITION_UPDATE_INTERVAL = 20;
     private Position position;
     private Segment segment;
-
     private Clip clip;
     private Timer positionListenerTimer;
-
     private int stopPosition = 0;
     private boolean paused = false;
-
-    private final long AUDIO_POSITION_UPDATE_INTERVAL = 20;
 
     /**
      * Sets up an audio player to play the specified sound file.

@@ -1,7 +1,6 @@
 package tat.ui;
 
 import tat.corpus.Segment;
-import tat.ui.PositionListener;
 
 import java.util.HashSet;
 import java.util.Set;

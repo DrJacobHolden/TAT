@@ -24,7 +24,7 @@ public class AnnotationFile extends BaseFileSystemElement {
 
     private static Logger LOGGER = Logger.getLogger(AnnotationFile.class.getName());
 
-    private final Charset ENCODING =  StandardCharsets.UTF_8;
+    private final Charset ENCODING = StandardCharsets.UTF_8;
 
     private Segment segment;
 
@@ -53,7 +53,7 @@ public class AnnotationFile extends BaseFileSystemElement {
             loadFromFile(file);
         } catch (IOException e) {
             //Meh, we tried. Annotation can be empty string.
-            LOGGER.info("Couldn't find file at "+path+" with extensions "+ Arrays.toString(getFileExtensions()));
+            LOGGER.info("Couldn't find file at " + path + " with extensions " + Arrays.toString(getFileExtensions()));
         }
     }
 

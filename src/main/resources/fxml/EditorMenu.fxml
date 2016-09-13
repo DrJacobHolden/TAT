@@ -1,137 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<?import tat.ui.element.IconButton?>
-<?import tat.ui.element.waveform.WaveformDisplay?>
 <?import tat.ui.element.annotation.AnnotationDisplay?>
-<VBox fx:id="window" id="mainFrame" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.ui.view.EditorMenuController">
-   <children>
-      <AnchorPane id="soundFileArea" minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0" VBox.vgrow="NEVER">
-         <VBox.margin>
-            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-         </VBox.margin>
-         <children>
-            <HBox minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <VBox alignment="CENTER" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="202.5" minWidth="62.5" prefHeight="405.0" prefWidth="125.0" style="-fx-background-color: #1c1b22;" HBox.hgrow="NEVER">
-                     <children>
-                        <IconButton fx:id="splitButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
-                           <VBox.margin>
-                              <Insets bottom="12.5" />
-                           </VBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="joinButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
-                           <VBox.margin>
-                              <Insets bottom="12.5" />
-                           </VBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="alignButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </IconButton>
-                     </children>
-                     <HBox.margin>
-                        <Insets top="60.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" HBox.hgrow="NEVER">
-                     <HBox.margin>
-                        <Insets left="16.0" />
-                     </HBox.margin>
-                     <children>
-                        <WaveformDisplay fx:id="waveformDisplay" styleClass="scrollBarOverride" minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0" style="-fx-background-color: #2b2934;" StackPane.alignment="BOTTOM_RIGHT" />
-                        <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="31.25" minWidth="62.5" prefHeight="62.5" prefWidth="125.0" StackPane.alignment="TOP_RIGHT">
-                           <children>
-                              <IconButton fx:id="zoomInButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
-                              <IconButton fx:id="zoomOutButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY" />
-                           </children>
+<?import tat.ui.element.*?>
+<?import tat.ui.element.waveform.WaveformDisplay?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="window" id="mainFrame" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0"
+      style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60"
+      fx:controller="tat.ui.view.EditorMenuController">
+    <children>
+        <AnchorPane id="soundFileArea" minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0"
+                    VBox.vgrow="NEVER">
+            <VBox.margin>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+            </VBox.margin>
+            <children>
+                <HBox minHeight="232.5" minWidth="935.0" prefHeight="465.0" prefWidth="1870.0"
+                      AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                      AnchorPane.topAnchor="0.0">
+                    <children>
+                        <VBox alignment="CENTER" fillWidth="false" maxHeight="1.7976931348623157E308"
+                              maxWidth="1.7976931348623157E308" minHeight="202.5" minWidth="62.5" prefHeight="405.0"
+                              prefWidth="125.0" style="-fx-background-color: #1c1b22;" HBox.hgrow="NEVER">
+                            <children>
+                                <IconButton fx:id="splitButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false"
+                                            prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                                    <VBox.margin>
+                                        <Insets bottom="12.5"/>
+                                    </VBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="joinButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false"
+                                            prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                                    <VBox.margin>
+                                        <Insets bottom="12.5"/>
+                                    </VBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="alignButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false"
+                                            prefHeight="125.0" prefWidth="125.0" VBox.vgrow="NEVER">
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                </IconButton>
+                            </children>
+                            <HBox.margin>
+                                <Insets top="60.0"/>
+                            </HBox.margin>
+                        </VBox>
+                        <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                                   minHeight="232.5" minWidth="865.0" prefHeight="465.0" prefWidth="1730.0"
+                                   style="-fx-background-color: #2b2934;" HBox.hgrow="NEVER">
+                            <HBox.margin>
+                                <Insets left="16.0"/>
+                            </HBox.margin>
+                            <children>
+                                <WaveformDisplay fx:id="waveformDisplay" styleClass="scrollBarOverride"
+                                                 minHeight="232.5" minWidth="865.0" prefHeight="465.0"
+                                                 prefWidth="1730.0" style="-fx-background-color: #2b2934;"
+                                                 StackPane.alignment="BOTTOM_RIGHT"/>
+                                <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="31.25" minWidth="62.5"
+                                      prefHeight="62.5" prefWidth="125.0" StackPane.alignment="TOP_RIGHT">
+                                    <children>
+                                        <IconButton fx:id="zoomInButton" alignment="CENTER" contentDisplay="CENTER"
+                                                    minHeight="31.25" minWidth="31.25" mnemonicParsing="false"
+                                                    prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY"/>
+                                        <IconButton fx:id="zoomOutButton" alignment="CENTER" contentDisplay="CENTER"
+                                                    minHeight="31.25" minWidth="31.25" mnemonicParsing="false"
+                                                    prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </HBox>
+                <HBox minHeight="60.0" minWidth="310.0" prefHeight="60.0" prefWidth="310.0" AnchorPane.leftAnchor="0.0"
+                      AnchorPane.topAnchor="0.0">
+                    <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false"
+                                prefHeight="60.0" prefWidth="250.0"
+                                style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;"
+                                text="a_1.wav" textFill="#e4e1f0">
+                        <items>
+                        </items>
+                        <font>
+                            <Font name="Levenim MT" size="26.0"/>
+                        </font>
+                    </MenuButton>
+                    <IconButton fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" minHeight="60.5"
+                                minWidth="60.5" mnemonicParsing="false" prefHeight="60.5" prefWidth="60.5"
+                                textAlignment="JUSTIFY"/>
+                </HBox>
+            </children>
+        </AnchorPane>
+        <VBox maxHeight="525.0" minHeight="250.0" minWidth="935.0" prefHeight="525.0">
+            <children>
+                <VBox id="menuArea" alignment="CENTER" maxHeight="125.0" minHeight="62.5" prefHeight="125.0">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <children>
+                        <Pane fx:id="alignmentPane" style="-fx-background-color: #2b2934;" visible="false">
+                            <VBox.margin>
+                                <Insets/>
+                            </VBox.margin>
+                        </Pane>
+                        <HBox alignment="CENTER" maxHeight="125.0" minHeight="62.5" prefHeight="125.0">
+                            <children>
+                                <IconButton fx:id="openFileSelectorButton" style="-fx-background-color: transparent;"
+                                            minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0"
+                                            prefWidth="125.0">
+                                </IconButton>
+                                <IconButton fx:id="openCorpusButton" minHeight="62.5" minWidth="62.5"
+                                            mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <IconButton fx:id="prevSegmentButton" alignment="CENTER" contentDisplay="CENTER"
+                                            minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5"
+                                            prefWidth="62.5" textAlignment="JUSTIFY">
+                                    <HBox.margin>
+                                        <Insets right="12.5"/>
+                                    </HBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="playButton" minHeight="31.25" minWidth="31.25"
+                                            mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                                    <HBox.margin>
+                                        <Insets right="12.5"/>
+                                    </HBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="pauseButton" minHeight="31.25" minWidth="31.25"
+                                            mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                                    <HBox.margin>
+                                        <Insets right="12.5"/>
+                                    </HBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="stopButton" minHeight="31.25" minWidth="31.25"
+                                            mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                                    <HBox.margin>
+                                        <Insets right="12.5"/>
+                                    </HBox.margin>
+                                </IconButton>
+                                <IconButton fx:id="nextSegmentButton" minHeight="31.25" minWidth="31.25"
+                                            mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
+                                    <HBox.margin>
+                                        <Insets/>
+                                    </HBox.margin>
+                                </IconButton>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <IconButton fx:id="settingsButton" minHeight="62.5" minWidth="62.5"
+                                            mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets/>
+                            </VBox.margin>
                         </HBox>
-                     </children>
-                  </StackPane>
-               </children>
-            </HBox>
-            <HBox minHeight="60.0" minWidth="310.0" prefHeight="60.0" prefWidth="310.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0; -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;" text="a_1.wav" textFill="#e4e1f0">
-                 <items>
-                 </items>
-                  <font>
-                     <Font name="Levenim MT" size="26.0" />
-                  </font>
-               </MenuButton>
-               <IconButton fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" minHeight="60.5" minWidth="60.5" mnemonicParsing="false" prefHeight="60.5" prefWidth="60.5" textAlignment="JUSTIFY"/>
-            </HBox>
-         </children>
-      </AnchorPane>
-      <VBox maxHeight="525.0" minHeight="250.0" minWidth="935.0" prefHeight="525.0">
-         <children>
-            <VBox id="menuArea" alignment="CENTER" maxHeight="125.0" minHeight="62.5" prefHeight="125.0">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-               <children>
-                  <Pane fx:id="alignmentPane" style="-fx-background-color: #2b2934;" visible="false">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Pane>
-                  <HBox alignment="CENTER" maxHeight="125.0" minHeight="62.5" prefHeight="125.0">
-                     <children>
-                        <IconButton fx:id="openFileSelectorButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0">
-                        </IconButton>
-                        <IconButton fx:id="openCorpusButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
-                        <Pane HBox.hgrow="ALWAYS" />
-                        <IconButton fx:id="prevSegmentButton" alignment="CENTER" contentDisplay="CENTER" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5" textAlignment="JUSTIFY">
-                           <HBox.margin>
-                              <Insets right="12.5" />
-                           </HBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="playButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
-                           <HBox.margin>
-                              <Insets right="12.5" />
-                           </HBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="pauseButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
-                           <HBox.margin>
-                              <Insets right="12.5" />
-                           </HBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="stopButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
-                           <HBox.margin>
-                              <Insets right="12.5" />
-                           </HBox.margin>
-                        </IconButton>
-                        <IconButton fx:id="nextSegmentButton" minHeight="31.25" minWidth="31.25" mnemonicParsing="false" prefHeight="62.5" prefWidth="62.5">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                        </IconButton>
-                        <Pane HBox.hgrow="ALWAYS" />
-                        <IconButton fx:id="settingsButton" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" />
-                     </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </HBox>
-               </children>
-            </VBox>
-            <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0" VBox.vgrow="ALWAYS">
-               <VBox.margin>
-                  <Insets top="25.0" />
-               </VBox.margin>
-            </AnnotationDisplay>
-         </children>
-         <VBox.margin>
-            <Insets bottom="25.0" left="25.0" right="25.0" />
-         </VBox.margin>
-      </VBox>
-   </children>
+                    </children>
+                </VBox>
+                <AnnotationDisplay id="textArea" fx:id="textArea" minHeight="150.0" prefHeight="300.0"
+                                   VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets top="25.0"/>
+                    </VBox.margin>
+                </AnnotationDisplay>
+            </children>
+            <VBox.margin>
+                <Insets bottom="25.0" left="25.0" right="25.0"/>
+            </VBox.margin>
+        </VBox>
+    </children>
 </VBox>

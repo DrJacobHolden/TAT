@@ -1,20 +1,22 @@
 package tat.ui.element;
 
-import tat.corpus.Recording;
-import tat.corpus.Segment;
-import tat.corpus.attribute.CustomAttribute;
-import tat.corpus.attribute.CustomAttributeInstance;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
+import tat.corpus.Recording;
+import tat.corpus.Segment;
+import tat.corpus.attribute.CustomAttribute;
+import tat.corpus.attribute.CustomAttributeInstance;
+import tat.ui.Colours;
 import tat.ui.Position;
 import tat.ui.PositionListener;
-import tat.ui.Colours;
 import tat.ui.view.EditorMenuController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static tat.ui.Main.p;
 
@@ -25,28 +27,27 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
     private final Recording r;
     private final EditorMenuController e;
-    private Segment activeSegment;
-
     private final int NUM_CONSTANT_ITEMS = 4;
+    private Segment activeSegment;
 
     //TODO:
     /**
      * Map speaker ids to an English name (Should be extensible as will be used by all custom fields)
      * Tooltips on Context Menu items
-     *
-     *  * = In Progress
-     *  / = Done
-     *
+     * <p>
+     * * = In Progress
+     * / = Done
+     * <p>
      * - Enable/Disable segment (*)
      * - Rename (*)
-     *   - Shows popup menu with a textfield ( )
+     * - Shows popup menu with a textfield ( )
      * - Set Speaker (/)
-     *   - List of Speakers
-     *     - Secondary_Gray == Current Speaker
-     *   - Add Speaker (/)
+     * - List of Speakers
+     * - Secondary_Gray == Current Speaker
+     * - Add Speaker (/)
      * - Set "Custom Field Name" (/)
-     *   - List of "Custom Field Name"
-     *   - Add "Custom Field Name"
+     * - List of "Custom Field Name"
+     * - Add "Custom Field Name"
      * - Add Custom Field (/)
      */
 
@@ -91,22 +92,22 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         //Build a list of all the available custom attributes for the recording
         List<CustomAttributeInstance> attributes = new ArrayList();
-        for(Segment s : r) {
+        for (Segment s : r) {
             for (CustomAttributeInstance c : s.customAttributes) {
-                if(!attributes.contains(c)) {
+                if (!attributes.contains(c)) {
                     attributes.add(c);
                 }
             }
         }
 
         List<Menu> customAttributeMenus = new ArrayList();
-        for(CustomAttributeInstance c : attributes) {
+        for (CustomAttributeInstance c : attributes) {
             customAttributeMenus.add(createCustomAttributeMenu(c));
         }
 
         MenuItem newCustomAttribute = createMenuItem("New Attribute", false, () -> {
             CustomAttribute custom = createAttribute();
-            if(custom != null) {
+            if (custom != null) {
                 activeSegment.customAttributes.add(custom.newCustomAttributeInstance());
             }
             //Do nothing if null == cancel/close dialog
@@ -129,7 +130,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
         //Create the new button
         speaker.getItems().add(createMenuItem("New", false, () -> {
             //Set the speaker id on the segment to be the next speakerId
-            activeSegment.setSpeakerId(speaker.getItems().size()-1);
+            activeSegment.setSpeakerId(speaker.getItems().size() - 1);
         }));
 
         return speaker;
@@ -155,17 +156,17 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
     private void refreshSpeakerMenu(Menu speaker) {
         //Find the highest used speaker id
         int highest = 0;
-        for(Segment s : r.getSegments().values()) {
-            if(highest < s.getSpeakerId())
+        for (Segment s : r.getSegments().values()) {
+            if (highest < s.getSpeakerId())
                 highest = s.getSpeakerId();
         }
 
         //Create the menu items
         List<MenuItem> items = new ArrayList();
-        for(int i = 0; i <= highest; i++) {
+        for (int i = 0; i <= highest; i++) {
             final int j = i;
             //Colour the active segment
-            if(i == activeSegment.getSpeakerId()) {
+            if (i == activeSegment.getSpeakerId()) {
                 items.add(createMenuItem(Integer.toString(i), true, () -> {
                     //Do nothing as already set
                 }));
@@ -187,11 +188,11 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
         //Find the values available for attribute
         List<String> values = new ArrayList();
         values.add(c.customAttribute.getDefaultValue());
-        for(Segment s : r.getSegments().values()) {
-            if(s.customAttributes.contains(c)) {
+        for (Segment s : r.getSegments().values()) {
+            if (s.customAttributes.contains(c)) {
                 String value = s.customAttributes.get(s.customAttributes.indexOf(c)).getValue();
                 //Add missing values
-                if(!values.contains(value)) {
+                if (!values.contains(value)) {
                     values.add(value);
                 }
             }
@@ -199,9 +200,9 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         //Create the menu items
         List<MenuItem> items = new ArrayList();
-        for(String v : values) {
+        for (String v : values) {
             //Colour the active segment
-            if(v.equals(c.customAttribute.getValue(activeSegment))) {
+            if (v.equals(c.customAttribute.getValue(activeSegment))) {
                 items.add(createMenuItem(v, true, () -> {
                     //Do nothing as already set
                 }));
@@ -231,7 +232,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
         Label label = new Label(text);
         label.setFont(Font.font("Levenim MT", 16));
 
-        if(selected) {
+        if (selected) {
             label.setTextFill(Colours.SECONDARY_GRAY);
         } else {
             label.setTextFill(Colours.WHITE);
@@ -245,10 +246,6 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
         activeSegment = segment;
-    }
-
-    private interface CustomCall {
-        void act();
     }
 
     private CustomAttribute createAttribute() {
@@ -296,7 +293,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         // Do some validation (using the Java 8 lambda syntax).
         name.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!token.getText().trim().equals("")) {
+            if (!token.getText().trim().equals("")) {
                 okayButton.setDisable(newValue.trim().isEmpty());
             } else {
                 okayButton.setDisable(true);
@@ -305,7 +302,7 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
 
         // Do some validation (using the Java 8 lambda syntax).
         token.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(!name.getText().trim().equals("")) {
+            if (!name.getText().trim().equals("")) {
                 okayButton.setDisable(newValue.trim().isEmpty());
             } else {
                 okayButton.setDisable(true);
@@ -315,14 +312,14 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
         dialogPane.setContent(grid);
 
         alert.setResultConverter(dialogButton -> {
-            if(dialogButton == buttonOkay) {
+            if (dialogButton == buttonOkay) {
                 return new String[]{name.getText(), defaultValue.getText(), token.getText()};
             }
             return null;
         });
 
         Optional<String[]> result = alert.showAndWait();
-        if(result.isPresent())
+        if (result.isPresent())
             return new CustomAttribute(result.get()[0], result.get()[1], result.get()[2]);
         return null;
     }
@@ -341,9 +338,13 @@ public class RightClickMenu extends ContextMenu implements PositionListener {
         dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             return result.get();
         }
         return null;
+    }
+
+    private interface CustomCall {
+        void act();
     }
 }

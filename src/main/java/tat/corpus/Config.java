@@ -1,9 +1,9 @@
 package tat.corpus;
 
-import tat.corpus.attribute.CustomAttribute;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import tat.corpus.attribute.CustomAttribute;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,19 +23,14 @@ import java.util.logging.Logger;
  * Created by max on 7/2/16.
  */
 public class Config {
-    private static Logger LOGGER = Logger.getLogger(Config.class.getName());
-
     public static final String DEFAULT_AUDIO_STORAGE_RULE = "%n/%d-%s";
     public static final String DEFAULT_ANNOTATION_STORAGE_RULE = "%n/%d-%s";
     public static final String DEFAULT_ALIGNMENT_STORAGE_RULE = "%n/%d-%s";
-
-
     private static final String ROOT_ELEMENT_NAME = "config";
-
     private static final String AUDIO_RULE_TAG_NAME = "audioRule";
     private static final String ANNOTATION_RULE_TAG_NAME = "annotationRule";
     private static final String ALIGNMENT_RULE_TAG_NAME = "alignmentRule";
-
+    private static Logger LOGGER = Logger.getLogger(Config.class.getName());
     /**
      * The storage rules for the different FileSystemElements
      */
@@ -52,6 +47,27 @@ public class Config {
         this.audioStorageRule = audioStorageRule;
         this.alignmentStorageRule = alignmentStorageRule;
         this.annotationStorageRule = annotationStorageRule;
+    }
+
+    public static Config load(Path configPath) throws IOException {
+        try {
+            LOGGER.info("Loading config from path " + configPath.toString());
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            Document xmlDoc = builder.parse(configPath.toFile());
+            String audioRule = xmlDoc.getElementsByTagName(AUDIO_RULE_TAG_NAME).item(0).getTextContent();
+            String annotationRule = xmlDoc.getElementsByTagName(ANNOTATION_RULE_TAG_NAME).item(0).getTextContent();
+            String alignmentRule = xmlDoc.getElementsByTagName(ALIGNMENT_RULE_TAG_NAME).item(0).getTextContent();
+            Element customAttributesElement = (Element) xmlDoc.getElementsByTagName(CustomAttribute.CUSTOM_ATTRIBUTES_TAG_NAME).item(0);
+
+            Config config = new Config(audioRule, annotationRule, alignmentRule);
+            config.customAttributes.addAll(CustomAttribute.XMLElementsToList(customAttributesElement));
+
+            return config;
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new IOException();
+        }
     }
 
     public void save(Path configPath) throws IOException {
@@ -85,26 +101,5 @@ public class Config {
         Element element = document.createElement(tagName);
         element.setTextContent(value);
         return element;
-    }
-
-    public static Config load(Path configPath) throws IOException {
-        try {
-            LOGGER.info("Loading config from path " + configPath.toString());
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            Document xmlDoc = builder.parse(configPath.toFile());
-            String audioRule = xmlDoc.getElementsByTagName(AUDIO_RULE_TAG_NAME).item(0).getTextContent();
-            String annotationRule = xmlDoc.getElementsByTagName(ANNOTATION_RULE_TAG_NAME).item(0).getTextContent();
-            String alignmentRule = xmlDoc.getElementsByTagName(ALIGNMENT_RULE_TAG_NAME).item(0).getTextContent();
-            Element customAttributesElement = (Element) xmlDoc.getElementsByTagName(CustomAttribute.CUSTOM_ATTRIBUTES_TAG_NAME).item(0);
-
-            Config config = new Config(audioRule, annotationRule, alignmentRule);
-            config.customAttributes.addAll(CustomAttribute.XMLElementsToList(customAttributesElement));
-
-            return config;
-        } catch (SAXException | ParserConfigurationException e) {
-            throw new IOException();
-        }
     }
 }

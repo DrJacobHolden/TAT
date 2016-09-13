@@ -10,13 +10,13 @@ import java.util.Timer;
 public class TimerHandler {
 
     private static TimerHandler instance;
+    private List<Timer> timerList = new ArrayList();
+
     public static TimerHandler getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new TimerHandler();
         return instance;
     }
-
-    private List<Timer> timerList = new ArrayList();
 
     public Timer newTimer() {
         Timer timer = new Timer();
@@ -25,7 +25,7 @@ public class TimerHandler {
     }
 
     public void shutdownTimers() {
-        for(Timer t : timerList) {
+        for (Timer t : timerList) {
             t.cancel();
         }
     }

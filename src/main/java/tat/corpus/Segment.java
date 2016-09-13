@@ -28,8 +28,27 @@ public class Segment {
 
     //EEK. Lots of associations. BEWARE! Constant for safety.
     private final Corpus corpus;
-    private Recording recording;
     public List<CustomAttributeInstance> customAttributes = new ArrayList<>();
+    private Recording recording;
+    //Default to 1
+    private int segmentNumber = 1;
+    private int speakerId = 0;
+    //This is only used if the segment is not yet associated with a recording yet.
+    private String baseName;
+    private AlignmentFile alignmentFile;
+    private AnnotationFile annotationFile;
+    private AudioFile audioFile;
+
+    public Segment(Corpus corpus) {
+        this.corpus = corpus;
+    }
+
+    public Segment(Corpus corpus, int segmentNumber, int speakerId, String baseName) {
+        this.corpus = corpus;
+        this.segmentNumber = segmentNumber;
+        this.speakerId = speakerId;
+        this.baseName = baseName;
+    }
 
     public Corpus getCorpus() {
         return corpus;
@@ -46,19 +65,22 @@ public class Segment {
         this.recording = recording;
     }
 
-    //Default to 1
-    private int segmentNumber = 1;
-    private int speakerId = 0;
-
-    //This is only used if the segment is not yet associated with a recording yet.
-    private String baseName;
-
     public int getSegmentNumber() {
         return segmentNumber;
     }
 
+    public void setSegmentNumber(int segmentNumber) {
+        attributeChanged();
+        this.segmentNumber = segmentNumber;
+    }
+
     public int getSpeakerId() {
         return speakerId;
+    }
+
+    public void setSpeakerId(int speakerId) {
+        attributeChanged();
+        this.speakerId = speakerId;
     }
 
     public String getBaseName() {
@@ -69,22 +91,6 @@ public class Segment {
         return baseName;
     }
 
-    public void setSegmentNumber(int segmentNumber) {
-        attributeChanged();
-        this.segmentNumber = segmentNumber;
-    }
-
-    public void setSpeakerId(int speakerId) {
-        attributeChanged();
-        this.speakerId = speakerId;
-    }
-
-    private void attributeChanged() {
-        if (recording != null) {
-            recording.markFilesForDelete(getPossiblePaths());
-        }
-    }
-
     public void setBaseName(String baseName) {
         if (recording != null) {
             throw new UnsupportedOperationException("Set the basename of the recording instead");
@@ -92,9 +98,11 @@ public class Segment {
         this.baseName = baseName;
     }
 
-    private AlignmentFile alignmentFile;
-    private AnnotationFile annotationFile;
-    private AudioFile audioFile;
+    private void attributeChanged() {
+        if (recording != null) {
+            recording.markFilesForDelete(getPossiblePaths());
+        }
+    }
 
     public AlignmentFile getAlignmentFile() {
         if (alignmentFile == null) {
@@ -134,17 +142,6 @@ public class Segment {
 
     protected void loadExternalAudioFile(File file) throws IOException, UnsupportedAudioFileException {
         this.audioFile = new AudioFile(this, file.toPath());
-    }
-
-    public Segment(Corpus corpus) {
-        this.corpus = corpus;
-    }
-
-    public Segment(Corpus corpus, int segmentNumber, int speakerId, String baseName) {
-        this.corpus = corpus;
-        this.segmentNumber = segmentNumber;
-        this.speakerId = speakerId;
-        this.baseName = baseName;
     }
 
     public void save() throws IOException {
@@ -192,7 +189,7 @@ public class Segment {
     }
 
     public Segment split(long frame, int stringPos) throws IOException {
-        Segment segment2 = new Segment(corpus, segmentNumber+1, speakerId, baseName);
+        Segment segment2 = new Segment(corpus, segmentNumber + 1, speakerId, baseName);
         segment2.setRecording(recording);
 
         AudioFile audio2 = getAudioFile().split(segment2, (int) frame);

@@ -1,11 +1,5 @@
 package tat.ui.view;
 
-import tat.corpus.Config;
-import tat.corpus.Corpus;
-import tat.corpus.Recording;
-import tat.corpus.file.AlignmentFile;
-import tat.corpus.file.AnnotationFile;
-import tat.corpus.file.AudioFile;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -21,15 +15,22 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tat.GlobalConfiguration;
-import tat.ui.Main;
-import tat.ui.TimerHandler;
+import tat.corpus.Config;
+import tat.corpus.Corpus;
+import tat.corpus.Recording;
+import tat.corpus.file.AlignmentFile;
+import tat.corpus.file.AnnotationFile;
+import tat.corpus.file.AudioFile;
 import tat.ui.Colours;
 import tat.ui.FileSelectedHandler;
+import tat.ui.Main;
+import tat.ui.TimerHandler;
 import tat.ui.element.IconButton;
 import tat.ui.icon.Icon;
 import tat.ui.icon.IconLoader;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -74,6 +75,37 @@ public class MainMenuController implements FileSelectedHandler {
     //Used if annotation file is dragged in before audio
     private File annotationFile;
 
+    /**
+     * The constructor is called before the initialize() method.
+     */
+    public MainMenuController() {
+    }
+
+    public static String getBasename(File f) {
+        return f.getName().substring(0, f.getName().lastIndexOf('.'));
+    }
+
+    public static int createSegmentSelectorDialog(String type, String filename, int count) {
+        ChoiceDialog<Integer> alert = new ChoiceDialog(1, IntStream.range(1, count + 1).boxed().
+                collect(Collectors.toList()));
+        alert.setTitle("Assign " + type);
+        alert.setHeaderText(filename + " matched recording " + filename + " which segment\n" +
+                " would you like to assign" +
+                " this " + type.toLowerCase() + " to?");
+        alert.setContentText("Segment: ");
+        alert.setGraphic(null);
+
+        alert.initOwner(p);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
+
+        Optional<Integer> result = alert.showAndWait();
+        if (result.isPresent())
+            return result.get();
+        return 0;
+    }
+
     private void loadIcons() {
         System.out.println("Icons loaded");
         fileButton.setIcons(new Icon(IconLoader.getInstance().mainFileIcon), new Icon(IconLoader.getInstance().mainFileIconPressed));
@@ -96,14 +128,14 @@ public class MainMenuController implements FileSelectedHandler {
     private void showAudioSelector() {
         FileChooser audioChooser = getFileChooser("Audio", AudioFile.FILE_EXTENSIONS);
         File file = audioChooser.showOpenDialog(primaryStage);
-        if(file != null)
+        if (file != null)
             addAudioFile(file, null, null);
     }
 
     private void showAnnotationSelector() {
         FileChooser annotationChooser = getFileChooser("Annotation", AnnotationFile.FILE_EXTENSIONS);
         File file = annotationChooser.showOpenDialog(primaryStage);
-        if(file != null)
+        if (file != null)
             addAnnotationFile(file);
     }
 
@@ -128,7 +160,7 @@ public class MainMenuController implements FileSelectedHandler {
             if (file != null) {
                 setCorpus(file);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             Main.createInfoDialog("Error", "Failed to load corpus.", Alert.AlertType.INFORMATION);
         }
     }
@@ -138,7 +170,6 @@ public class MainMenuController implements FileSelectedHandler {
         settingsButton.setFlashing(false);
         menuFlash();
     }
-
 
     //TODO: Generic or specific error messages?
     public void setCorpus(File file) throws IOException {
@@ -151,8 +182,8 @@ public class MainMenuController implements FileSelectedHandler {
     }
 
     public void fileSelected(String file) {
-        if(editor != null) {
-            if(!editor.createSaveDialog()) {
+        if (editor != null) {
+            if (!editor.createSaveDialog()) {
                 //User chose cancel or saving failed
                 return;
             }
@@ -165,7 +196,7 @@ public class MainMenuController implements FileSelectedHandler {
         loader.setLocation(ClassLoader.getSystemResource("fxml/EditorMenu.fxml"));
         try {
             main.rootLayout = loader.load();
-        } catch(IOException e) {
+        } catch (IOException e) {
             Main.createInfoDialog("Error", "Program error, please reinstall.", Alert.AlertType.INFORMATION);
         }
 
@@ -190,11 +221,6 @@ public class MainMenuController implements FileSelectedHandler {
         initialiseDragAndDrop();
         EditorMenuController.populateFileMenu(main.corpus, fileMenu, null);
     }
-
-    /**
-     * The constructor is called before the initialize() method.
-     */
-    public MainMenuController() {}
 
     /**
      * Initializes the controller class. This method is automatically called
@@ -234,35 +260,35 @@ public class MainMenuController implements FileSelectedHandler {
     }
 
     public void initialiseDragAndDrop() {
-            window.setOnDragOver(new EventHandler <DragEvent>()  {
-                public String[] acceptedTypes = Stream.concat(
-                        Arrays.stream(AudioFile.FILE_EXTENSIONS),
-                        Stream.concat(Arrays.stream(AnnotationFile.FILE_EXTENSIONS),
-                        Arrays.stream(AlignmentFile.FILE_EXTENSIONS)))
-                        .toArray(String[]::new);
+        window.setOnDragOver(new EventHandler<DragEvent>() {
+            public String[] acceptedTypes = Stream.concat(
+                    Arrays.stream(AudioFile.FILE_EXTENSIONS),
+                    Stream.concat(Arrays.stream(AnnotationFile.FILE_EXTENSIONS),
+                            Arrays.stream(AlignmentFile.FILE_EXTENSIONS)))
+                    .toArray(String[]::new);
 
-                @Override
-                public void handle(DragEvent event) {
-                    Dragboard db = event.getDragboard();
-                    boolean invalidFileFound = false;
-                    if (db.hasFiles()) {
-                        for(File file : db.getFiles()) {
-                            String absolutePath = file.getAbsolutePath();
-                            if (!file.isDirectory() && !invalidFileFound) {
-                                invalidFileFound = !isValidExtension(file, acceptedTypes);
-                            } else {
-                                //Only accept a single item if the item is a directory
-                                if (db.getFiles().size() != 1) {
-                                    invalidFileFound = true;
-                                }
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean invalidFileFound = false;
+                if (db.hasFiles()) {
+                    for (File file : db.getFiles()) {
+                        String absolutePath = file.getAbsolutePath();
+                        if (!file.isDirectory() && !invalidFileFound) {
+                            invalidFileFound = !isValidExtension(file, acceptedTypes);
+                        } else {
+                            //Only accept a single item if the item is a directory
+                            if (db.getFiles().size() != 1) {
+                                invalidFileFound = true;
                             }
                         }
-                        if (!invalidFileFound)
-                            event.acceptTransferModes(TransferMode.ANY);
                     }
-                    event.consume();
+                    if (!invalidFileFound)
+                        event.acceptTransferModes(TransferMode.ANY);
                 }
-            });
+                event.consume();
+            }
+        });
 
         window.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
@@ -270,9 +296,9 @@ public class MainMenuController implements FileSelectedHandler {
             Map<String, File> annotationFiles = new HashMap<String, File>();
             Map<String, File> alignmentFiles = new HashMap<String, File>();
 
-            for(File f : db.getFiles()) {
+            for (File f : db.getFiles()) {
                 if (f.isDirectory()) {
-                    if(Corpus.corpusExists(f.toPath())) {
+                    if (Corpus.corpusExists(f.toPath())) {
                         try {
                             setCorpus(f);
                         } catch (IOException e) {
@@ -293,16 +319,16 @@ public class MainMenuController implements FileSelectedHandler {
             }
 
             //Loop through audioFiles
-            for(File f : audioFiles) {
+            for (File f : audioFiles) {
                 String name = getBasename(f);
                 addAudioFile(f, annotationFiles.remove(name), alignmentFiles.remove(name));
             }
 
             //Handle remaining files
-            for (File f: annotationFiles.values()) {
+            for (File f : annotationFiles.values()) {
                 addAnnotationFile(f);
             }
-            for (File f: alignmentFiles.values()) {
+            for (File f : alignmentFiles.values()) {
                 addAlignmentFile(f);
             }
         });
@@ -312,7 +338,7 @@ public class MainMenuController implements FileSelectedHandler {
     public void addAudioFile(File f, File annotationFile, File alignmentFile) {
         String name = getBasename(f);
         Recording r = main.corpus.recordings.get(name);
-        if(r != null) {
+        if (r != null) {
             Main.createInfoDialog("Error", "A duplicate audio file called " + name + " already exists. Please rename" +
                     " this file before reimporting.", Alert.AlertType.INFORMATION);
             return;
@@ -324,11 +350,11 @@ public class MainMenuController implements FileSelectedHandler {
     public void addAnnotationFile(File f) {
         String name = getBasename(f);
         Recording r = main.corpus.recordings.get(name);
-        if(r != null) {
+        if (r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
                 int id = createSegmentSelectorDialog("Annotation", name, r.getSegments().size());
-                if(id == 0) //Cancel/Window close
+                if (id == 0) //Cancel/Window close
                     return;
                 segmentId = id;
             }
@@ -342,11 +368,11 @@ public class MainMenuController implements FileSelectedHandler {
     public void addAlignmentFile(File f) {
         String name = getBasename(f);
         Recording r = main.corpus.recordings.get(name);
-        if(r != null) {
+        if (r != null) {
             int segmentId = 0;
             if (r.getSegments().size() != 1) {
                 int id = createSegmentSelectorDialog("Alignment", name, r.getSegments().size());
-                if(id == 0) //Cancel/Window close
+                if (id == 0) //Cancel/Window close
                     return;
                 segmentId = id;
             }
@@ -364,7 +390,7 @@ public class MainMenuController implements FileSelectedHandler {
      * a result the user will never see the button flashing forever.
      */
     private void menuFlash() {
-        if(!menuFlashing) {
+        if (!menuFlashing) {
             menuFlashing = true;
             TimerHandler.getInstance().newTimer().schedule(
                     new TimerTask() {
@@ -389,33 +415,8 @@ public class MainMenuController implements FileSelectedHandler {
         }
     }
 
-    public static String getBasename(File f) {
-        return f.getName().substring(0, f.getName().lastIndexOf('.'));
-    }
-
     public boolean isValidExtension(File file, String[] extensions) {
         return Arrays.stream(extensions).anyMatch(e -> file.toString().endsWith(e));
-    }
-
-    public static int createSegmentSelectorDialog(String type, String filename, int count) {
-        ChoiceDialog<Integer> alert = new ChoiceDialog(1, IntStream.range(1, count+1).boxed().
-                collect(Collectors.toList()));
-        alert.setTitle("Assign " + type);
-        alert.setHeaderText(filename + " matched recording " + filename + " which segment\n" +
-                " would you like to assign" +
-                " this " + type.toLowerCase() + " to?");
-        alert.setContentText("Segment: ");
-        alert.setGraphic(null);
-
-        alert.initOwner(p);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(ClassLoader.getSystemResource("css/dialog.css").toExternalForm());
-
-        Optional<Integer> result = alert.showAndWait();
-        if(result.isPresent())
-            return result.get();
-        return 0;
     }
 }
 

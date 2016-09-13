@@ -7,5 +7,6 @@ import java.io.InputStream;
  */
 public interface AlignmentFormat {
     public String getFileExtension();
+
     public InputStream getStream();
 }

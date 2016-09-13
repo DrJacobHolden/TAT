@@ -1,84 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import tat.ui.element.IconButton?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<VBox id="mainFrame" fx:id="window" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tat.ui.view.MainMenuController">
-   <children>
-      <AnchorPane fx:id="soundFileArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;" VBox.vgrow="NEVER" disable="TRUE">
-         <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;" text="No files" textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <items>
-            </items>
-            <font>
-               <Font name="Levenim MT" size="28.0" />
-            </font>
-         </MenuButton>
-         <VBox.margin>
-            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-         </VBox.margin>
-         <children>
-            <Label id="loadText" alignment="CENTER" layoutX="1.0" layoutY="94.0" prefWidth="1870.0" text="DRAG SOUND FILE HERE" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="90.0">
-               <font>
-                  <Font name="Levenim MT Bold" size="70.0" />
-               </font>
-            </Label>
-            <Label id="loadText" alignment="CENTER" layoutX="6.0" layoutY="177.0" prefWidth="1870.0" text="or click to browse" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="177.0">
-               <font>
-                  <Font name="Levenim MT Bold" size="36.0" />
-               </font>
-            </Label>
-         </children>
-      </AnchorPane>
-      <GridPane id="menuArea" alignment="CENTER" minHeight="100.0" prefHeight="200.0" VBox.vgrow="NEVER">
-         <VBox.margin>
-            <Insets left="25.0" right="25.0" />
-         </VBox.margin>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" />
-         </rowConstraints>
-         <columnConstraints>
-            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <children>
-            <IconButton fx:id="fileButton" contentDisplay="CENTER" mnemonicParsing="false" minHeight="75" minWidth="75" prefHeight="150.0" prefWidth="150.0" maxHeight="300.0" maxWidth="300.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-            <IconButton fx:id="settingsButton" style="-fx-background-color: transparent;" minHeight="62.5" minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.valignment="CENTER" disable="TRUE"/>
-            <Label fx:id="corpus" alignment="CENTER" prefWidth="1870.0" text="Please select a Corpus" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" GridPane.columnIndex="1" GridPane.rowIndex="2">
-            <font>
-               <Font name="Levenim MT Bold" size="36.0" />
-            </font>
-            </Label>
-         </children>
-      </GridPane>
-      <AnchorPane fx:id="textArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;" VBox.vgrow="NEVER" disable="TRUE">
-         <VBox.margin>
-            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-         </VBox.margin>
-         <children>
-            <Label id="loadText" alignment="CENTER" layoutX="1.0" layoutY="100.0" prefWidth="1870.0" text="DRAG TEXT FILE HERE" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="90.0">
-               <font>
-                  <Font name="Levenim MT Bold" size="70.0" />
-               </font>
-            </Label>
-            <Label id="loadText" alignment="CENTER" layoutX="38.0" layoutY="173.0" prefWidth="1870.0" text="or click to browse" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="177.0">
-               <font>
-                  <Font name="Levenim MT Bold" size="36.0" />
-               </font>
-            </Label>
-         </children>
-      </AnchorPane>
-   </children>
+<VBox xmlns:fx="http://javafx.com/fxml/1" id="mainFrame" fx:id="window" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0"
+      style="-fx-background-color: #1c1b22;" xmlns="http://javafx.com/javafx/8.0.60"
+      fx:controller="tat.ui.view.MainMenuController">
+    <children>
+        <AnchorPane fx:id="soundFileArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;"
+                    VBox.vgrow="NEVER" disable="TRUE">
+            <MenuButton fx:id="fileMenu" layoutY="2.0" minHeight="60.0" minWidth="250.0" mnemonicParsing="false"
+                        prefHeight="60.0" prefWidth="250.0"
+                        style="-fx-background-color: #1c1b22; -fx-mark-color: #e4e1f0;" text="No files"
+                        textFill="#e4e1f0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <items>
+                </items>
+                <font>
+                    <Font name="Levenim MT" size="28.0"/>
+                </font>
+            </MenuButton>
+            <VBox.margin>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+            </VBox.margin>
+            <children>
+                <Label id="loadText" alignment="CENTER" layoutX="1.0" layoutY="94.0" prefWidth="1870.0"
+                       text="DRAG SOUND FILE HERE" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP"
+                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="90.0">
+                    <font>
+                        <Font name="Levenim MT Bold" size="70.0"/>
+                    </font>
+                </Label>
+                <Label id="loadText" alignment="CENTER" layoutX="6.0" layoutY="177.0" prefWidth="1870.0"
+                       text="or click to browse" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP"
+                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="177.0">
+                    <font>
+                        <Font name="Levenim MT Bold" size="36.0"/>
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+        <GridPane id="menuArea" alignment="CENTER" minHeight="100.0" prefHeight="200.0" VBox.vgrow="NEVER">
+            <VBox.margin>
+                <Insets left="25.0" right="25.0"/>
+            </VBox.margin>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+            </rowConstraints>
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <children>
+                <IconButton fx:id="fileButton" contentDisplay="CENTER" mnemonicParsing="false" minHeight="75"
+                            minWidth="75" prefHeight="150.0" prefWidth="150.0" maxHeight="300.0" maxWidth="300.0"
+                            style="-fx-background-color: transparent;" GridPane.columnIndex="1"
+                            GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+                            GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS"/>
+                <IconButton fx:id="settingsButton" style="-fx-background-color: transparent;" minHeight="62.5"
+                            minWidth="62.5" mnemonicParsing="false" prefHeight="125.0" prefWidth="125.0"
+                            GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.valignment="CENTER" disable="TRUE"/>
+                <Label fx:id="corpus" alignment="CENTER" prefWidth="1870.0" text="Please select a Corpus"
+                       textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP" GridPane.columnIndex="1"
+                       GridPane.rowIndex="2">
+                    <font>
+                        <Font name="Levenim MT Bold" size="36.0"/>
+                    </font>
+                </Label>
+            </children>
+        </GridPane>
+        <AnchorPane fx:id="textArea" minHeight="200.0" prefHeight="400.0" style="-fx-background-color: #2b2934;"
+                    VBox.vgrow="NEVER" disable="TRUE">
+            <VBox.margin>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+            </VBox.margin>
+            <children>
+                <Label id="loadText" alignment="CENTER" layoutX="1.0" layoutY="100.0" prefWidth="1870.0"
+                       text="DRAG TEXT FILE HERE" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP"
+                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="90.0">
+                    <font>
+                        <Font name="Levenim MT Bold" size="70.0"/>
+                    </font>
+                </Label>
+                <Label id="loadText" alignment="CENTER" layoutX="38.0" layoutY="173.0" prefWidth="1870.0"
+                       text="or click to browse" textAlignment="JUSTIFY" textFill="#e4e1f0" textOverrun="CLIP"
+                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="177.0">
+                    <font>
+                        <Font name="Levenim MT Bold" size="36.0"/>
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+    </children>
 </VBox>

@@ -12,15 +12,15 @@ public class CustomAttributeInstance {
         customAttribute = attribute;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public String getValue() {
         if (value == null) {
             value = customAttribute.getDefaultValue();
         }
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getName() {

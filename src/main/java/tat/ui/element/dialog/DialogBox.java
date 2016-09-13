@@ -19,7 +19,7 @@ public class DialogBox {
     private DialogOption[] options;
 
     public DialogBox(String title, String content) {
-        this(title, content, new DialogOption[] {DialogOption.OK});
+        this(title, content, new DialogOption[]{DialogOption.OK});
     }
 
     public DialogBox(String title, String content, DialogOption[] options) {
@@ -33,7 +33,7 @@ public class DialogBox {
         alert.initOwner(p);
 
         buttons = new ButtonType[options.length];
-        for (int i=0; i<buttons.length; i++) {
+        for (int i = 0; i < buttons.length; i++) {
             buttons[i] = options[i].getButton();
         }
         alert.getButtonTypes().setAll(buttons);
@@ -44,7 +44,7 @@ public class DialogBox {
 
     public DialogOption showAndGetResult() {
         Optional<ButtonType> result = alert.showAndWait();
-        for (int i=0; i<buttons.length; i++) {
+        for (int i = 0; i < buttons.length; i++) {
             if (buttons[i] == result.get()) {
                 return options[i];
             }

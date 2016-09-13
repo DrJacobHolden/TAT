@@ -10,7 +10,9 @@ import java.nio.file.Path;
  */
 public interface FileSystemElement {
     public void save() throws IOException;
+
     public String[] getFileExtensions();
+
     public File getFileForPath(Path path) throws FileNotFoundException;
 }
 

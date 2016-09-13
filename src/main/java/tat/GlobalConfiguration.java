@@ -9,19 +9,18 @@ import java.util.prefs.Preferences;
  */
 public class GlobalConfiguration {
 
+    private static final String CORPUS_PATH_KEY = "LastUsedCorpus";
     private static GlobalConfiguration instance;
+    private final Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
+
     public static GlobalConfiguration getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new GlobalConfiguration();
         return instance;
     }
 
-    private final Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
-
-    private static final String CORPUS_PATH_KEY = "LastUsedCorpus";
-
     public Path getCorpusPath() {
-        String stringPath =  prefs.get(CORPUS_PATH_KEY, "");
+        String stringPath = prefs.get(CORPUS_PATH_KEY, "");
         if (stringPath.length() == 0) {
             return null;
         } else {

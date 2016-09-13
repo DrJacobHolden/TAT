@@ -7,7 +7,10 @@ import tat.corpus.Segment;
  */
 public interface PathToken {
     String getToken();
+
     String getValue(Segment segment);
+
     String getRegex();
+
     void setValue(Segment segment, String val);
 }

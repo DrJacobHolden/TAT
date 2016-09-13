@@ -1,7 +1,5 @@
 package tat.ui.element.annotation;
 
-import tat.corpus.Recording;
-import tat.corpus.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
@@ -12,6 +10,8 @@ import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
+import tat.corpus.Recording;
+import tat.corpus.Segment;
 import tat.ui.PositionListener;
 
 import java.util.ArrayList;
@@ -30,10 +30,8 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 public class AnnotationDisplay extends StyleClassedTextArea implements PositionListener {
 
     public static final String DEFAULT_TEXT = "Annotation Missing Please Add Annotation";
-
-    private tat.ui.Position position;
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
-
+    private tat.ui.Position position;
     private Stack<TextState> undoStates = new Stack<>();
     private Stack<TextState> redoStates = new Stack<>();
     private TextState currentState;
@@ -46,7 +44,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     public AnnotationDisplay() {
         super();
-        setPadding(new Insets(0,0,0,0));
+        setPadding(new Insets(0, 0, 0, 0));
         setWrapText(true);
 
         setInputBindings();
@@ -67,7 +65,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
                 //Select whole segment if segment contains default text AND we are not in part of a triple click
                 // (or else the first segment will be selected).
-                if (getActiveAnnotation().isEmpty() && previousSegRange == null){
+                if (getActiveAnnotation().isEmpty() && previousSegRange == null) {
                     selectRange(getActiveAnnotation().range.getStart(), getActiveAnnotation().range.getEnd());
                 }
             }
@@ -109,7 +107,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         //Disable enter, shift or no shift
         Nodes.addInputMap(this, InputMap.consume(keyPressed(ENTER, SHIFT_ANY)));
         //Do not allow dragging text
-        setOnSelectionDrop(a -> {});
+        setOnSelectionDrop(a -> {
+        });
     }
 
     private boolean entireAnnotationSelected() {
@@ -120,11 +119,11 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
      * Move the cursor to either the next segment, or previous, specified by offset
      */
     private void maybeMoveCursorToSegmentOffset(int offset, boolean loopAround) {
-        int segmentNum = getActiveAnnotation().segment.getSegmentNumber()+offset;
+        int segmentNum = getActiveAnnotation().segment.getSegmentNumber() + offset;
         if (loopAround) {
-            segmentNum = ((segmentNum-1) % currentState.annotations.size()) + 1;
+            segmentNum = ((segmentNum - 1) % currentState.annotations.size()) + 1;
         }
-        
+
         Segment nextSegment = recording.getSegment(segmentNum);
         if (nextSegment != null) {
             position.setSelected(nextSegment, 0, nextSegment);
@@ -192,14 +191,14 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private void typedCharacter(String character) {
         //Do not register non printable characters
-        if(character.charAt(0) < 32 || character.charAt(0) > 126)
+        if (character.charAt(0) < 32 || character.charAt(0) > 126)
             return;
         insertTextAtCurrentPosition(character);
     }
 
     private void backspaceCharacter() {
 
-        if(getSelection().getLength() == 0 &&
+        if (getSelection().getLength() == 0 &&
                 (getSelection().getStart() == getActiveAnnotation().range.getStart())) {
             return;
         }
@@ -211,14 +210,14 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
         boolean single = localSelection.getLength() == 0;
 
-        if(single) {
-            localSelection = new IndexRange(localSelection.getStart()-1, localSelection.getEnd());
+        if (single) {
+            localSelection = new IndexRange(localSelection.getStart() - 1, localSelection.getEnd());
         }
 
         newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
         updateState(new TextState(currentState, getActiveAnnotation(), newText.toString()));
 
-        if(single) {
+        if (single) {
             selectRange(selection.getStart() - 1, selection.getStart() - 1);
         } else {
             selectRange(selection.getStart(), selection.getStart());
@@ -226,7 +225,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private void deletedCharacter() {
-        if(getSelection().getLength() == 0 &&
+        if (getSelection().getLength() == 0 &&
                 (getSelection().getEnd() == getActiveAnnotation().range.getEnd())) {
             return;
         }
@@ -236,8 +235,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         IndexRange selection = getSelection();
         IndexRange localSelection = getLocalSelection();
 
-        if(localSelection.getLength() == 0) {
-            localSelection = new IndexRange(localSelection.getStart(), localSelection.getEnd()+1);
+        if (localSelection.getLength() == 0) {
+            localSelection = new IndexRange(localSelection.getStart(), localSelection.getEnd() + 1);
         }
 
         newText.replace(localSelection.getStart(), localSelection.getEnd(), "");
@@ -256,7 +255,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
         if (getSelection().getStart() < getActiveAnnotation().range.getStart()) {
             newRange = new IndexRange(getActiveAnnotation().range.getStart(), newRange.getEnd());
         }
-        if(!newRange.equals(getSelection())) {
+        if (!newRange.equals(getSelection())) {
             selectRange(newRange.getStart(), newRange.getEnd());
         }
     }
@@ -323,7 +322,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     @Override
     public void positionChanged(Segment segment, int frame, Object initiator) {
         //We should always update our position in the text if this is the first positionChanged we recieve
-        if((initiator != this && segment != getSegmentForSelection(getSelection())) || firstSelect) {
+        if ((initiator != this && segment != getSegmentForSelection(getSelection())) || firstSelect) {
             firstSelect = false;
 
             Annotation active = getActiveAnnotation();
@@ -333,7 +332,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     public void setColours() {
-        for(Annotation a : currentState.annotations) {
+        for (Annotation a : currentState.annotations) {
             if (a.segment == position.getSegment()) {
                 setStyleClass(a.range.getStart(), a.range.getEnd(), "orange");
             } else {
@@ -357,16 +356,16 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private Annotation getAnnotationForSelection(IndexRange selection) {
-        for(Annotation a: currentState.annotations) {
-            if(isWithinRange(selection, a.range))
+        for (Annotation a : currentState.annotations) {
+            if (isWithinRange(selection, a.range))
                 return a;
         }
         return null;
     }
 
     private Annotation getActiveAnnotation() {
-        for(Annotation a: currentState.annotations) {
-            if(a.segment == position.getSegment()) {
+        for (Annotation a : currentState.annotations) {
+            if (a.segment == position.getSegment()) {
                 return a;
             }
         }
@@ -379,8 +378,8 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
     }
 
     private Segment getSegmentForSelection(IndexRange selection) {
-        for(Annotation a: currentState.annotations) {
-            if(isWithinRange(selection, a.range)) {
+        for (Annotation a : currentState.annotations) {
+            if (isWithinRange(selection, a.range)) {
                 return a.segment;
             }
         }
@@ -402,7 +401,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 annotations.add(a);
             }
             fullString = generateFullString();
-            selection = new IndexRange(0,0);
+            selection = new IndexRange(0, 0);
         }
 
         protected TextState(TextState old, Annotation changedAnnotation, String text) {
@@ -422,12 +421,12 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
                 annotations.add(updatedAnnotation);
             }
             fullString = generateFullString();
-            selection = new IndexRange(0,0);
+            selection = new IndexRange(0, 0);
         }
 
         private String generateFullString() {
             String intermediateString = "";
-            for(Annotation a : annotations) {
+            for (Annotation a : annotations) {
                 intermediateString = intermediateString + " " + a.text;
             }
             //Remove first space
@@ -462,7 +461,7 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
             }
 
             this.text = text;
-            range = new IndexRange(start, start+text.length());
+            range = new IndexRange(start, start + text.length());
         }
 
         private boolean isEmpty() {

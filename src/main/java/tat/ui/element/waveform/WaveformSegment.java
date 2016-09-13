@@ -1,13 +1,13 @@
 package tat.ui.element.waveform;
 
-import tat.audio.WaveformGenerator;
-import tat.corpus.Segment;
 import javafx.geometry.Insets;
 import javafx.scene.image.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
+import tat.audio.WaveformGenerator;
+import tat.corpus.Segment;
 import tat.ui.Colours;
 
 import javax.sound.sampled.AudioInputStream;
@@ -19,19 +19,12 @@ import java.io.IOException;
  */
 public class WaveformSegment extends StackPane {
 
-    private int noFrames;
-    private ImageView imageView;
-
     private final Background SELECTED_BACKGROUND = new Background(new BackgroundFill(Colours.ORANGE, CornerRadii.EMPTY, Insets.EMPTY));
     private final Background ODD_BACKGROUND = new Background(new BackgroundFill(Colours.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
     private final Background EVEN_BACKGROUND = new Background(new BackgroundFill(Colours.TERTIARY_GRAY, CornerRadii.EMPTY, Insets.EMPTY));
     private final Segment segment;
-
-    public double getImageWidth() {
-        return imageView.getImage().getWidth();
-    }
-
-    public double getImageHeight() { return imageView.getImage().getHeight(); }
+    private int noFrames;
+    private ImageView imageView;
 
     public WaveformSegment(Segment segment) throws IOException, UnsupportedAudioFileException {
         this.segment = segment;
@@ -43,6 +36,14 @@ public class WaveformSegment extends StackPane {
         this.noFrames = noFrames;
         this.segment = segment;
         addImageView(image);
+    }
+
+    public double getImageWidth() {
+        return imageView.getImage().getWidth();
+    }
+
+    public double getImageHeight() {
+        return imageView.getImage().getHeight();
     }
 
     private void addImageView(Image image) {
@@ -86,11 +87,11 @@ public class WaveformSegment extends StackPane {
     }
 
     public int getFrameForPosition(double x) {
-        return (int) ((x/getWidth()) * noFrames);
+        return (int) ((x / getWidth()) * noFrames);
     }
 
     public double getPositionForFrame(int frame) {
-        return (double) frame/noFrames * getWidth();
+        return (double) frame / noFrames * getWidth();
     }
 
     public WaveformSegment split(Segment newSegment, int frame) {
@@ -101,7 +102,7 @@ public class WaveformSegment extends StackPane {
         int height = (int) currentImage.getHeight();
         //x, y, width, height
         Image image1 = new WritableImage(reader, 0, 0, splitPos, height);
-        Image image2 = new WritableImage(reader, splitPos, 0, (int)currentImage.getWidth() - splitPos, height);
+        Image image2 = new WritableImage(reader, splitPos, 0, (int) currentImage.getWidth() - splitPos, height);
 
         //Update this view
         imageView.setImage(image1);
@@ -112,14 +113,14 @@ public class WaveformSegment extends StackPane {
 
     private Image joinImages(Image image1, Image image2) {
         //Create image
-        WritableImage joinedImage = new WritableImage((int)(image1.getWidth()+image2.getWidth()), (int)image1.getHeight());
+        WritableImage joinedImage = new WritableImage((int) (image1.getWidth() + image2.getWidth()), (int) image1.getHeight());
         PixelWriter writer = joinedImage.getPixelWriter();
         //Write image 1
         PixelReader reader1 = image1.getPixelReader();
-        writer.setPixels(0, 0, (int)image1.getWidth(), (int)image1.getHeight(), reader1, 0, 0);
+        writer.setPixels(0, 0, (int) image1.getWidth(), (int) image1.getHeight(), reader1, 0, 0);
         //Write image 2 to the right of image 1
         PixelReader reader2 = image2.getPixelReader();
-        writer.setPixels((int) image1.getWidth(), 0, (int)image2.getWidth(), (int)image2.getHeight(), reader2, 0, 0);
+        writer.setPixels((int) image1.getWidth(), 0, (int) image2.getWidth(), (int) image2.getHeight(), reader2, 0, 0);
 
         return joinedImage;
     }

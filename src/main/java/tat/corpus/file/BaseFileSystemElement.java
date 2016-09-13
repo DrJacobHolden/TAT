@@ -11,7 +11,7 @@ public abstract class BaseFileSystemElement implements FileSystemElement {
 
     public File getFileForPath(Path path) throws FileNotFoundException {
         for (String ext : getFileExtensions()) {
-            File possibleFile = new File(path.toString()+ext);
+            File possibleFile = new File(path.toString() + ext);
             if (path.toString().endsWith(ext)) {
                 return path.toFile();
             } else if (possibleFile.exists()) {

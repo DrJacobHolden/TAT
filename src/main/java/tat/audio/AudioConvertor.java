@@ -22,7 +22,7 @@ public class AudioConvertor {
                 convertedFile.deleteOnExit();
                 myConverter.convert(input.getPath(), convertedFile.getPath());
                 input = convertedFile;
-            } catch (JavaLayerException e){
+            } catch (JavaLayerException e) {
                 e.printStackTrace();
                 throw new UnsupportedAudioFileException();
             }

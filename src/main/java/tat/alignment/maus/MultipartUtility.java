@@ -14,11 +14,12 @@ import java.util.List;
 /**
  * This utility class provides an abstraction layer for sending multipart HTTP
  * POST requests to a web server.
+ *
  * @author www.codejava.net
  */
 public class MultipartUtility {
-    private final String boundary;
     private static final String LINE_FEED = "\r\n";
+    private final String boundary;
     private HttpURLConnection httpConn;
     private String charset;
     private OutputStream outputStream;
@@ -73,11 +74,11 @@ public class MultipartUtility {
     /**
      * Adds a upload audioStream section to the request
      *
-     * @param fieldName name attribute in <input type="file" name="..." />
+     * @param fieldName   name attribute in <input type="file" name="..." />
      * @param audioStream a stream to be uploaded
      */
     public void addAudioPart(String fieldName, String audioName, AudioInputStream audioStream)
-        throws IOException {
+            throws IOException {
         writer.append("--" + boundary).append(LINE_FEED);
         writer.append(
                 "Content-Disposition: form-data; name=\"" + fieldName
