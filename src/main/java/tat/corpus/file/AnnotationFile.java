@@ -69,6 +69,7 @@ public class AnnotationFile extends BaseFileSystemElement {
             //Ensure directory exists
             saveFile.toPath().getParent().toFile().mkdirs();
             PrintWriter out = new PrintWriter(saveFile);
+            out.write(annotation);
             out.close();
         } else {
             //Delete empty annotation if it exists
