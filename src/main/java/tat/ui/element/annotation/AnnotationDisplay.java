@@ -83,7 +83,12 @@ public class AnnotationDisplay extends StyleClassedTextArea implements PositionL
 
     private void setInputBindings() {
         //Handle regular key typed
-        Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e -> typedCharacter(e.getCharacter())));
+        Nodes.addInputMap(this, InputMap.consume((KeyEvent.KEY_TYPED), e ->
+        {
+                if (!e.isControlDown()){
+                    typedCharacter(e.getCharacter());
+                }
+        }));
         //Handle backspace
         Nodes.addInputMap(this, InputMap.consume(keyPressed(BACK_SPACE), e -> backspaceCharacter()));
         //Handle delete
